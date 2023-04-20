@@ -1,5 +1,5 @@
 import { doc, setDoc } from "firebase/firestore";
-import { useContext, useEffect, useTransition } from "react";
+import { useContext, useEffect } from "react";
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { UserData } from "../App";
