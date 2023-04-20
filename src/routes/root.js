@@ -13,6 +13,7 @@ const Root = () => {
 
     const {user, setUser} = useContext(UserData);
     console.log(user)
+    
     if (user == null) {
         return (
             <div>

@@ -1,4 +1,4 @@
-import { BrowserRouter, Link, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import React from "react";
 import Redirect from "./routes/redirect";
@@ -20,9 +20,11 @@ const [user, setUser] = React.useState(null)
               </UserData.Provider>
             }
           />
-          <Route path="/redirect/exchange_token" element={<UserData.Provider value={{user, setUser}}>
+          <Route path="/redirect/exchange_token" element={
+            <UserData.Provider value={{user, setUser}}>
                 <Redirect />
-              </UserData.Provider>} />
+            </UserData.Provider>}
+            />
         </Routes>
     </BrowserRouter>
   );

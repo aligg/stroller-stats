@@ -21,7 +21,7 @@ const Redirect = () => {
             const requestOptions = {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ title: 'React Hooks POST Request Example' })
+                body: JSON.stringify({})
             };
             const response = await fetch(`https://www.strava.com/api/v3/oauth/token?client_id=${REACT_APP_CLIENT_ID}&client_secret=${REACT_APP_CLIENT_SECRET}&code=${authToken}&grant_type=authorization_code`, requestOptions)
             const resp = await response.json()
@@ -34,9 +34,9 @@ const Redirect = () => {
                 expires_at: resp.expires_at,
                 first_name: resp.athlete.firstname
             }
-            
+                
             setUser(userData)
-            
+                
             try {
                 await setDoc(doc(db, "users", `${user_id}`), userData)
                 console.log("User written with ID: ", user_id);
