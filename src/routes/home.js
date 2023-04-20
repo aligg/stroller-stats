@@ -1,7 +1,10 @@
-import React from "react";
+import React, { useContext } from "react";
+
+import { UserData } from "../App";
 
 const Home = (props) => {
-    
+    const {user, setUser} = useContext(UserData);
+
     // const [user, setUser] = React.useState(null)
     console.log("props", props)
     return (
