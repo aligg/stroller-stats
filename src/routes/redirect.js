@@ -12,7 +12,6 @@ const { REACT_APP_CLIENT_ID, REACT_APP_CLIENT_SECRET } = process.env;
 const Redirect = () => {
     const location = useLocation();
     const navigate = useNavigate();
-    const {user, setUser} = useContext(UserData);
 
     useEffect(() => {
         const authenticate = async () => {
@@ -25,8 +24,9 @@ const Redirect = () => {
             };
             const response = await fetch(`https://www.strava.com/api/v3/oauth/token?client_id=${REACT_APP_CLIENT_ID}&client_secret=${REACT_APP_CLIENT_SECRET}&code=${authToken}&grant_type=authorization_code`, requestOptions)
             const resp = await response.json()
-            console.log(resp)
+            // TODO: better err handling
             const user_id = resp.athlete.id
+            localStorage.setItem("user_id", `${resp.athlete.id}`);
             const userData = {
                 access_token: resp.access_token, 
                 refresh_token: resp.refresh_token,
@@ -34,9 +34,7 @@ const Redirect = () => {
                 expires_at: resp.expires_at,
                 first_name: resp.athlete.firstname
             }
-                
-            setUser(userData)
-                
+                                
             try {
                 await setDoc(doc(db, "users", `${user_id}`), userData)
                 console.log("User written with ID: ", user_id);
@@ -46,7 +44,7 @@ const Redirect = () => {
             navigate("/")
        }
     authenticate()
-    }, [location.search, navigate, setUser, user])
+    }, [location.search, navigate])
     
     return (
         <div>Loading</div>

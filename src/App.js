@@ -1,8 +1,8 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
+import Home from "./routes/home";
 import React from "react";
 import Redirect from "./routes/redirect";
-import Root from "./routes/root";
 
 export const UserData = React.createContext();
 
@@ -16,7 +16,7 @@ const [user, setUser] = React.useState(null)
             path="/"
             element={
               <UserData.Provider value={{user, setUser}}>
-                <Root />
+                <Home />
               </UserData.Provider>
             }
           />
