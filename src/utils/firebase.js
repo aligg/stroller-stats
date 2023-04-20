@@ -2,7 +2,7 @@ import { getFirestore } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 
 const firebaseConfig = {
-  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+  apiKey: "AIzaSyBpszAGcpwbWjbwH50F44Q3gy2Jq0VmuE4",
   authDomain: "stroller-stats.firebaseapp.com",
   projectId: "stroller-stats",
   storageBucket: "stroller-stats.appspot.com",
