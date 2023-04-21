@@ -68,3 +68,9 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+
+Ideas for webhooks:
+https://github.com/vyper/biketastic
+https://medium.com/@eric.l.m.thomas/setting-up-strava-webhooks-e8b825329dc7
+https://www.curtiscode.dev/post/project/displaying-strava-stats-using-webhooks/
