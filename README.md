@@ -71,6 +71,14 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/t
 
 
 Ideas for webhooks:
+https://firebase.google.com/docs/functions/get-started
 https://github.com/vyper/biketastic
 https://medium.com/@eric.l.m.thomas/setting-up-strava-webhooks-e8b825329dc7
 https://www.curtiscode.dev/post/project/displaying-strava-stats-using-webhooks/
+https://github.com/curtiscde/stravaytd/tree/main/app/functions/webhook
+https://github.com/plinck/TeamATC/blob/050a0147e38f4bab4eea481db403d55a7330afb0/client/functions/src/modules/webhook.ts
+https://github.com/caiismyname/atalanta/blob/3a7e6fe1d267c6c16ac12eb88546ac91c5058c02/functions/index.js
+
+https://github.com/curtiscde/stravaytd/blob/b9ba5e7aab721bb8b87136d3f949b2ed4e3428d2/bin/updatesub.sh
+
+subscription id: {"id":239616}
