@@ -24,6 +24,10 @@ const getAccessToken = async (refreshToken) => {
   }).then((res) => res.json()).then((res) => res.access_token);
 };
 
+const getLastActivity = async (accessToken, userId) => {
+  console.log(accessToken, userId)
+}
+
 /**
  * Webhooks - the GET method must respond to an initial request to create
  * the subscription. See: https://developers.strava.com/docs/webhooks/
@@ -65,6 +69,7 @@ exports.stravaWebhook = functions.https.onRequest((request, response) => {
 const handlePost = async (userId) => {
   const refreshToken = await getRefreshToken(userId);
   const accessToken = await getAccessToken(refreshToken);
+  const recentActivity = await getLastActivity(accessToken, userId)
   // TODO: get latest activities and update db
 };
 
