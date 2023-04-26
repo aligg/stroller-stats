@@ -24,7 +24,6 @@ const getRefreshToken = async (userId) => {
       .limit(1)
       .get()
       .then((data) => {
-        functions.logger.info("DATA", data.docs);
         return data.docs[0].get("refresh_token");
       });
 };
@@ -43,8 +42,6 @@ const getAccessToken = async (refreshToken) => {
   }).then((res) => res.json()).then((res) => res.access_token);
 };
 const getLastActivity = async (accessToken, activityId) => {
-  functions.logger.info("in get last activity", typeof activityId);
-
   const response = await fetch(`https://www.strava.com/api/v3/activities/${activityId}?include_all_efforts=false`, {
     headers: {authorization: `Bearer ${accessToken}`},
   });
@@ -81,7 +78,6 @@ const addActivityToDB = (activityData) => {
  *
  */
 exports.stravaWebhook = functions.https.onRequest((request, response) => {
-  functions.logger.info("got a request");
   if (request.method === "POST") {
     functions.logger.info("Received webhook event", {
       query: request.query,
@@ -101,7 +97,7 @@ exports.stravaWebhook = functions.https.onRequest((request, response) => {
 
     if (mode && token) {
       if (mode === "subscribe" && token === VERIFY_TOKEN) {
-        functions.logger.info("WEBHOOK_VERIFIED");
+        functions.logger.info("Webhook verified");
         response.status(200).json({"hub.challenge": challenge});
       } else {
         response.sendStatus(403);
