@@ -50,13 +50,27 @@ const getLastActivity = async (accessToken, activityId) => {
   });
   const data = await response.json();
   return {
+    activity_id: data["id"],
     title: data["name"],
     distance: data["distance"],
     sport_type: data["sport_type"],
     start_date: data["start_date"],
     average_speed: data["average_speed"],
     description: data["description"],
+    is_stroller: data["description"].toLowerCase().includes("strollerstats"),
   };
+};
+
+const addActivityToDB = (activityData) => {
+  if (activityData.sport_type === "Run" || activityData.sport_type === "Walk") {
+    db.collection("activities").doc(activityData.activity_id.toString())
+        .set(activityData).then(() => {
+          functions.logger.info("Wrote to DB", activityData);
+        });
+  } else {
+    // eslint-disable-next-line max-len
+    functions.logger.info(`Skipped write to DB for ${activityData.activity_id} sport type ${activityData.sport_type}`);
+  }
 };
 
 /**
@@ -100,10 +114,10 @@ exports.stravaWebhook = functions.https.onRequest((request, response) => {
 
 const handlePost = async (userId, activityId) => {
   const refreshToken = await getRefreshToken(userId);
-  functions.logger.info("REFRESH TOKEN", refreshToken);
   const accessToken = await getAccessToken(refreshToken);
   const recentActivity = await getLastActivity(accessToken, activityId);
   // TODO: get latest activities and update db
+  addActivityToDB(recentActivity);
   console.log(recentActivity);
 };
 
