@@ -7,6 +7,12 @@ export const useUser = (user_id) => {
 
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true)
+
+    // db.collection("users").limit(1).get()
+    // .then((data) => {
+    //   console.log("DATA", data.docs);
+    //   data.docs[0].get("refresh_token");
+    // });
   
     useEffect(() => {
 

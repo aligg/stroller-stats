@@ -1,10 +1,9 @@
 import { doc, setDoc } from "firebase/firestore";
-import { useContext, useEffect } from "react";
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import { UserData } from "../App";
 import {db} from '../utils/firebase'
 import { parseAuthData } from '../utils/parseAuthData';
+import { useEffect } from "react";
 
 const { REACT_APP_CLIENT_ID, REACT_APP_CLIENT_SECRET } = process.env;
 
@@ -15,8 +14,8 @@ const Redirect = () => {
 
     useEffect(() => {
         const authenticate = async () => {
-            const [authToken, scope] = parseAuthData(location.search) // find token in URL
-
+            const [authToken, scopes] = parseAuthData(location.search) // find token in URL
+            console.log(scopes)
             const requestOptions = {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -28,9 +27,10 @@ const Redirect = () => {
             const user_id = resp.athlete.id
             localStorage.setItem("user_id", `${resp.athlete.id}`);
             const userData = {
+                user_id: user_id,
                 access_token: resp.access_token, 
                 refresh_token: resp.refresh_token,
-                scopes: scope,
+                scopes: scopes,
                 expires_at: resp.expires_at,
                 first_name: resp.athlete.firstname
             }

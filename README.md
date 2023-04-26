@@ -82,3 +82,32 @@ https://github.com/caiismyname/atalanta/blob/3a7e6fe1d267c6c16ac12eb88546ac91c50
 https://github.com/curtiscde/stravaytd/blob/b9ba5e7aab721bb8b87136d3f949b2ed4e3428d2/bin/updatesub.sh
 
 subscription id: {"id":239616}
+
+curl -X POST https://us-central1-stroller-stats.cloudfunctions.net/stravaWebhook -H ‘Content-Type: application/json’
+
+ -d {
+      “aspect_type”: “create”,
+      “event_time”: 1682356786,
+      “object_id”: 8955721197,
+      “object_type”: “activity”,
+      “owner_id”: 3438509,
+      “subscription_id”: 239616
+    }
+
+    curl -X POST https://www.strava.com/api/v3/push_subscriptions -F client_id=1875 -F client_secret=2d442b8ba100c73169fa095cea89f34e730aafeb -F callback_url='https://us-central1-stroller-stats.cloudfunctions.net/stravaWebhook' -F verify_token=STROLLER-STATS
+
+
+
+    curl -X POST https://localhost:5001/stravaWebhook -H 'Content-Type: application/json' \
+ -d '{
+      "aspect_type": "create",
+      "event_time": 1682356786,
+      "object_id": 8948950859,
+      "object_type": "activity",
+      "owner_id": 3438509,
+      "subscription_id": 239616
+    }'
+
+
+us-central1-stroller-stats.cloudfunctions.net
+
