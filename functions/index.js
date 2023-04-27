@@ -53,6 +53,7 @@ const getLastActivity = async (accessToken, activityId) => {
     sport_type: data["sport_type"],
     start_date: data["start_date"],
     average_speed: data["average_speed"],
+    user_id: data["athlete"]["id"],
     description: data["description"],
     is_stroller: data["description"].toLowerCase().includes("strollerstats"),
   };

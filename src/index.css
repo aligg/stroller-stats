@@ -1,0 +1,23 @@
+body {
+    font-family: 'Inter';
+    padding: 30px;
+    max-width: 80ch;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+tr {
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    text-align: left;
+    font-weight: bolder;
+}
+
+th, td {
+    padding: 10px;
+  }

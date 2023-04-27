@@ -1,4 +1,5 @@
 import React from "react";
+import { useData } from "../hooks/useData";
 import {useUser} from "../hooks/useUser"
 
 const Home = () => {
@@ -10,6 +11,10 @@ const Home = () => {
 
     const user_id = localStorage.getItem("user_id");
     const [user, loading] = useUser(user_id)
+    const [data, dataLoading] = useData(user_id)
+    console.log(data)
+
+    const year = new Date().getFullYear()
     
     if (user_id == null) {
         return (
@@ -20,13 +25,31 @@ const Home = () => {
         );
     }
     
-    if (loading) {
+    if (loading || dataLoading) {
         return (<div>Loading</div>)
     }
     
-    
     else {
-        return (<div>Hello {user.first_name} </div>)
+        return (
+            <div>
+                <h1>Stroller Stats</h1>
+                <p>Hey {user.first_name}!</p>
+                <table>
+                    <tbody>
+                        <tr>
+                            <th>{year}</th>
+                        </tr>  
+                        <tr>
+                            <td>Total stroller run miles</td>
+                            <td>{Math.round(data["total_run_miles"])}</td>
+                        </tr>
+                        <tr>
+                            <td>Total stroller walk miles</td>
+                            <td>{Math.round(data["total_walk_miles"])}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>)
     }
     
 };
