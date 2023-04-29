@@ -46,6 +46,11 @@ const getLastActivity = async (accessToken, activityId) => {
     headers: {authorization: `Bearer ${accessToken}`},
   });
   const data = await response.json();
+  let isStroller = false;
+  // eslint-disable-next-line max-len
+  if (data["description"]) {
+    isStroller = data["description"].toLowerCase().includes("strollerstats");
+  }
   return {
     activity_id: data["id"],
     title: data["name"],
@@ -55,12 +60,13 @@ const getLastActivity = async (accessToken, activityId) => {
     average_speed: data["average_speed"],
     user_id: data["athlete"]["id"],
     description: data["description"],
-    is_stroller: data["description"].toLowerCase().includes("strollerstats"),
+    is_stroller: isStroller,
   };
 };
 
 const addActivityToDB = (activityData) => {
-  if (activityData.sport_type === "Run" || activityData.sport_type === "Walk") {
+  if (activityData.is_stroller &&
+    (activityData.sport_type === "Run" || activityData.sport_type === "Walk")) {
     db.collection("activities").doc(activityData.activity_id.toString())
         .set(activityData).then(() => {
           functions.logger.info("Wrote to DB", activityData);
@@ -69,6 +75,51 @@ const addActivityToDB = (activityData) => {
     // eslint-disable-next-line max-len
     functions.logger.info(`Skipped write to DB for ${activityData.activity_id} sport type ${activityData.sport_type}`);
   }
+};
+
+const retrieveYTDStrollerMiles = async (recentActivity) => {
+  const userId = recentActivity.user_id;
+  const sportType = recentActivity.sport_type;
+  const currYear = new Date().getFullYear().toString();
+
+  const activityRef = db.collection("activities")
+      .where("user_id", "==", userId)
+      .where("sport_type", "==", sportType)
+      .where("start_date", ">", currYear);
+  const activities = await activityRef.get();
+
+  let totalMeters = 0;
+  for (const doc of activities.docs) {
+    const data = doc.data();
+    totalMeters += data.distance;
+  }
+  const totalMiles = totalMeters * 0.000621371192; // Convert to miles
+  functions.logger.info(`Got total miles ${totalMiles}`);
+
+  return Math.round(totalMiles);
+};
+
+const updateDescription = async (recentActivity, accessToken) => {
+  const description = recentActivity.description;
+  const activityId = recentActivity.activity_id;
+  const totalMiles = await retrieveYTDStrollerMiles(recentActivity);
+  // eslint-disable-next-line max-len
+  const updateDescription = description.concat(" ", `strollerstats.com - ${totalMiles} YTD Stroller${recentActivity.sport_type} miles`);
+  functions.logger.info(`about to update desc with ${updateDescription}`);
+  const requestOptions = {
+    method: "PUT",
+    headers: {authorization: `Bearer ${accessToken}`},
+    body: {description: updateDescription},
+  };
+  fetch(`https://www.strava.com/api/v3/activities/${activityId}`, requestOptions).then((response) => {
+    if (response.ok) {
+      response.json().then((data) => {
+        functions.logger.info("Updated description with", data);
+      });
+    }
+  }).catch((err) => {
+    functions.logger.info(err);
+  });
 };
 
 /**
@@ -113,8 +164,9 @@ const handlePost = async (userId, activityId) => {
   const refreshToken = await getRefreshToken(userId);
   const accessToken = await getAccessToken(refreshToken);
   const recentActivity = await getLastActivity(accessToken, activityId);
-  // TODO: get latest activities and update db
-  addActivityToDB(recentActivity);
-  console.log(recentActivity);
+  if (recentActivity.is_stroller) {
+    addActivityToDB(recentActivity);
+    updateDescription(recentActivity, accessToken);
+  }
 };
 
