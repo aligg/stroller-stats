@@ -1,6 +1,6 @@
 const LoginContent = () => {
     const { REACT_APP_CLIENT_ID } = process.env;
-    const redirectUrl = "http://localhost:3000/redirect"
+    const redirectUrl = "http://strollerstats.com/redirect"
 
     const handleLogin = () => {
         window.location = `http://www.strava.com/oauth/authorize?client_id=${REACT_APP_CLIENT_ID}&response_type=code&redirect_uri=${redirectUrl}/exchange_token&approval_prompt=force&scope=read,activity:read,activity:write`;
