@@ -77,15 +77,19 @@ const addActivityToDB = (activityData) => {
   }
 };
 
-const retrieveYTDStrollerMiles = async (recentActivity) => {
+const retrieveMonthlyStrollerMiles = async (recentActivity) => {
   const userId = recentActivity.user_id;
   const sportType = recentActivity.sport_type;
-  const currYear = new Date().getFullYear().toString();
+  const date = new Date();
+  const firstDayOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+  const lastDayOfMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0);
 
   const activityRef = db.collection("activities")
       .where("user_id", "==", userId)
       .where("sport_type", "==", sportType)
-      .where("start_date", ">", currYear);
+      .where("start_date", ">", firstDayOfMonth)
+      .where("start_date", "<", lastDayOfMonth)
+      .where("is_stroller", "==", true);
   const activities = await activityRef.get();
 
   let totalMeters = 0;
@@ -102,9 +106,9 @@ const retrieveYTDStrollerMiles = async (recentActivity) => {
 const updateDescription = async (recentActivity, accessToken) => {
   const description = recentActivity.description;
   const activityId = recentActivity.activity_id;
-  const totalMiles = await retrieveYTDStrollerMiles(recentActivity);
+  const totalMiles = await retrieveMonthlyStrollerMiles(recentActivity);
   // eslint-disable-next-line max-len
-  const updatedDescription = description.concat(" ", `strollerstats.com - ${totalMiles} YTD Stroller ${recentActivity.sport_type} miles`);
+  const updatedDescription = description.concat(" ", `${totalMiles} Stroller ${recentActivity.sport_type} miles so far this month via strollerstats.com`);
   const requestOptions = {
     method: "PUT",
     // eslint-disable-next-line max-len
