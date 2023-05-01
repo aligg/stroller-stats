@@ -104,18 +104,21 @@ const updateDescription = async (recentActivity, accessToken) => {
   const activityId = recentActivity.activity_id;
   const totalMiles = await retrieveYTDStrollerMiles(recentActivity);
   // eslint-disable-next-line max-len
-  const updateDescription = description.concat(" ", `strollerstats.com - ${totalMiles} YTD Stroller${recentActivity.sport_type} miles`);
-  functions.logger.info(`about to update desc with ${updateDescription}`);
+  const updatedDescription = description.concat(" ", `strollerstats.com - ${totalMiles} YTD Stroller ${recentActivity.sport_type} miles`);
   const requestOptions = {
     method: "PUT",
-    headers: {authorization: `Bearer ${accessToken}`},
-    body: {description: updateDescription},
+    // eslint-disable-next-line max-len
+    headers: {"authorization": `Bearer ${accessToken}`, "Content-Type": "application/json"},
+    body: JSON.stringify({description: updatedDescription}),
   };
   fetch(`https://www.strava.com/api/v3/activities/${activityId}`, requestOptions).then((response) => {
+    functions.logger.info("RESP", response);
     if (response.ok) {
       response.json().then((data) => {
-        functions.logger.info("Updated description with", data);
+        functions.logger.info("Updated description", data);
       });
+    } else {
+      functions.logger.info("ELSE");
     }
   }).catch((err) => {
     functions.logger.info(err);

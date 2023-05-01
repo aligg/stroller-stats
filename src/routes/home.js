@@ -1,4 +1,7 @@
+import About from "../components/About";
+import Nav from "../components/Nav";
 import React from "react";
+import Stats from "../components/Stats";
 import { useData } from "../hooks/useData";
 import {useUser} from "../hooks/useUser"
 
@@ -12,45 +15,36 @@ const Home = () => {
     const user_id = localStorage.getItem("user_id");
     const [user, loading] = useUser(user_id)
     const [data, dataLoading] = useData(user_id)
+    
+    const renderContent = () => {
+        if (user_id == null) {
+            return (
+                <div>
+                    <About />
+                    <button onClick={handleLogin}>Connect with Strava</button>
+                </div>
+            );
+        }
+        
+        if (loading || dataLoading) {
+            return (<div>Loading</div>)
+        }
 
-    const year = new Date().getFullYear()
-    
-    if (user_id == null) {
-        return (
-            <div>
-                <h1>Stroller Stats</h1>
-                <button onClick={handleLogin}>Connect with Strava</button>
-            </div>
-        );
+        else {
+            return (
+                <><p>Hey {user.first_name}!</p><Stats data={data} /></>
+            )
+        }
     }
-    
-    if (loading || dataLoading) {
-        return (<div>Loading</div>)
-    }
-    
-    else {
-        return (
-            <div>
-                <h1>Stroller Stats</h1>
-                <p>Hey {user.first_name}!</p>
-                <table>
-                    <tbody>
-                        <tr>
-                            <th>{year}</th>
-                        </tr>  
-                        <tr>
-                            <td>Total stroller run miles</td>
-                            <td>{Math.round(data["total_run_miles"])}</td>
-                        </tr>
-                        <tr>
-                            <td>Total stroller walk miles</td>
-                            <td>{Math.round(data["total_walk_miles"])}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>)
-    }
-    
+
+    return (
+        <div id="container">
+            <Nav loggedIn={!!user_id}/>
+            <main>
+                {renderContent()}
+            </main>
+            <footer><p id="footer-text">❤️Made during naptime by <a href="https://github.com/aligg" target="_blank" rel="noreferrer">aligg</a></p></footer>
+        </div>)
 };
 
 export default Home;

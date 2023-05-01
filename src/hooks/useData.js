@@ -49,9 +49,9 @@ export const useData = (user_id) => {
                     dataToReturn["total_walk_miles"] += getMiles(dbData.distance)
                     walkSpeeds.push(dbData.average_speed)
                 }   
-            runSpeeds.forEach((speed) => {
-                console.log(getMinutesPerMile(speed))
-            })
+            // runSpeeds.forEach((speed) => {
+            //     console.log(getMinutesPerMile(speed))
+            // })
             const averageRunSpeed = calculateAverageSpeed(runSpeeds);
             const averageWalkSpeed = calculateAverageSpeed(walkSpeeds);
             dataToReturn["average_run_speed"] = averageRunSpeed
