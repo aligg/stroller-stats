@@ -112,13 +112,12 @@ const updateDescription = async (recentActivity, accessToken) => {
     body: JSON.stringify({description: updatedDescription}),
   };
   fetch(`https://www.strava.com/api/v3/activities/${activityId}`, requestOptions).then((response) => {
-    functions.logger.info("RESP", response);
     if (response.ok) {
       response.json().then((data) => {
         functions.logger.info("Updated description", data);
       });
     } else {
-      functions.logger.info("ELSE");
+      // pass
     }
   }).catch((err) => {
     functions.logger.info(err);
