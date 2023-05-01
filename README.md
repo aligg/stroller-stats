@@ -1,6 +1,6 @@
 # Stroller Stats
 
-This projeect integrates with the Strava API to display stroller run data. It is deployed at [StrollerStats.com](https://strollerstats.com). The project was bootstrapped with Create-React-App on the frontend and Google Firebase Functions and Firestore for the backend
+This project integrates with the Strava API to display stroller run data. It is deployed at [StrollerStats.com](https://strollerstats.com). The project was bootstrapped with Create-React-App on the frontend and Google Firebase Functions and Firestore for the backend
 
 ## Running Locally
 
@@ -8,4 +8,5 @@ From the project directory run `npm  start` to run the project locally. Open [ht
 
 From the functions directory, run `firebase deploy --only functions` in order to deploy function changes to google firebase.
 
-## Feature requests and code contriutions welcome - File an issue!
+## Feature requests and code contributions
+These are welcome! File an issue and we'll see what we can do.
