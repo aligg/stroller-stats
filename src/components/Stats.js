@@ -2,7 +2,7 @@ const Stats = ({data}) => {
     const year = new Date().getFullYear()
 
     return (
-        <table>
+    <table>
         <tbody>
             <tr>
                 <th>{year}</th>
@@ -14,6 +14,10 @@ const Stats = ({data}) => {
             <tr>
                 <td>Total stroller walk miles</td>
                 <td>{Math.round(data["total_walk_miles"])}</td>
+            </tr>
+            <tr>
+                <td>Average pace with stroller</td>
+                <td>Coming soon</td>
             </tr>
         </tbody>
     </table>
