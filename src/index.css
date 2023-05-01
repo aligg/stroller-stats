@@ -92,10 +92,6 @@ a:hover {
   text-underline-offset: 3px;
 }
 
-a:visited {
-    color: #90e0ef;
-}
-
 button {
   align-items: center;
   appearance: none;

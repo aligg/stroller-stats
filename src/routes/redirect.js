@@ -15,7 +15,6 @@ const Redirect = () => {
     useEffect(() => {
         const authenticate = async () => {
             const [authToken, scopes] = parseAuthData(location.search) // find token in URL
-            console.log(scopes)
             const requestOptions = {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -26,6 +25,7 @@ const Redirect = () => {
             // TODO: better err handling
             const user_id = resp.athlete.id
             localStorage.setItem("user_id", `${resp.athlete.id}`);
+            
             const userData = {
                 user_id: user_id,
                 access_token: resp.access_token, 
@@ -37,17 +37,16 @@ const Redirect = () => {
                                 
             try {
                 await setDoc(doc(db, "users", `${user_id}`), userData)
-                console.log("User written with ID: ", user_id);
                 } catch (e) {
                 console.error("Error adding user: ", e);
             }
-            navigate("/")
+            navigate("/", {state: "justLoggedIn"})
        }
     authenticate()
     }, [location.search, navigate])
     
     return (
-        <div>Loading</div>
+        <main>Loading</main>
     )
 }
 

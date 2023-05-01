@@ -1,5 +1,4 @@
 import About from "../components/About";
-import Nav from "../components/Nav";
 import React from "react";
 import Stats from "../components/Stats";
 import { useData } from "../hooks/useData";
@@ -27,7 +26,7 @@ const Home = () => {
         }
         
         if (loading || dataLoading) {
-            return (<div>Loading</div>)
+            return (<main>Loading</main>)
         }
 
         else {

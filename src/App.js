@@ -8,9 +8,7 @@ import React from "react";
 import Redirect from "./routes/redirect";
 
 export default function App() {
-
   const user_id = localStorage.getItem("user_id");
-
 
   return (
     <BrowserRouter>
@@ -23,7 +21,7 @@ export default function App() {
                 <Home />
             }
           />
-          <Route path="/redirect/exchange_token" element={
+            <Route path="/redirect/exchange_token" element={
                 <Redirect />
             }
             />
