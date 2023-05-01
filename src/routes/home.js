@@ -38,13 +38,10 @@ const Home = () => {
     }
 
     return (
-        <div id="container">
-            <Nav loggedIn={!!user_id}/>
             <main>
                 {renderContent()}
             </main>
-            <footer><p id="footer-text">❤️Made during naptime by <a href="https://github.com/aligg" target="_blank" rel="noreferrer">aligg</a></p></footer>
-        </div>)
+        )
 };
 
 export default Home;
