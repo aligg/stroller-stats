@@ -8,7 +8,6 @@ const getMiles = (meters) =>{
 }
 
 const calculateAverageSpeed = (runs) => {
-    // console.log(runs)
     const n = runs.length;
     const reciprocalsSum = runs.reduce((sum, speed) => sum + 1 / speed, 0);
     const harmonicMean = n / reciprocalsSum;
@@ -20,7 +19,6 @@ const calculateAverageSpeed = (runs) => {
 
 const getMinutesPerMile = (metersPerSecond) => {
     const milesPerHour = metersPerSecond * 2.23694;
-    // console.log(milesPerHour)
     const minutesPerMile = 60 / milesPerHour;
     return minutesPerMile;
 }

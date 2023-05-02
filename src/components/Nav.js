@@ -1,20 +1,28 @@
 import {useLocation} from "react-router-dom"
+/* eslint-disable react/jsx-no-comment-textnodes */
+import { useState } from "react"
 
 const Nav = ({loggedIn}) => {
     const location = useLocation()
     const isLoggedIn = loggedIn || location.state
+    const [menuVisible, setDisplayMenu] = useState(false)
+    const toggleMenu = () => {
+        setDisplayMenu(!menuVisible)
+    }
 
     return (
-        <nav className="navMenu">
+        <nav className="navbar">
             <a href="/"><img src="/logo.png" alt="stroller" height="50px"/></a>
-            <div id="links-container">
-                {isLoggedIn && <a href="/">Home</a>}
-                {isLoggedIn && <a href="/about">About</a>}
-                {isLoggedIn && <a href="/" onClick={() => window.localStorage.clear()}>Logout</a>}
-            </div>
+            {isLoggedIn && (<div id="nav-container">
+                {menuVisible && (<div class="menu-items">
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/about">About </a></li>
+                    <li><a href="/" onClick={() => window.localStorage.clear()}>Logout</a></li>
+                </div>)}
+                <img src={`/${menuVisible ? "close" : "hamburger"}.png`} height="50px" alt="hamburger menu" onClick={toggleMenu}/>
+            </div>)}
   </nav>
     )
-
 }
 
 export default Nav

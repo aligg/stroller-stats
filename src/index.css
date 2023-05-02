@@ -57,28 +57,56 @@ footer h1 {
     color: #00f5d4
 }
 
-.navMenu {
+.navbar {
   display: flex;
   justify-content: space-between;
   background-color: #03045e;
   padding: 20px
 }
 
-.navMenu a {
+.navbar a {
   font-size: 1.2em;
   text-transform: uppercase;
   text-decoration: none;
   font-weight: 800;
-  width: 80px;
+  /* width: 80px; */
   -webkit-transition: all 0.2s ease-in-out;
   transition: all 0.2s ease-in-out;
   margin-top: 16px;
   margin-bottom: 16px;
 }
 
-.navMenu #links-container {
-    align-items: center;
+.menu-items {
+    position: absolute;
+    height: 100vh;
+    top: 0px;
+    right: 0px;
+    transition: transform 0.5s ease-in-out;
+    background-color:#00f5d4;
+    width: 100%;
+    padding-top: 100px;
+}
+
+
+.navbar .menu-items li {
+    margin-bottom: 1.2rem;
+    font-size: 1.5rem;
+    font-weight: 500;
+    list-style: none;
+    text-align: center;
+}
+
+.navbar img {
+    z-index: 99;
+}
+
+.navbar a {
+    color: #03045e
+}
+
+#nav-container {
     display: flex;
+    align-items: center;
 }
 
 a {
@@ -136,3 +164,4 @@ button:active {
   box-shadow: #D6D6E7 0 3px 7px inset;
   transform: translateY(2px);
 }
+

@@ -12,6 +12,8 @@ const Redirect = () => {
     const location = useLocation();
     const navigate = useNavigate();
 
+    console.log(process.env.NODE_ENV)
+
     useEffect(() => {
         const authenticate = async () => {
             const [authToken, scopes] = parseAuthData(location.search) // find token in URL
