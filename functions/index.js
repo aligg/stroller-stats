@@ -81,14 +81,17 @@ const retrieveMonthlyStrollerMiles = async (recentActivity) => {
   const userId = recentActivity.user_id;
   const sportType = recentActivity.sport_type;
   const date = new Date();
-  const firstDayOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
-  const lastDayOfMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+  const firstDayOfMonth = new Date(date.getFullYear(),
+      date.getMonth(), 1).toISOString();
+  const lastDayOfMonth = new Date(date.getFullYear(),
+      date.getMonth() + 1, 0).toISOString();
+  functions.logger.info("DATES", firstDayOfMonth, lastDayOfMonth);
 
   const activityRef = db.collection("activities")
       .where("user_id", "==", userId)
       .where("sport_type", "==", sportType)
-      .where("start_date", ">", firstDayOfMonth)
-      .where("start_date", "<", lastDayOfMonth)
+      .where("start_date", ">=", firstDayOfMonth)
+      .where("start_date", "<=", lastDayOfMonth)
       .where("is_stroller", "==", true);
   const activities = await activityRef.get();
 
@@ -105,10 +108,14 @@ const retrieveMonthlyStrollerMiles = async (recentActivity) => {
 
 const updateDescription = async (recentActivity, accessToken) => {
   const description = recentActivity.description;
+  // if already wrote, exit
+  if (description.includes("StrollerStats.com -")) {
+    return;
+  }
   const activityId = recentActivity.activity_id;
   const totalMiles = await retrieveMonthlyStrollerMiles(recentActivity);
   // eslint-disable-next-line max-len
-  const updatedDescription = description.concat(" ", `${totalMiles} Stroller ${recentActivity.sport_type} miles so far this month via strollerstats.com`);
+  const updatedDescription = description.concat("\n", `StrollerStats.com - ${totalMiles} stroller ${recentActivity.sport_type.toLowerCase()} miles so far this month`);
   const requestOptions = {
     method: "PUT",
     // eslint-disable-next-line max-len

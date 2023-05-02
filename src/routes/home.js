@@ -14,7 +14,7 @@ const Home = () => {
     const user_id = localStorage.getItem("user_id");
     const [user, loading] = useUser(user_id)
     const [data, dataLoading] = useData(user_id)
-    
+    console.log(loading, dataLoading)
     const renderContent = () => {
         if (user_id == null) {
             return (

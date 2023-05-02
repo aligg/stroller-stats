@@ -40,6 +40,14 @@ export const useData = (user_id) => {
             const runSpeeds = [];
             const q = query(collection(db, "activities"), where("user_id", "==", Number(user_id)), where("is_stroller", "==", true), where("start_date", ">", currYear));
             const querySnapshot = await getDocs(q);
+            
+            // If no results, exit early
+            if (querySnapshot.size === 0) {
+                setLoading(false)
+                setData(dataToReturn)
+            }
+
+
             querySnapshot.forEach((doc) => {
                 const dbData = doc.data()
                 if (dbData.sport_type === "Run") {
