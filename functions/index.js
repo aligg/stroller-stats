@@ -17,6 +17,9 @@ const db = admin.firestore();
 
 const functions = require("firebase-functions");
 const fetch = require("node-fetch");
+const aggregateData = require("./aggregateData");
+
+exports.aggregateData = aggregateData.aggregateData;
 
 const getRefreshToken = async (userId) => {
   return db.collection("users")
@@ -28,7 +31,6 @@ const getRefreshToken = async (userId) => {
       });
 };
 
-// TODO update db w/ new tokens?
 const getAccessToken = async (refreshToken) => {
   return fetch("https://www.strava.com/oauth/token", {
     method: "POST",
@@ -41,6 +43,7 @@ const getAccessToken = async (refreshToken) => {
     }),
   }).then((res) => res.json()).then((res) => res.access_token);
 };
+
 const getLastActivity = async (accessToken, activityId) => {
   const response = await fetch(`https://www.strava.com/api/v3/activities/${activityId}?include_all_efforts=false`, {
     headers: {authorization: `Bearer ${accessToken}`},
@@ -51,6 +54,8 @@ const getLastActivity = async (accessToken, activityId) => {
   if (data["description"]) {
     isStroller = data["description"].toLowerCase().includes("strollerstats");
   }
+  functions.logger.info("IN GET LAST", data["description"], isStroller);
+
   return {
     activity_id: data["id"],
     title: data["name"],
@@ -64,10 +69,10 @@ const getLastActivity = async (accessToken, activityId) => {
   };
 };
 
-const addActivityToDB = (activityData) => {
+const addActivityToDB = async (activityData) => {
   if (activityData.is_stroller &&
     (activityData.sport_type === "Run" || activityData.sport_type === "Walk")) {
-    db.collection("activities").doc(activityData.activity_id.toString())
+    await db.collection("activities").doc(activityData.activity_id.toString())
         .set(activityData).then(() => {
           functions.logger.info("Wrote to DB", activityData);
         });
@@ -80,12 +85,11 @@ const addActivityToDB = (activityData) => {
 const retrieveMonthlyStrollerMiles = async (recentActivity) => {
   const userId = recentActivity.user_id;
   const sportType = recentActivity.sport_type;
-  const date = new Date();
+  const date = new Date(recentActivity.start_date);
   const firstDayOfMonth = new Date(date.getFullYear(),
       date.getMonth(), 1).toISOString();
   const lastDayOfMonth = new Date(date.getFullYear(),
       date.getMonth() + 1, 0).toISOString();
-  functions.logger.info("DATES", firstDayOfMonth, lastDayOfMonth);
 
   const activityRef = db.collection("activities")
       .where("user_id", "==", userId)
@@ -178,8 +182,7 @@ const handlePost = async (userId, activityId) => {
   const accessToken = await getAccessToken(refreshToken);
   const recentActivity = await getLastActivity(accessToken, activityId);
   if (recentActivity.is_stroller) {
-    addActivityToDB(recentActivity);
+    await addActivityToDB(recentActivity);
     updateDescription(recentActivity, accessToken);
   }
 };
-
