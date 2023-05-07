@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_KEY,
@@ -52,7 +53,7 @@ const getLastActivity = async (accessToken, activityId) => {
   let isStroller = false;
   // eslint-disable-next-line max-len
   if (data["description"]) {
-    isStroller = data["description"].toLowerCase().includes("strollerstats");
+    isStroller = data["description"].toLowerCase().includes("strollerstats") || data["description"].toLowerCase().includes("strollermiles");
   }
   functions.logger.info("IN GET LAST", data["description"], isStroller);
 
