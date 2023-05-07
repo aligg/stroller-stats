@@ -1,11 +1,8 @@
-import {
-  onDocumentCreated,
-} from "firebase-functions/v2/firestore";
+/* eslint-disable max-len */
 const functions = require("firebase-functions");
 
 
-// eslint-disable-next-line max-len
-exports.aggregateData = onDocumentCreated("activities/{activityId}", (event) => {
+exports.aggregateData = functions.firestore.document("activities/{activityId}").onWrite((event) => {
   // Get an object representing the document
   // e.g. {'name': 'Marie', 'age': 66}
   const snapshot = event.data;
