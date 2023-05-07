@@ -106,9 +106,10 @@ const retrieveMonthlyStrollerMiles = async (recentActivity) => {
     totalMeters += data.distance;
   }
   const totalMiles = totalMeters * 0.000621371192; // Convert to miles
-  functions.logger.info(`Got total miles ${totalMiles}`);
+  const roundedTotalMiles = totalMiles.toFixed(2);
+  functions.logger.info(`Got total miles ${roundedTotalMiles}`);
 
-  return Math.round(totalMiles);
+  return roundedTotalMiles;
 };
 
 const updateDescription = async (recentActivity, accessToken) => {
