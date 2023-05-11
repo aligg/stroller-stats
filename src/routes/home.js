@@ -1,6 +1,7 @@
 import About from "../components/About";
+import AnnualStats from "../components/AnnualStats";
+import MonthlyStats from "../components/MonthlyStats";
 import React from "react";
-import Stats from "../components/Stats";
 import { useData } from "../hooks/useData";
 import {useUser} from "../hooks/useUser"
 
@@ -30,7 +31,12 @@ const Home = () => {
 
         else {
             return (
-                <><p>Hey {user.first_name}!</p><Stats data={data} /><p>More data and monthly breakdowns and such in the works!</p></>
+                <>
+                    <p>Hey {user.first_name}!</p>
+                    <AnnualStats data={data} />
+                    <MonthlyStats />
+                    <p>More data and monthly breakdowns and such in the works!</p>
+                </>
             )
         }
     }

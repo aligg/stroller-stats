@@ -1,4 +1,4 @@
-const Stats = ({data}) => {
+const AnnualStats = ({data}) => {
     const year = new Date().getFullYear()
 
     return (
@@ -24,4 +24,4 @@ const Stats = ({data}) => {
     )
 }
 
-export default Stats;
+export default AnnualStats;

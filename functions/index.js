@@ -13,14 +13,14 @@ const firebaseConfig = {
 // The Firebase Admin SDK to access Firestore.
 const admin = require("firebase-admin");
 admin.initializeApp(firebaseConfig);
-
-const db = admin.firestore();
-
 const functions = require("firebase-functions");
 const fetch = require("node-fetch");
-const aggregateData = require("./aggregateData");
+const db = admin.firestore();
+const express = require("express");
+const app = express();
+const cors = require("cors")({origin: true});
+app.use(cors);
 
-exports.aggregateData = aggregateData.aggregateData;
 
 const getRefreshToken = async (userId) => {
   return db.collection("users")
@@ -188,3 +188,33 @@ const handlePost = async (userId, activityId) => {
     updateDescription(recentActivity, accessToken);
   }
 };
+
+app.get("/monthly-activities/:user_id", async (request, res) => {
+  const userId = request.params.user_id;
+  const snapshot = await admin.firestore().collection("activities").where("user_id", "==", Number(userId)).get();
+  const monthlyData = [];
+  snapshot.forEach((doc) => {
+    const data = doc.data();
+    functions.logger.info("data", data);
+    const startDate = new Date(data.start_date);
+    const month = startDate.getMonth() + 1;
+    const year = startDate.getFullYear();
+    const monthIdentifier = `${year}-${month}`;
+    const existingObject = monthlyData.find((obj) => obj.month === monthIdentifier);
+    if (existingObject) {
+      const key = `${data.sport_type.toLowerCase()}_distance`;
+      existingObject[key] += data.distance;
+    } else {
+      let newObject ={};
+      if (data.sport_type === "Run") {
+        newObject = {month: monthIdentifier, run_distance: data.distance, walk_distance: 0};
+      } else {
+        newObject = {month: monthIdentifier, run_distance: 0, walk_distance: data.distance};
+      }
+      monthlyData.push(newObject);
+    }
+  });
+  res.status(200).send(JSON.stringify(monthlyData));
+});
+
+exports.app = functions.https.onRequest(app);

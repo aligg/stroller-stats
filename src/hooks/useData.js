@@ -2,10 +2,7 @@ import { collection, getDocs, query, where } from "firebase/firestore";
 import { useEffect, useState } from "react";
 
 import {db} from '../utils/firebase'
-
-const getMiles = (meters) =>{
-     return meters * 0.000621371192;
-}
+import { getMiles } from "../utils/getMiles";
 
 const calculateAverageSpeed = (runs) => {
     const n = runs.length;
