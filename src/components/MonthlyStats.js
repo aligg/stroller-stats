@@ -23,6 +23,10 @@ const MonthlyStats = () => {
         retrieveData()
     }, [])
 
+    if (loading) {
+        return (<></>)
+    }
+
     return (
         <Plot  data={[
             {
@@ -44,8 +48,12 @@ const MonthlyStats = () => {
                 line: {color: "#00f5d4", width: 3}
               },
           ]}
-          layout={ { title: 'Monthly Stroller Miles', xaxis: {title: "Month", type: "date", 'tickformat': '%b', tickmode: "array", tickvals: months}, yaxis: {title: "Miles", "tickformat": ".2f"}, hovermode: "x"} }
-          config={{responsive: true}}
+          layout={ { font: {family: "Inter", color: "black"}, font_color: "black", title: 'Monthly Stroller Miles', xaxis: {type: "date", 'tickformat': '%b', tickmode: "array", tickvals: months}, yaxis: {title: "Miles", "tickformat": ".2f"}, hovermode: "x", legend: {
+          orientation: "h"
+          }, margin: {l: 0, r: 0}} }
+          useResizeHandler={true}
+          style={{width: "100%"}}
+          config={{displayModeBar: false}}
         />
     );
 

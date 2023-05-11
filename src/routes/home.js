@@ -35,7 +35,7 @@ const Home = () => {
                     <p>Hey {user.first_name}!</p>
                     <AnnualStats data={data} />
                     <MonthlyStats />
-                    <p>More data and monthly breakdowns and such in the works!</p>
+                    <p>More data coming soon!</p>
                 </>
             )
         }
