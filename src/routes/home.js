@@ -32,7 +32,7 @@ const Home = () => {
         else {
             return (
                 <>
-                    <p>Hey {user.first_name}!</p>
+                    <p>Hey {user.first_name}!👋</p>
                     <AnnualStats data={data} />
                     <MonthlyStats />
                     <p>More data coming soon!</p>

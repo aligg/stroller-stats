@@ -77,7 +77,7 @@ footer h1 {
 }
 
 .menu-items {
-    position: absolute;
+    position: fixed;
     height: 100vh;
     top: 0px;
     right: 0px;
@@ -85,6 +85,8 @@ footer h1 {
     background-color:#00f5d4;
     width: 100%;
     padding-top: 100px;
+    z-index: 90;
+    min-height: -webkit-fill-available;
 }
 
 
