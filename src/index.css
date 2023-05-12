@@ -38,13 +38,13 @@ th, td {
 
 main {
     flex-grow: 1;
-    padding: 30px;
+    padding: 20px;
     max-width: 80ch;
 }
 
 footer {
     background-color: #03045e;
-    padding: 20px;
+    padding: 10px;
 }
 
 #footer-text {
@@ -61,7 +61,7 @@ footer h1 {
   display: flex;
   justify-content: space-between;
   background-color: #03045e;
-  padding: 20px
+  padding: 10px
 }
 
 .navbar a {
