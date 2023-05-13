@@ -217,4 +217,26 @@ app.get("/monthly-activities/:user_id", async (request, res) => {
   res.status(200).send(JSON.stringify(monthlyData));
 });
 
+const getBeginningOfYearTimestamp = () => {
+  const now = new Date(); // Get the current date
+  const year = now.getFullYear(); // Get the current year
+  const beginningOfYear = new Date(year, 0, 1); // Create a new Date object for January 1st of the current year
+  const timestamp = Math.floor(beginningOfYear.getTime() / 1000); // Get the epoch timestamp by dividing the milliseconds by 1000
+
+  return timestamp;
+};
+
+
+app.post("/sync-historical-data/:user_id", async (request, res) => {
+  const userId = request.params.user_id;
+  const refreshToken = await getRefreshToken(userId);
+  const accessToken = await getAccessToken(refreshToken);
+  const begOfYear = getBeginningOfYearTimestamp();
+  const response = await fetch(`https://www.strava.com/api/v3/athlete/activities?after=${begOfYear}`, {
+    headers: {authorization: `Bearer ${accessToken}`},
+  });
+  const data = await response.json();
+  functions.logger.info("HI", data);
+});
+
 exports.app = functions.https.onRequest(app);

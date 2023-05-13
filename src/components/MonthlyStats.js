@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import Plot from 'react-plotly.js';
 import { formatMonthData } from "../utils/formatMonthData";
 
-const MonthlyStats = () => {
+const MonthlyStats = ({userId}) => {
     const [loading, setLoading] = useState(false);
     const [months, setMonths] = useState([])
     const [runMiles, setRuns] = useState([])
@@ -12,7 +12,7 @@ const MonthlyStats = () => {
     useEffect(() => {
         const retrieveData = async () => {
             setLoading(true);
-            const response = await fetch("https://us-central1-stroller-stats.cloudfunctions.net/app/monthly-activities/3438509")
+            const response = await fetch(`https://us-central1-stroller-stats.cloudfunctions.net/app/monthly-activities/${userId}`)
             const data = await response.json();
             const [months, runDistances, walkDistances] = formatMonthData(data)
             setMonths(months)

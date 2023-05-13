@@ -1,9 +1,8 @@
+import Settings from './Settings';
 import { useLocation } from 'react-router-dom'
 
 const About = () => {
-
     const location = useLocation();
-    console.log(location.pathname)
     return (
         <main>
             <h1>Track your stroller miles with Stroller Stats.</h1>
@@ -22,6 +21,7 @@ const About = () => {
                     <p>I haven't made a 'click to pull in all your past activities' mechanism yet. However, if you add #strollerstats to your activity description and also make a small title change at the same time, the app will pull it in. Unfortunately you do have to change the title at the same time due to how Strava webhooks work!</p>
                     <h2>How can I report a bug or submit a feature request?</h2>
                     <p>Feel free to file an issue in the <a href="https://github.com/aligg/stroller-stats" target="_blank" rel="noreferrer">github project</a>. Code contributions are welcome! My <a href="https://twitter.com/aliglenesk" target="_blank" rel="noreferrer">Twitter DMs</a> are also open if that's an easier way for you to reach out.</p>
+                    <Settings />
                 </div>
             )}
         </main>   

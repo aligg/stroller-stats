@@ -34,7 +34,7 @@ const Home = () => {
                 <>
                     <p>Hey {user.first_name}!👋</p>
                     <AnnualStats data={data} />
-                    <MonthlyStats />
+                    <MonthlyStats userId={user_id}/>
                 </>
             )
         }
