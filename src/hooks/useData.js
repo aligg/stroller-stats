@@ -14,8 +14,8 @@ export const useData = (user_id) => {
         const getData = async (user_id) => {
             setLoading(true)
             const currYear = new Date().getFullYear().toString()
-            const walkTime = 0;
-            const runTime = 0;
+            let walkTime = 0;
+            let runTime = 0;
             const q = query(collection(db, "activities"), where("user_id", "==", Number(user_id)), where("is_stroller", "==", true), where("start_date", ">", currYear));
             const querySnapshot = await getDocs(q);
             
@@ -47,7 +47,6 @@ export const useData = (user_id) => {
 
             setData(dataToReturn)
             setLoading(false)
-            });
         }
        
         getData(user_id)
