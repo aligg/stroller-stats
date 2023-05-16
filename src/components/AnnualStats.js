@@ -1,6 +1,5 @@
 const AnnualStats = ({data}) => {
     const year = new Date().getFullYear()
-    console.log(data)
     return (
     <>
         <h1>{year} year to date</h1>
