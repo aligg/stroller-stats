@@ -4,23 +4,6 @@ import { useEffect, useState } from "react";
 import {db} from '../utils/firebase'
 import { getMiles } from "../utils/getMiles";
 
-const calculateAverageSpeed = (runs) => {
-    const n = runs.length;
-    const reciprocalsSum = runs.reduce((sum, speed) => sum + 1 / speed, 0);
-    const harmonicMean = n / reciprocalsSum;
-    const averageSpeed = 1 / harmonicMean;
-    const speedInMinPerMile = getMinutesPerMile(averageSpeed)
-    return speedInMinPerMile;
-    // return averageSpeed
-}
-
-const getMinutesPerMile = (metersPerSecond) => {
-    const milesPerHour = metersPerSecond * 2.23694;
-    const minutesPerMile = 60 / milesPerHour;
-    return minutesPerMile;
-}
-
-
 export const useData = (user_id) => {
 
     const [data, setData] = useState(null);
@@ -31,8 +14,8 @@ export const useData = (user_id) => {
         const getData = async (user_id) => {
             setLoading(true)
             const currYear = new Date().getFullYear().toString()
-            const walkSpeeds = [];
-            const runSpeeds = [];
+            const walkTime = 0;
+            const runTime = 0;
             const q = query(collection(db, "activities"), where("user_id", "==", Number(user_id)), where("is_stroller", "==", true), where("start_date", ">", currYear));
             const querySnapshot = await getDocs(q);
             
@@ -42,23 +25,25 @@ export const useData = (user_id) => {
                 setData(dataToReturn)
             }
 
-
             querySnapshot.forEach((doc) => {
                 const dbData = doc.data()
                 if (dbData.sport_type === "Run") {
                     dataToReturn["total_run_miles"] += getMiles(dbData.distance)
-                    runSpeeds.push(dbData.average_speed)
+                    // run_time_seconds = distance (meters) / average_speed (m/s)
+                    runTime += dbData.distance / dbData.average_speed;
                 } else if (dbData.sport_type === "Walk") {
                     dataToReturn["total_walk_miles"] += getMiles(dbData.distance)
-                    walkSpeeds.push(dbData.average_speed)
-                }   
-            // runSpeeds.forEach((speed) => {
-            //     console.log(getMinutesPerMile(speed))
-            // })
-            const averageRunSpeed = calculateAverageSpeed(runSpeeds);
-            const averageWalkSpeed = calculateAverageSpeed(walkSpeeds);
-            dataToReturn["average_run_speed"] = averageRunSpeed
-            dataToReturn["average_walk_speed"] = averageWalkSpeed
+                    walkTime += dbData.distance / dbData.average_speed;
+                }
+            });
+            const mins_per_mile_run = Math.floor((runTime / dataToReturn["total_run_miles"]) / 60);
+            const mins_per_mile_walk = Math.floor((walkTime / dataToReturn["total_walk_miles"]) / 60);
+            
+            const secs_per_mile_run = Math.floor((runTime / dataToReturn["total_run_miles"]) % 60);
+            const secs_per_mile_walk = Math.floor((runTime / dataToReturn["total_walk_miles"]) % 60);
+
+            dataToReturn["average_run_speed"] = mins_per_mile_run + ":" + secs_per_mile_run;
+            dataToReturn["average_walk_speed"] = mins_per_mile_walk + ":" + secs_per_mile_walk;
 
             setData(dataToReturn)
             setLoading(false)
