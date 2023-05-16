@@ -1,6 +1,7 @@
 import { doc, setDoc } from "firebase/firestore";
 import { useLocation, useNavigate } from 'react-router-dom';
 
+import Loading from "../components/Loading";
 import {db} from '../utils/firebase'
 import { parseAuthData } from '../utils/parseAuthData';
 import { useEffect } from "react";
@@ -48,7 +49,7 @@ const Redirect = () => {
     }, [location.search, navigate])
     
     return (
-        <main>Loading</main>
+        <main><Loading/></main>
     )
 }
 

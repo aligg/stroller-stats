@@ -1,5 +1,6 @@
 import About from "../components/About";
 import AnnualStats from "../components/AnnualStats";
+import Loading from "../components/Loading";
 import MonthlyStats from "../components/MonthlyStats";
 import React from "react";
 import { useData } from "../hooks/useData";
@@ -26,7 +27,7 @@ const Home = () => {
         }
         
         if (loading || dataLoading) {
-            return (<main>Loading</main>)
+            return (<main><Loading/></main>)
         }
 
         else {

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 
+import Loading from "./Loading";
 import Plot from 'react-plotly.js';
 import { formatMonthData } from "../utils/formatMonthData";
 
@@ -21,41 +22,40 @@ const MonthlyStats = ({userId}) => {
             setLoading(false);
         }
         retrieveData()
-    }, [])
-
-    if (loading) {
-        return (<></>)
-    }
+    }, [userId])
 
     return (
-        <><h1>Monthly stroller miles</h1>
-        <Plot  data={[
-            {
-              x: months,
-              y: runMiles,
-              type: 'scatter',
-              name: "Run miles",
-              mode: 'lines+markers',
-              marker: {color: '#03045e'},
-              line: {color: "#03045e", width: 3}
-            },
-            {
+        <>
+            <h1>Monthly stroller miles</h1>
+            {loading ? <Loading /> :
+            <Plot  data={[
+                {
                 x: months,
-                y: walkMiles,
+                y: runMiles,
                 type: 'scatter',
-                name: "Walk miles",
+                name: "Run miles",
                 mode: 'lines+markers',
-                marker: {color: "#00f5d4"},
-                line: {color: "#00f5d4", width: 3}
-              },
-          ]}
-          layout={ { font: {family: "Inter", color: "black"}, font_color: "black", xaxis: {type: "date", 'tickformat': '%b', tickmode: "array", tickvals: months}, yaxis: {title: "Stroller Miles", "tickformat": ".2f"}, hovermode: "x", legend: {
-          orientation: "h"
-          }, margin: {l: 0, r: 0}} }
-          useResizeHandler={true}
-          style={{width: "100%"}}
-          config={{displayModeBar: false}}
-        /></>
+                marker: {color: '#03045e'},
+                line: {color: "#03045e", width: 3}
+                },
+                {
+                    x: months,
+                    y: walkMiles,
+                    type: 'scatter',
+                    name: "Walk miles",
+                    mode: 'lines+markers',
+                    marker: {color: "#00f5d4"},
+                    line: {color: "#00f5d4", width: 3}
+                },
+            ]}
+            layout={ { font: {family: "Inter", color: "black"}, font_color: "black", xaxis: {type: "date", 'tickformat': '%b', tickmode: "array", tickvals: months}, yaxis: {title: "Stroller Miles", "tickformat": ".2f"}, hovermode: "x", legend: {
+            orientation: "h"
+            }, margin: {l: 0, r: 0}} }
+            useResizeHandler={true}
+            style={{width: "100%"}}
+            config={{displayModeBar: false}}
+            />}
+        </>
     );
 
 

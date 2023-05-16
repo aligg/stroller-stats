@@ -11,11 +11,11 @@ const AnnualStats = ({data}) => {
                     </tr>  
                     <tr>
                         <td>Total stroller run miles</td>
-                        <td>{Math.round(data["total_run_miles"])}</td>
+                        <td>{data["total_run_miles"].toFixed(2)}</td>
                     </tr>
                     <tr>
                         <td>Total stroller walk miles</td>
-                        <td>{Math.round(data["total_walk_miles"])}</td>
+                        <td>{data["total_walk_miles"].toFixed(2)}</td>
                     </tr>
                     <tr>
                         <td>Average pace with stroller</td>

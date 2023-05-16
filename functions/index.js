@@ -33,7 +33,7 @@ const getRefreshToken = async (userId) => {
 };
 
 const getAccessToken = async (refreshToken) => {
-  return fetch("https://www.strava.com/oauth/token", {
+  const response = await fetch("https://www.strava.com/oauth/token", {
     method: "POST",
     headers: {"Content-Type": "application/json"},
     body: JSON.stringify({
@@ -41,22 +41,17 @@ const getAccessToken = async (refreshToken) => {
       client_secret: process.env.STRAVA_CLIENT_SECRET,
       refresh_token: refreshToken,
       grant_type: "refresh_token",
-    }),
-  }).then((res) => res.json()).then((res) => res.access_token);
+    })});
+  const data = await response.json();
+  return data.access_token;
 };
 
-const getLastActivity = async (accessToken, activityId) => {
-  const response = await fetch(`https://www.strava.com/api/v3/activities/${activityId}?include_all_efforts=false`, {
-    headers: {authorization: `Bearer ${accessToken}`},
-  });
-  const data = await response.json();
+const formatActivity = (data) => {
   let isStroller = false;
   // eslint-disable-next-line max-len
   if (data["description"]) {
     isStroller = data["description"].toLowerCase().includes("strollerstats") || data["description"].toLowerCase().includes("strollermiles");
   }
-  functions.logger.info("IN GET LAST", data["description"], isStroller);
-
   return {
     activity_id: data["id"],
     title: data["name"],
@@ -70,6 +65,16 @@ const getLastActivity = async (accessToken, activityId) => {
   };
 };
 
+const getActivity = async (accessToken, activityId) => {
+  const response = await fetch(`https://www.strava.com/api/v3/activities/${activityId}?include_all_efforts=false`, {
+    headers: {authorization: `Bearer ${accessToken}`},
+  });
+  const data = await response.json();
+  const activity = formatActivity(data);
+
+  return activity;
+};
+
 const addActivityToDB = async (activityData) => {
   if (activityData.is_stroller &&
     (activityData.sport_type === "Run" || activityData.sport_type === "Walk")) {
@@ -77,9 +82,11 @@ const addActivityToDB = async (activityData) => {
         .set(activityData).then(() => {
           functions.logger.info("Wrote to DB", activityData);
         });
+    return 1;
   } else {
     // eslint-disable-next-line max-len
     functions.logger.info(`Skipped write to DB for ${activityData.activity_id} sport type ${activityData.sport_type}`);
+    return 0;
   }
 };
 
@@ -135,6 +142,7 @@ const updateDescription = async (recentActivity, accessToken) => {
       });
     } else {
       // pass
+      functions.logger.info("potential problem with write to description.");
     }
   }).catch((err) => {
     functions.logger.info(err);
@@ -182,7 +190,7 @@ exports.stravaWebhook = functions.https.onRequest((request, response) => {
 const handlePost = async (userId, activityId) => {
   const refreshToken = await getRefreshToken(userId);
   const accessToken = await getAccessToken(refreshToken);
-  const recentActivity = await getLastActivity(accessToken, activityId);
+  const recentActivity = await getActivity(accessToken, activityId);
   if (recentActivity.is_stroller) {
     await addActivityToDB(recentActivity);
     updateDescription(recentActivity, accessToken);
@@ -195,7 +203,6 @@ app.get("/monthly-activities/:user_id", async (request, res) => {
   const monthlyData = [];
   snapshot.forEach((doc) => {
     const data = doc.data();
-    functions.logger.info("data", data);
     const startDate = new Date(data.start_date);
     const month = startDate.getMonth() + 1;
     const year = startDate.getFullYear();
@@ -226,17 +233,61 @@ const getBeginningOfYearTimestamp = () => {
   return timestamp;
 };
 
-
+/** TODO: below got super hacky - clean up and add tests */
 app.post("/sync-historical-data/:user_id", async (request, res) => {
-  const userId = request.params.user_id;
+  const userId = Number(request.body.user_id);
   const refreshToken = await getRefreshToken(userId);
   const accessToken = await getAccessToken(refreshToken);
   const begOfYear = getBeginningOfYearTimestamp();
-  const response = await fetch(`https://www.strava.com/api/v3/athlete/activities?after=${begOfYear}`, {
+  const response = await fetch(`https://www.strava.com/api/v3/athlete/activities?after=${begOfYear}&per_page=20`, {
     headers: {authorization: `Bearer ${accessToken}`},
   });
   const data = await response.json();
-  functions.logger.info("HI", data);
+  const firstActivity = data[0]["start_date"];
+  const lastActivity = data[data.length - 1]["start_date"];
+
+  // This doesn't update because the loop below is async.
+  let writes = 0;
+  data.forEach((activity) => {
+    const activityId = activity["id"].toString();
+    db.collection("activities").doc(activityId).get().then((doc) => {
+      if (doc.exists) {
+        functions.logger.info("Write skipped, doc already exists in database");
+      } else {
+        // Ping Strava API again b/c list API doesn't include description
+        getActivity(accessToken, activityId).then((activityWithDescription) => {
+          // if stroller handle side effects
+          if (activityWithDescription.is_stroller) {
+            functions.logger.info("GOT IN with stroller");
+            addActivityToDB(activityWithDescription).then((added) => {
+              writes += added;
+              updateDescription(activityWithDescription, accessToken);
+              functions.logger.info("writes now", writes);
+            }).then(() => {
+              functions.logger.info("writes now miau", writes);
+            });
+          }
+        });
+      }
+    });
+    // const doc = await db.collection("activities").doc(activityId).get();
+    // if (doc.exists) {
+    //   functions.logger.info("Write skipped, doc already exists in database");
+    // } else {
+    //   // Ping Strava API again b/c list API doesn't include description
+    //   const activityWithDescription = await getActivity(accessToken, activityId);
+    //   // if stroller handle side effects
+    //   if (activityWithDescription.is_stroller) {
+    //     functions.logger.info("GOT IN with stroller");
+    //     const added = await addActivityToDB(activityWithDescription);
+    //     functions.logger.info("ADDED value", added);
+    //     writes += added;
+    //     await updateDescription(activityWithDescription, accessToken);
+    //     functions.logger.info("writes now", writes);
+    //   }
+    // }
+  });
+  res.status(200).send(JSON.stringify({writes: writes, activities_length: data.length, start_date: firstActivity, end_date: lastActivity}));
 });
 
 exports.app = functions.https.onRequest(app);
