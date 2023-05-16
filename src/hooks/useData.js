@@ -42,8 +42,8 @@ export const useData = (user_id) => {
             const secs_per_mile_run = Math.floor((runTime / dataToReturn["total_run_miles"]) % 60);
             const secs_per_mile_walk = Math.floor((runTime / dataToReturn["total_walk_miles"]) % 60);
 
-            dataToReturn["average_run_speed"] = mins_per_mile_run + ":" + secs_per_mile_run.toLocaleString('en-US', minimumIntegerDigits: 2);
-            dataToReturn["average_walk_speed"] = mins_per_mile_walk + ":" + secs_per_mile_walk.toLocaleString('en-US', minimumIntegerDigits: 2);
+            dataToReturn["average_run_speed"] = mins_per_mile_run + ":" + secs_per_mile_run.toLocaleString('en-US', 2);
+            dataToReturn["average_walk_speed"] = mins_per_mile_walk + ":" + secs_per_mile_walk.toLocaleString('en-US', 2);
 
             setData(dataToReturn)
             setLoading(false)
