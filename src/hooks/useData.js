@@ -36,14 +36,14 @@ export const useData = (user_id) => {
                     walkTime += dbData.distance / dbData.average_speed;
                 }
             });
-            const mins_per_mile_run = Math.floor((runTime / dataToReturn["total_run_miles"]) / 60);
-            const mins_per_mile_walk = Math.floor((walkTime / dataToReturn["total_walk_miles"]) / 60);
+            const minsPerMileRun = Math.floor((runTime / dataToReturn["total_run_miles"]) / 60);
+            const minsPerMileWalk = Math.floor((walkTime / dataToReturn["total_walk_miles"]) / 60);
             
             const secs_per_mile_run = Math.floor((runTime / dataToReturn["total_run_miles"]) % 60);
             const secs_per_mile_walk = Math.floor((runTime / dataToReturn["total_walk_miles"]) % 60);
 
-            dataToReturn["average_run_speed"] = mins_per_mile_run + ":" + secs_per_mile_run.toString().padStart(2, '0');
-            dataToReturn["average_walk_speed"] = mins_per_mile_walk + ":" + secs_per_mile_walk.toString().padStart(2, '0');
+            dataToReturn["average_run_speed"] = minsPerMileRun + ":" + secs_per_mile_run.toString().padStart(2, '0');
+            dataToReturn["average_walk_speed"] = minsPerMileWalk + ":" + secs_per_mile_walk.toString().padStart(2, '0');
 
             setData(dataToReturn)
             setLoading(false)

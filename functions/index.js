@@ -21,7 +21,11 @@ const app = express();
 const cors = require("cors")({origin: true});
 app.use(cors);
 
-
+/**
+ * Retrieve refresh token from the db
+ * @param {number} userId
+ * @return {number}
+ */
 const getRefreshToken = async (userId) => {
   return db.collection("users")
       .where("user_id", "==", userId)
@@ -32,6 +36,11 @@ const getRefreshToken = async (userId) => {
       });
 };
 
+/**
+ * Call to Strava to get a fresh access token
+ * @param {number} refreshToken
+ * @return {number}
+ */
 const getAccessToken = async (refreshToken) => {
   const response = await fetch("https://www.strava.com/oauth/token", {
     method: "POST",
