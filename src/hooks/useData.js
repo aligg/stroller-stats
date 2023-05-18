@@ -17,7 +17,7 @@ export const useData = (user_id) => {
             let walkTime = 0;
             let runTime = 0;
             const q = query(collection(db, "activities"), where("user_id", "==", Number(user_id)), where("is_stroller", "==", true), where("start_date", ">", currYear));
-            const querySnapshot = await getDocs(q);
+            const querySnapshot = await getDocs(q); //TODO: replace client request
             
             // If no results, exit early
             if (querySnapshot.size === 0) {

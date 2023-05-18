@@ -13,7 +13,7 @@ const Home = () => {
         window.location = `http://www.strava.com/oauth/authorize?client_id=${REACT_APP_CLIENT_ID}&response_type=code&redirect_uri=${redirectUrl}/exchange_token&approval_prompt=force&scope=read,activity:read,activity:write`;
     };
     const user_id = localStorage.getItem("user_id");
-    const [user, loading] = useUser(user_id)
+    // const [user, loading] = useUser(user_id) //TODO: replace client request
     const [data, dataLoading] = useData(user_id)
 
     const renderContent = () => {
@@ -26,14 +26,14 @@ const Home = () => {
             );
         }
         
-        if (loading || dataLoading) {
+        if (dataLoading) { //TODO: put back loading
             return (<main><Loading/></main>)
         }
 
         else {
             return (
                 <>
-                    <p>Hey {user.first_name}!👋</p>
+                    <p>Hey!👋</p>
                     <AnnualStats data={data} />
                     <MonthlyStats userId={user_id}/>
                 </>

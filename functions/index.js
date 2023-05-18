@@ -242,6 +242,25 @@ const getBeginningOfYearTimestamp = () => {
   return timestamp;
 };
 
+app.post("/create-user", async (request, response) => {
+  const userId = request.body.user_id;
+
+  const userData = {
+    user_id: userId,
+    access_token: request.body.access_token,
+    refresh_token: request.body.refresh_token,
+    scopes: request.body.scopes,
+    expires_at: request.body.expires_at,
+    first_name: request.body.first_name,
+  };
+
+  await db.collection("users").doc(userId.toString())
+      .set(userData).then(() => {
+        functions.logger.info("Wrote user to DB", userData);
+      });
+  response.status(200).send("wrote");
+});
+
 /** TODO: below got super hacky - clean up and add tests */
 app.post("/sync-historical-data/:user_id", async (request, res) => {
   const userId = Number(request.body.user_id);

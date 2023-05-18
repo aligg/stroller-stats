@@ -1,9 +1,6 @@
-import { doc, setDoc } from "firebase/firestore";
-// import { getAuth, signInWithCustomToken } from "firebase/auth";
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import Loading from "../components/Loading";
-import {db} from '../utils/firebase'
 import { parseAuthData } from '../utils/parseAuthData';
 import { useEffect } from "react";
 
@@ -38,8 +35,9 @@ const Redirect = () => {
             }
                                 
             try {
-                await setDoc(doc(db, "users", `${user_id}`), userData)
-                } catch (e) {
+                await fetch(`https://us-central1-stroller-stats.cloudfunctions.net/app/create-user`, {method: "POST", headers: {"Content-Type": "application/json",
+                }, body: JSON.stringify(userData)})
+            } catch (e) {
                 console.error("Error adding user: ", e);
             }
             navigate("/", {state: "justLoggedIn"})
