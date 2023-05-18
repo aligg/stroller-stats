@@ -14,7 +14,7 @@ const Nav = ({loggedIn}) => {
         <nav className="navbar">
             <a href="/"><img src="/logo.png" alt="stroller" height="50px"/></a>
             {isLoggedIn && (<div id="nav-container">
-                {menuVisible && (<div class="menu-items">
+                {menuVisible && (<div className="menu-items">
                     <li><a href="/">Home</a></li>
                     <li><a href="/about">About </a></li>
                     <li><a href="/" onClick={() => window.localStorage.clear()}>Logout</a></li>

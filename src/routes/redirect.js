@@ -1,4 +1,5 @@
 import { doc, setDoc } from "firebase/firestore";
+// import { getAuth, signInWithCustomToken } from "firebase/auth";
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import Loading from "../components/Loading";
@@ -13,8 +14,6 @@ const Redirect = () => {
     const location = useLocation();
     const navigate = useNavigate();
 
-    console.log(process.env.NODE_ENV)
-
     useEffect(() => {
         const authenticate = async () => {
             const [authToken, scopes] = parseAuthData(location.search) // find token in URL
@@ -28,7 +27,7 @@ const Redirect = () => {
             // TODO: better err handling
             const user_id = resp.athlete.id
             localStorage.setItem("user_id", `${resp.athlete.id}`);
-            
+                        
             const userData = {
                 user_id: user_id,
                 access_token: resp.access_token, 
