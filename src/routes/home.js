@@ -26,7 +26,7 @@ const Home = () => {
             );
         }
         
-        if (dataLoading) { //TODO: put back loading
+        if (dataLoading) {
             return (<main><Loading/></main>)
         }
 
