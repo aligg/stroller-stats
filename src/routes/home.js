@@ -4,7 +4,6 @@ import Loading from "../components/Loading";
 import MonthlyStats from "../components/MonthlyStats";
 import React from "react";
 import { useData } from "../hooks/useData";
-// import {useUser} from "../hooks/useUser"
 
 const Home = () => {
     const { REACT_APP_CLIENT_ID } = process.env;
@@ -13,7 +12,6 @@ const Home = () => {
         window.location = `http://www.strava.com/oauth/authorize?client_id=${REACT_APP_CLIENT_ID}&response_type=code&redirect_uri=${redirectUrl}/exchange_token&approval_prompt=force&scope=read,activity:read,activity:write`;
     };
     const user_id = localStorage.getItem("user_id");
-    // const [user, loading] = useUser(user_id) //TODO: replace client request
     const [data, dataLoading] = useData(user_id)
 
     const renderContent = () => {
@@ -33,7 +31,7 @@ const Home = () => {
         else {
             return (
                 <>
-                    <p>Hey! 👋</p>
+                    <p>Hey {data.first_name}! 👋</p>
                     <AnnualStats data={data} />
                     <MonthlyStats userId={user_id}/>
                 </>

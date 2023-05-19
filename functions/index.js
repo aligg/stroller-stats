@@ -210,6 +210,16 @@ const getMiles = (meters) =>{
   return meters * 0.000621371192;
 };
 
+const getUserName = async (userId) => {
+  return db.collection("users")
+      .where("user_id", "==", Number(userId))
+      .limit(1)
+      .get()
+      .then((data) => {
+        return data.docs[0].get("first_name");
+      });
+};
+
 app.get("/user-activity-data/:user_id", async (request, res) => {
   const userId = request.params.user_id;
   const data = {
@@ -217,11 +227,17 @@ app.get("/user-activity-data/:user_id", async (request, res) => {
     "total_run_miles": 0,
     "average_run_speed": null,
     "average_walk_speed": null,
+    "first_name": "",
   };
   const currYear = new Date().getFullYear().toString();
   let walkTime = 0;
   let runTime = 0;
 
+  // populate user
+  const name = await getUserName(userId);
+  data["first_name"] = name;
+
+  // retrieve activities
   const snapshot = await admin.firestore().collection("activities")
       .where("user_id", "==", Number(userId))
       .where("is_stroller", "==", true)
@@ -256,36 +272,6 @@ app.get("/user-activity-data/:user_id", async (request, res) => {
   data["average_walk_speed"] = minsPerMileWalk + ":" + secsPerMileWalk.toString().padStart(2, "0");
 
   res.status(200).send(JSON.stringify(data));
-});
-
-app.get("/monthly-activities/:user_id", async (request, res) => {
-  const userId = request.params.user_id;
-  const snapshot = await admin.firestore().collection("activities")
-      .where("user_id", "==", Number(userId))
-      .get();
-
-  const monthlyData = [];
-  snapshot.forEach((doc) => {
-    const data = doc.data();
-    const startDate = new Date(data.start_date);
-    const month = startDate.getMonth() + 1;
-    const year = startDate.getFullYear();
-    const monthIdentifier = `${year}-${month}`;
-    const existingObject = monthlyData.find((obj) => obj.month === monthIdentifier);
-    if (existingObject) {
-      const key = `${data.sport_type.toLowerCase()}_distance`;
-      existingObject[key] += data.distance;
-    } else {
-      let newObject ={};
-      if (data.sport_type === "Run") {
-        newObject = {month: monthIdentifier, run_distance: data.distance, walk_distance: 0};
-      } else {
-        newObject = {month: monthIdentifier, run_distance: 0, walk_distance: data.distance};
-      }
-      monthlyData.push(newObject);
-    }
-  });
-  res.status(200).send(JSON.stringify(monthlyData));
 });
 
 app.get("/monthly-activities/:user_id", async (request, res) => {
