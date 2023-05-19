@@ -14,7 +14,7 @@ const Home = () => {
     };
     const user_id = localStorage.getItem("user_id");
     // const [user, loading] = useUser(user_id) //TODO: replace client request
-    // const [data, dataLoading] = useData(user_id)
+    const [data, dataLoading] = useData(user_id)
 
     const renderContent = () => {
         if (user_id == null) {
@@ -26,15 +26,15 @@ const Home = () => {
             );
         }
         
-        // if (dataLoading) { //TODO: put back loading
-        //     return (<main><Loading/></main>)
-        // }
+        if (dataLoading) { //TODO: put back loading
+            return (<main><Loading/></main>)
+        }
 
         else {
             return (
                 <>
-                    <p>Hey! Annual data will be back shortly👋</p>
-                    {/* <AnnualStats data={data} /> */}
+                    <p>Hey! 👋</p>
+                    <AnnualStats data={data} />
                     <MonthlyStats userId={user_id}/>
                 </>
             )

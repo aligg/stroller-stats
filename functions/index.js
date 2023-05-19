@@ -206,6 +206,88 @@ const handlePost = async (userId, activityId) => {
   }
 };
 
+const getMiles = (meters) =>{
+  return meters * 0.000621371192;
+};
+
+app.get("/user-activity-data/:user_id", async (request, res) => {
+  const userId = request.params.user_id;
+  const data = {
+    "total_walk_miles": 0,
+    "total_run_miles": 0,
+    "average_run_speed": null,
+    "average_walk_speed": null,
+  };
+  const currYear = new Date().getFullYear().toString();
+  let walkTime = 0;
+  let runTime = 0;
+
+  const snapshot = await admin.firestore().collection("activities")
+      .where("user_id", "==", Number(userId))
+      .where("is_stroller", "==", true)
+      .where("start_date", ">", currYear)
+      .get();
+
+  if (snapshot.size === 0) {
+    res.status(200).send(JSON.stringify(data));
+  }
+
+  // populate annual mileage data
+  snapshot.forEach((doc) => {
+    const dbData = doc.data();
+    if (dbData.sport_type === "Run") {
+      data["total_run_miles"] += getMiles(dbData.distance);
+      // run_time_seconds = distance (meters) / average_speed (m/s)
+      runTime += dbData.distance / dbData.average_speed;
+    } else if (dbData.sport_type === "Walk") {
+      data["total_walk_miles"] += getMiles(dbData.distance);
+      walkTime += dbData.distance / dbData.average_speed;
+    }
+  });
+
+  // populate speeds
+  const minsPerMileRun = Math.floor((runTime / data["total_run_miles"]) / 60);
+  const minsPerMileWalk = Math.floor((walkTime / data["total_walk_miles"]) / 60);
+
+  const secsPerMileRun = Math.floor((runTime / data["total_run_miles"]) % 60);
+  const secsPerMileWalk = Math.floor((runTime / data["total_walk_miles"]) % 60);
+
+  data["average_run_speed"] = minsPerMileRun + ":" + secsPerMileRun.toString().padStart(2, "0");
+  data["average_walk_speed"] = minsPerMileWalk + ":" + secsPerMileWalk.toString().padStart(2, "0");
+
+  res.status(200).send(JSON.stringify(data));
+});
+
+app.get("/monthly-activities/:user_id", async (request, res) => {
+  const userId = request.params.user_id;
+  const snapshot = await admin.firestore().collection("activities")
+      .where("user_id", "==", Number(userId))
+      .get();
+
+  const monthlyData = [];
+  snapshot.forEach((doc) => {
+    const data = doc.data();
+    const startDate = new Date(data.start_date);
+    const month = startDate.getMonth() + 1;
+    const year = startDate.getFullYear();
+    const monthIdentifier = `${year}-${month}`;
+    const existingObject = monthlyData.find((obj) => obj.month === monthIdentifier);
+    if (existingObject) {
+      const key = `${data.sport_type.toLowerCase()}_distance`;
+      existingObject[key] += data.distance;
+    } else {
+      let newObject ={};
+      if (data.sport_type === "Run") {
+        newObject = {month: monthIdentifier, run_distance: data.distance, walk_distance: 0};
+      } else {
+        newObject = {month: monthIdentifier, run_distance: 0, walk_distance: data.distance};
+      }
+      monthlyData.push(newObject);
+    }
+  });
+  res.status(200).send(JSON.stringify(monthlyData));
+});
+
 app.get("/monthly-activities/:user_id", async (request, res) => {
   const userId = request.params.user_id;
   const snapshot = await admin.firestore().collection("activities").where("user_id", "==", Number(userId)).get();
