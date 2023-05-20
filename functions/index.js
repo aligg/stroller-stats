@@ -131,13 +131,13 @@ const retrieveMonthlyStrollerMiles = async (recentActivity) => {
 const updateDescription = async (recentActivity, accessToken) => {
   const description = recentActivity.description;
   // if already wrote, exit
-  if (description.includes("StrollerStats.com -")) {
+  if (description.includes("StrollerStats.com -") || description.includes("| strollerstats.com")) {
     return;
   }
   const activityId = recentActivity.activity_id;
   const totalMiles = await retrieveMonthlyStrollerMiles(recentActivity);
   // eslint-disable-next-line max-len
-  const updatedDescription = description.concat("\n", `StrollerStats.com - ${totalMiles} stroller ${recentActivity.sport_type.toLowerCase()} miles so far this month`);
+  const updatedDescription = description.concat("\n", `${totalMiles} stroller ${recentActivity.sport_type.toLowerCase()} miles so far this month | strollerstats.com`);
   const requestOptions = {
     method: "PUT",
     // eslint-disable-next-line max-len
