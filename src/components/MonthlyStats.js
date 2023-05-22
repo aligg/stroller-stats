@@ -50,9 +50,19 @@ const MonthlyStats = ({userId}) => {
                     line: {color: "#00f5d4", width: 3}
                 },
             ]}
-            layout={ { font: {family: "Inter", color: "black"}, font_color: "black", dragmode: false, xaxis: {type: "date", 'tickformat': '%b', tickmode: "array", tickvals: months}, yaxis: {title: "Stroller Miles", "tickformat": ".2f"}, hovermode: "x", legend: {
-            orientation: "h"
-            }, margin: {l: 0, r: 0}} }
+            layout={ { 
+                font: {family: "Inter", color: "black"}, 
+                font_color: "black", 
+                dragmode: false, 
+                xaxis: {type: "date", 'tickformat': '%b', tickmode: "array", tickvals: months}, 
+                yaxis: {visible: true, hoverformat: ".2f"}, 
+                hovermode: "x", 
+                tickformat: ".0f",
+                legend: {
+                    orientation: "h"
+                }, 
+                margin: { r: 0, l: 15, t: 0}
+            } }
             useResizeHandler={true}
             style={{width: "100%"}}
             config={{displayModeBar: false}}
