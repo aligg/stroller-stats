@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 
 import Loading from "./Loading";
 import Plot from 'react-plotly.js';
+import { PropTypes } from "prop-types";
+import React from "react";
 import { formatMonthData } from "../utils/formatMonthData";
 
 const MonthlyStats = ({userId}) => {
@@ -67,8 +69,11 @@ const MonthlyStats = ({userId}) => {
             />}
         </>
     );
+}
 
-
+MonthlyStats.propTypes = {
+    userId: PropTypes.string.isRequired,
 }
 
 export default MonthlyStats;
+
