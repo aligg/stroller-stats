@@ -210,6 +210,16 @@ const getMiles = (meters) =>{
   return meters * 0.000621371192;
 };
 
+const getUser = async (userId) => {
+  return db.collection("users")
+      .where("user_id", "==", Number(userId))
+      .limit(1)
+      .get()
+      .then((data) => {
+        return data.docs[0];
+      });
+};
+
 const getUserName = async (userId) => {
   return db.collection("users")
       .where("user_id", "==", Number(userId))
@@ -219,6 +229,24 @@ const getUserName = async (userId) => {
         return data.docs[0].get("first_name");
       });
 };
+
+app.get("/user/:user_id", async (request, res) => {
+  const userId = request.params.user_id;
+  const doc = await getUser(userId);
+  res.status(200).send(JSON.stringify(doc.data()));
+});
+
+app.post("/update-user/", async (request, res) => {
+  const userId = request.body.user_id;
+
+  const userData = request.body;
+
+  await db.collection("users").doc(userId.toString())
+      .update(userData).then(() => {
+        functions.logger.info("Wrote user to DB", userData);
+      });
+  res.status(200).send("wrote");
+});
 
 app.get("/user-activity-data/:user_id", async (request, res) => {
   const userId = request.params.user_id;
@@ -366,22 +394,6 @@ app.post("/sync-historical-data/:user_id", async (request, res) => {
         });
       }
     });
-    // const doc = await db.collection("activities").doc(activityId).get();
-    // if (doc.exists) {
-    //   functions.logger.info("Write skipped, doc already exists in database");
-    // } else {
-    //   // Ping Strava API again b/c list API doesn't include description
-    //   const activityWithDescription = await getActivity(accessToken, activityId);
-    //   // if stroller handle side effects
-    //   if (activityWithDescription.is_stroller) {
-    //     functions.logger.info("GOT IN with stroller");
-    //     const added = await addActivityToDB(activityWithDescription);
-    //     functions.logger.info("ADDED value", added);
-    //     writes += added;
-    //     await updateDescription(activityWithDescription, accessToken);
-    //     functions.logger.info("writes now", writes);
-    //   }
-    // }
   });
   res.status(200).send(JSON.stringify({writes: writes, activities_length: data.length, start_date: firstActivity, end_date: lastActivity}));
 });
