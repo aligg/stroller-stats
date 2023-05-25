@@ -232,8 +232,12 @@ const getUserName = async (userId) => {
 
 app.get("/user/:user_id", async (request, res) => {
   const userId = request.params.user_id;
+  functions.logger.info(userId);
   const doc = await getUser(userId);
-  res.status(200).send(JSON.stringify(doc.data()));
+  functions.logger.info("doc", doc);
+  const data = await doc.data();
+  functions.logger.info("Data", data);
+  res.status(200).send(JSON.stringify(data));
 });
 
 app.post("/update-user/", async (request, res) => {
@@ -243,9 +247,9 @@ app.post("/update-user/", async (request, res) => {
 
   await db.collection("users").doc(userId.toString())
       .update(userData).then(() => {
-        functions.logger.info("Wrote user to DB", userData);
+        functions.logger.info("Wrote user update to DB", userData);
       });
-  res.status(200).send("wrote");
+  res.status(200).send({"updated_user": userId});
 });
 
 app.get("/user-activity-data/:user_id", async (request, res) => {
