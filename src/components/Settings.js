@@ -25,6 +25,8 @@ const Settings = () => {
           }, body: JSON.stringify({user_id: Number(userId), opted_in_leaderboard: optedIn})})
     }
 
+
+    // TODO: rate limit before launch
     // const handleClick = async () => {
     //     setLoading(true)
     //     const response = await fetch(`https://us-central1-stroller-stats.cloudfunctions.net/app/sync-historical-data/${userId}`, {method: "POST", headers: {
