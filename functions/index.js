@@ -355,7 +355,7 @@ app.post("/create-user", async (request, response) => {
   };
 
   await db.collection("users").doc(userId.toString())
-      .set(userData).then(() => {
+      .set(userData, {merge: true}).then(() => {
         functions.logger.info("Wrote user to DB", userData);
       });
   response.status(200).send("wrote");

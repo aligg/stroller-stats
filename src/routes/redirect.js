@@ -21,17 +21,22 @@ const Redirect = () => {
             };
             const response = await fetch(`https://www.strava.com/api/v3/oauth/token?client_id=${REACT_APP_CLIENT_ID}&client_secret=${REACT_APP_CLIENT_SECRET}&code=${authToken}&grant_type=authorization_code`, requestOptions)
             const resp = await response.json()
+            
             // TODO: better err handling
-            const user_id = resp.athlete.id
-            localStorage.setItem("user_id", `${resp.athlete.id}`);
-                        
+            let user_id;
+            let firstname;
+            if (resp.athlete) {
+                user_id = resp.athlete.id
+                firstname = resp.athlete.firstname
+                localStorage.setItem("user_id", `${resp.athlete.id}`);
+            }             
             const userData = {
                 user_id: user_id,
                 access_token: resp.access_token, 
                 refresh_token: resp.refresh_token,
                 scopes: scopes,
                 expires_at: resp.expires_at,
-                first_name: resp.athlete.firstname
+                first_name: firstname
             }
                                 
             try {
