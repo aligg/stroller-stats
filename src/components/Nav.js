@@ -16,7 +16,8 @@ const Nav = ({loggedIn}) => {
             {isLoggedIn && (<div id="nav-container">
                 {menuVisible && (<div className="menu-items">
                     <li><a href="/">Home</a></li>
-                    <li><a href="/about">About + Settings </a></li>
+                    <li><a href="/about">About </a></li>
+                    <li><a href="/settings">Settings </a></li>
                     <li><a href="/" onClick={() => window.localStorage.clear()}>Logout</a></li>
                 </div>)}
                 <img src={`/${menuVisible ? "close" : "hamburger"}.png`} height="50px" alt="hamburger menu" onClick={toggleMenu}/>

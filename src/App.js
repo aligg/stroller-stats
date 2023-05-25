@@ -6,6 +6,7 @@ import Home from "./routes/home";
 import Nav from "./components/Nav";
 import React from "react";
 import Redirect from "./routes/redirect";
+import Settings from "./components/Settings";
 
 export default function App() {
   const user_id = localStorage.getItem("user_id");
@@ -29,6 +30,12 @@ export default function App() {
             path="/about"
             element={
                 <About />
+            }
+          />
+           <Route
+            path="/settings"
+            element={
+                <Settings />
             }
           />
         </Routes>

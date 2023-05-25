@@ -36,11 +36,11 @@ const Settings = () => {
     // }
 
     return (
-        <div>
+        <main>
             <h1>Settings</h1>
             <h2>Leaderboard</h2>
             <div className="leaderboard-toggle-container">
-            <p style={{marginBlockEnd: 0, maxWidth: "60%"}}>Opt in to the leaderboard (coming soon!). This means that other users will see your first name and monthly mileage. </p>
+            <p style={{marginBlockEnd: 0, maxWidth: "60%"}}>Include me in the leaderboard (coming soon!). This means that other users will see your first name and monthly mileage. </p>
             <div style={{display: "flex", alignItems: "center"}}>
                 <label className="switch">
                     <input type="checkbox" onChange={updateUser} checked={checked}/>
@@ -50,7 +50,7 @@ const Settings = () => {
             </div>
             </div>
             {/* <button disabled={!!loading }onClick={handleClick}>{loading? "Work in progress..." : "Sync data from previously this year."}</button> */}
-        </div>
+        </main>
     )
 }
 export default Settings;
