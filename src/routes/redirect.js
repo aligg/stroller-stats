@@ -1,3 +1,4 @@
+// import { getAuth, signInWithCustomToken } from "firebase/auth";
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import Loading from "../components/Loading";
@@ -45,10 +46,32 @@ const Redirect = () => {
             } catch (e) {
                 console.error("Error adding user: ", e);
             }
+
+            // try {
+            //     const resp = await fetch(`https://us-central1-stroller-stats.cloudfunctions.net/app/auth-user`, {method: "POST", headers: {"Content-Type": "application/json",
+            //     }, body: JSON.stringify(userData)})
+            //     const data = await resp.json();
+                
+            
+            //     const auth = getAuth();
+            //     signInWithCustomToken(auth, data.customToken)
+            //     .then((userCredential) => {
+            //         // Signed in
+            //         const user = userCredential.user;
+            //         console.log("hey cool we logged in", user)
+            //     })
+            //     .catch((error) => {
+            //         console.error(error);
+            //     });
+                
+            // } catch (e) {
+            //     console.error("Error adding user: ", e);
+            // }
+            
             navigate("/", {state: "justLoggedIn"})
        }
     authenticate()
-    }, [location.search, navigate])
+    }, [/*location.search, navigate*/])
     
     return (
         <main><Loading/></main>

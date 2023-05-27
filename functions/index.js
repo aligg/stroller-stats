@@ -1,5 +1,11 @@
 /* eslint-disable max-len */
 
+// The Firebase Admin SDK to access Firestore.
+const admin = require("firebase-admin");
+const {applicationDefault} = require("firebase-admin/app");
+
+const {getAuth} = require("firebase-admin/auth");
+
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_KEY,
   authDomain: "stroller-stats.firebaseapp.com",
@@ -8,11 +14,10 @@ const firebaseConfig = {
   messagingSenderId: "958011019232",
   appId: "1:958011019232:web:70b9bc995f933a4c782585",
   measurementId: "G-L9CK7DZZQH",
+  credential: applicationDefault(),
 };
 
-// The Firebase Admin SDK to access Firestore.
-const admin = require("firebase-admin");
-admin.initializeApp(firebaseConfig);
+const firebaseApp = admin.initializeApp(firebaseConfig);
 const functions = require("firebase-functions");
 const fetch = require("node-fetch");
 const db = admin.firestore();
@@ -308,6 +313,7 @@ app.get("/user-activity-data/:user_id", async (request, res) => {
 
 app.get("/monthly-activities/:user_id", async (request, res) => {
   const userId = request.params.user_id;
+
   const snapshot = await admin.firestore().collection("activities").where("user_id", "==", Number(userId)).get();
   const monthlyData = [];
   snapshot.forEach((doc) => {
@@ -341,6 +347,21 @@ const getBeginningOfYearTimestamp = () => {
 
   return timestamp;
 };
+
+app.post("/auth-user", async (request, response) => {
+  const accessToken = request.body.access_token;
+  // const userId = request.body.user_id;
+  // Check that a user id exists with that access token.
+  functions.logger.info("top of /auth-user with: ", request.body, accessToken, typeof accessToken);
+  getAuth(firebaseApp)
+      .createCustomToken(accessToken)
+      .then((customToken) => {
+        response.status(200).send({customToken});
+      })
+      .catch((error) => {
+        functions.logger.info("Error creating custom token:", error);
+      });
+});
 
 app.post("/create-user", async (request, response) => {
   const userId = request.body.user_id;

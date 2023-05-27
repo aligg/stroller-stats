@@ -9,7 +9,9 @@ export const useData = (userId) => {
         
         const getData = async (userId) => {
             setLoading(true)
-
+            if (!userId) {
+                return;
+            }
             const response = await fetch(`https://us-central1-stroller-stats.cloudfunctions.net/app/user-activity-data/${userId}`)
             const data = await response.json();
             
