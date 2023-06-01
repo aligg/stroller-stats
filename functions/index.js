@@ -5,6 +5,7 @@ const admin = require("firebase-admin");
 const {applicationDefault} = require("firebase-admin/app");
 
 const {getAuth} = require("firebase-admin/auth");
+const {writeMonthlyData} = require("./monthlyData");
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_KEY,
@@ -382,6 +383,68 @@ app.post("/create-user", async (request, response) => {
   response.status(200).send("wrote");
 });
 
+const getPrevMonthIdentifier = () => {
+  const currentDate = new Date(); // Get the current date
+  const currentYear = currentDate.getFullYear(); // Get the current year
+  const currentMonth = currentDate.getMonth() + 1; // Get the current month (0-indexed, so we add 1)
+  let previousMonth;
+  let previousYear;
+  // Handle the case where the current month is January (1)
+  if (currentMonth === 1) {
+    previousYear = currentYear - 1; // Subtract 1 from the current year
+    previousMonth = 12; // Set the previous month to December (12)
+  } else {
+    previousYear = currentYear; // Keep the current year
+    previousMonth = currentMonth - 1; // Subtract 1 from the current month
+  }
+
+  // Return the previous month and year as a string in the format "YYYY-MM"
+  return previousYear + "-" + previousMonth;
+};
+
+
+app.get("/leaderboard", async (request, response) => {
+  // Verify current opt-ins again to account for opted in then opted out
+  const optedInSnap = await db.collection("users").where("opted_in_leaderboard", "==", true).get();
+  const optedInUserIds = [];
+  optedInSnap.forEach((doc) => {
+    const user = doc.data();
+    optedInUserIds.push(user.user_id);
+  });
+
+  const currDate = new Date();
+  const currMonth = currDate.getMonth() + 1;
+  const year = currDate.getFullYear();
+  const currMonthIdentifier = `${year}-${currMonth}`;
+  const lastMonthIdentifier = getPrevMonthIdentifier();
+
+  const currMonthData = [];
+  const lastMonthData = [];
+  const currSnapshot = await db.collection("leaderboard")
+      .doc(currMonthIdentifier)
+      .collection("monthly-data")
+      .get();
+  currSnapshot.forEach((doc) => {
+    const userMonthlyData = doc.data();
+    if (optedInUserIds.includes(userMonthlyData.user_id)) {
+      functions.logger.info("Found:", userMonthlyData);
+      currMonthData.push(userMonthlyData);
+    }
+  });
+  const snapshot = await db.collection("leaderboard")
+      .doc(lastMonthIdentifier)
+      .collection("monthly-data")
+      .get();
+  snapshot.forEach((doc) => {
+    const userMonthlyData = doc.data();
+    if (optedInUserIds.includes(userMonthlyData.user_id)) {
+      functions.logger.info("Found:", userMonthlyData);
+      lastMonthData.push(userMonthlyData);
+    }
+  });
+  response.status(200).send(JSON.stringify({currMonthData, lastMonthData}));
+});
+
 /** TODO: below got super hacky - clean up and add tests */
 app.post("/sync-historical-data/:user_id", async (request, res) => {
   const userId = Number(request.body.user_id);
@@ -423,4 +486,18 @@ app.post("/sync-historical-data/:user_id", async (request, res) => {
   res.status(200).send(JSON.stringify({writes: writes, activities_length: data.length, start_date: firstActivity, end_date: lastActivity}));
 });
 
+// const monthlyData = functions.https.onRequest((request, response) => {
+//   writeMonthlyData(db).then(() => {
+//     response.status(204).write("completed");
+//   });
+// });
+
+
 exports.app = functions.https.onRequest(app);
+exports.monthlyData = functions.pubsub.schedule("every 120 minutes from 8:00 to 20:00").onRun((context) => {
+  writeMonthlyData(db).then(() => {
+    functions.logger.info("Executed monthly data write");
+  });
+  return null;
+});
+// exports.monthlyData = monthlyData;
