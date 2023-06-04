@@ -275,3 +275,7 @@ input:checked + .slider:before {
 th {
   font-weight: bolder;
 }
+
+td > a {
+  color: #03045e;
+}

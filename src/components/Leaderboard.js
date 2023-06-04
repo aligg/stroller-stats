@@ -22,8 +22,8 @@ const LeaderboardTable = ({data, sport}) => {
                     {sortedData.map((obj, i) => {
                         return (
                             <tr key={obj.first_name+i}>
-                                <td>{i+1}</td>
-                                <td>{obj.first_name}</td>
+                                <td>{i === 0 ? <p style={{margin: 0, padding: 0}}>{i+1} &#128081;</p> : i+1}</td>
+                                <td><a href={`https://www.strava.com/athletes/${obj.user_id}`} target="_blank" rel="noreferrer">{obj.first_name}</a></td>
                                 <td>{getMiles(obj[key]).toFixed(2)}</td>
                             </tr>
                         )
@@ -66,7 +66,7 @@ const Leaderboard = () => {
             <TabPanel>{loading ? <Loading/> : <LeaderboardTable data={data.currMonthData} sport="walk"/>}</TabPanel>
             <TabPanel>{loading ? <Loading/> : <LeaderboardTable data={data.currMonthData} sport="run"/>}</TabPanel>
         </Tabs>
-            <p style={{textAlign: "right"}}>Want to opt into the leaderboard? Head over to <a href="/settings">settings</a>.</p><p style={{textAlign: "right"}}>Please note that the leaderboard updates a few times daily. Wonky numbers? This is a new feature that is in development - expect bugs🙏</p>
+            <p style={{textAlign: "right"}}>Please note that the leaderboard updates a few times daily. Wonky numbers? This is a new feature that is in development - expect bugs🙏 Want to opt in to the leaderboard? Head over to <a href="/settings">settings</a>.</p>
     </>)
 }
 

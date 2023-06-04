@@ -486,12 +486,6 @@ app.post("/sync-historical-data/:user_id", async (request, res) => {
   res.status(200).send(JSON.stringify({writes: writes, activities_length: data.length, start_date: firstActivity, end_date: lastActivity}));
 });
 
-// const monthlyData = functions.https.onRequest((request, response) => {
-//   writeMonthlyData(db).then(() => {
-//     response.status(204).write("completed");
-//   });
-// });
-
 
 exports.app = functions.https.onRequest(app);
 exports.monthlyData = functions.pubsub.schedule("every 120 minutes from 8:00 to 20:00").onRun((context) => {
@@ -500,4 +494,3 @@ exports.monthlyData = functions.pubsub.schedule("every 120 minutes from 8:00 to 
   });
   return null;
 });
-// exports.monthlyData = monthlyData;
