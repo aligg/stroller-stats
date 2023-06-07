@@ -21,8 +21,8 @@ const Home = () => {
                 <div>
                     <About />
                     <button className="authButton" onClick={handleLogin}>
-                        <img src="/strava-button.png"alt="Connect with Strava" /
-                    ></button>
+                        <img src="/strava-button.png"alt="Connect with Strava" />
+                    </button>
                 </div>
             );
         }

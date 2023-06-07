@@ -8,6 +8,7 @@ export const useData = (userId) => {
     useEffect(() => {
         
         const getData = async (userId) => {
+            
             setLoading(true)
             if (!userId) {
                 return;

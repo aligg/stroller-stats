@@ -18,11 +18,11 @@ const AnnualStats = ({data}) => {
                     </tr>
                     <tr>
                         <td>Average run pace with stroller</td>
-                        <td>{data["average_run_speed"]} min/mile</td>
+                        <td>{data["average_run_speed"] === null ? "N/A" : `${data["average_run_speed"]} min/mile`}</td>
                     </tr>
                     <tr>
                         <td>Average walk pace with stroller</td>
-                        <td>{data["average_walk_speed"]} min/mile</td>
+                        <td>{data["average_walk_speed"] === null ? "N/A" : `${data["average_walk_speed"]} min/mile`}</td>
                     </tr>
                 </tbody>
         </table>
