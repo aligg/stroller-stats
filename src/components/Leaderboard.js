@@ -66,7 +66,7 @@ const Leaderboard = () => {
             <TabPanel>{loading ? <Loading/> : <LeaderboardTable data={data.currMonthData} sport="walk"/>}</TabPanel>
             <TabPanel>{loading ? <Loading/> : <LeaderboardTable data={data.currMonthData} sport="run"/>}</TabPanel>
         </Tabs>
-            <p style={{textAlign: "right"}}>Please note that the leaderboard updates a few times daily. Wonky numbers? This is a new feature that is in development - expect bugs🙏 Want to opt in to the leaderboard? Head over to <a href="/settings">settings</a>.</p>
+            <p style={{textAlign: "right"}}>Please note that the leaderboard updates a few times daily. Opt in to the leaderboard in <a href="/settings">settings</a>.</p>
     </>)
 }
 
