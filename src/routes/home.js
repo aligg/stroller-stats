@@ -20,7 +20,7 @@ const Home = () => {
             return (
                 <div>
                     <About />
-                    <button onClick={handleLogin}>Connect with Strava</button>
+                    <button className="authButton" onClick={handleLogin}><img src="/strava-button.png"alt="Connect with Strava" /></button>
                 </div>
             );
         }
