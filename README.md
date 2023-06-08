@@ -2,7 +2,7 @@
 
 This project integrates with the Strava API to display stroller run data. It is deployed at [StrollerStats.com](https://strollerstats.com). The project was bootstrapped with Create-React-App on the frontend and Google Firebase Functions and Firestore for the backend
 
-![Preview of the app appearance]("preview.png")
+![Preview of the app appearance](preview.png)
 
 ## Running Locally
 
