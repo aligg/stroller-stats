@@ -1,3 +1,5 @@
+/* eslint-disable testing-library/no-container */
+/* eslint-disable testing-library/no-node-access */
 import '@testing-library/jest-dom'
 
 import {render, screen} from '@testing-library/react'
@@ -22,7 +24,7 @@ const newUserTestData = {
 
 describe(("AnnualStats"), () => {
     test("handles new user", async () => {
-        await render(<AnnualStats data={newUserTestData} />)
+        await render(<AnnualStats data={newUserTestData} loading={false}/>)
         const cells = await screen.findAllByRole("cell")
         expect(cells[0]).toHaveTextContent("Total stroller run miles")
         expect(cells[1]).toHaveTextContent("0.00")
@@ -35,7 +37,7 @@ describe(("AnnualStats"), () => {
     })
 
     test("handles user with populated data", async () => {
-        await render(<AnnualStats data={populatedTestData} />)
+        await render(<AnnualStats data={populatedTestData} loading={false}/>)
         const cells = await screen.findAllByRole("cell")
         expect(cells[0]).toHaveTextContent("Total stroller run miles")
         expect(cells[1]).toHaveTextContent("46.86")
@@ -45,5 +47,10 @@ describe(("AnnualStats"), () => {
         expect(cells[5]).toHaveTextContent("12:56 min/mile")
         expect(cells[6]).toHaveTextContent("Average walk pace with stroller")
         expect(cells[7]).toHaveTextContent("25:52 min/mile")
+    })
+
+    test("handles loading", async () => {
+        const {container} = await render(<AnnualStats data={populatedTestData} loading={true}/>)
+        expect(container.getElementsByClassName("loading-spinner")).toHaveLength(1)
     })
 })

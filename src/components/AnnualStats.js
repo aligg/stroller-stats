@@ -1,9 +1,11 @@
-const AnnualStats = ({data}) => {
+import Loading from "./Loading";
+
+const AnnualStats = ({data, loading}) => {
     const year = new Date().getFullYear()
     return (
     <>
         <h1>{year} year to date</h1>
-            <table>
+            {loading? <Loading/> : (<table>
                 <tbody>
                     <tr>
                         <th></th>
@@ -25,7 +27,7 @@ const AnnualStats = ({data}) => {
                         <td>{data["average_walk_speed"] === null ? "N/A" : `${data["average_walk_speed"]} min/mile`}</td>
                     </tr>
                 </tbody>
-        </table>
+        </table>)}
     </>
     )
 }

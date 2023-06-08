@@ -26,16 +26,12 @@ const Home = () => {
                 </div>
             );
         }
-        
-        if (dataLoading) {
-            return (<main><Loading/></main>)
-        }
 
         else {
             return (
                 <>
-                    <p>Hey {data.first_name}! 👋</p>
-                    <AnnualStats data={data} />
+                    <p>{data && `Hey ${data.first_name}! 👋`}</p>
+                    <AnnualStats data={data} loading={dataLoading}/>
                     <MonthlyStats userId={user_id}/>
                     <Leaderboard />
                 </>

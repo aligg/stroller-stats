@@ -1,11 +1,11 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Redirect, Route, Routes } from "react-router-dom";
 
 import About from "./components/About";
 import Footer from "./components/Footer";
 import Home from "./routes/home";
 import Nav from "./components/Nav";
 import React from "react";
-import Redirect from "./routes/redirect";
+import RedirectComponent from "./routes/redirect";
 import Settings from "./components/Settings";
 
 export default function App() {
@@ -23,7 +23,7 @@ export default function App() {
             }
           />
             <Route path="/redirect/exchange_token" element={
-                <Redirect />
+                <RedirectComponent />
             }
             />
            <Route
@@ -38,6 +38,7 @@ export default function App() {
                 <Settings />
             }
           />
+          <Route path="*" element={<Navigate to="/"/>}/>
         </Routes>
         <Footer />
         </div>
