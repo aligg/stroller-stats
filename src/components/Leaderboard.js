@@ -9,7 +9,7 @@ import { getPreviousMonth } from '../utils/getPreviousMonth';
 
 const LeaderboardTable = ({data, sport}) => {
     const key = `${sport}_distance`
-    const sortedData = data ? data.sort((a, b) => b[key] - a[key]) : [];
+    const sortedData = data ? data.sort((a, b) => b[key] - a[key]).filter((obj) => {return obj[key] !== 0}) : [];
     return (
         <>
             <table>

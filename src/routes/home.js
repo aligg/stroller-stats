@@ -1,7 +1,6 @@
 import About from "../components/About";
 import AnnualStats from "../components/AnnualStats";
 import Leaderboard from "../components/Leaderboard";
-import Loading from "../components/Loading";
 import MonthlyStats from "../components/MonthlyStats";
 import React from "react";
 import { useData } from "../hooks/useData";

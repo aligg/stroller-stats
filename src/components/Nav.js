@@ -1,6 +1,6 @@
 import {useLocation} from "react-router-dom"
 /* eslint-disable react/jsx-no-comment-textnodes */
-import { useState } from "react"
+import {useState} from "react"
 
 const Nav = ({loggedIn}) => {
     const location = useLocation()

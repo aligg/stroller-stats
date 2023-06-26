@@ -12,6 +12,7 @@ const Redirect = () => {
     const location = useLocation();
     const navigate = useNavigate();
 
+
     useEffect(() => {
         const authenticate = async () => {
             const [authToken, scopes] = parseAuthData(location.search) // find token in URL
@@ -23,7 +24,6 @@ const Redirect = () => {
             const response = await fetch(`https://www.strava.com/api/v3/oauth/token?client_id=${REACT_APP_CLIENT_ID}&client_secret=${REACT_APP_CLIENT_SECRET}&code=${authToken}&grant_type=authorization_code`, requestOptions)
             const resp = await response.json()
             
-            // TODO: better err handling
             let user_id;
             let firstname;
             if (resp.athlete) {
@@ -31,6 +31,7 @@ const Redirect = () => {
                 firstname = resp.athlete.firstname
                 localStorage.setItem("user_id", `${resp.athlete.id}`);
             }             
+            
             const userData = {
                 user_id: user_id,
                 access_token: resp.access_token, 
@@ -46,32 +47,10 @@ const Redirect = () => {
             } catch (e) {
                 console.error("Error adding user: ", e);
             }
-
-            // try {
-            //     const resp = await fetch(`https://us-central1-stroller-stats.cloudfunctions.net/app/auth-user`, {method: "POST", headers: {"Content-Type": "application/json",
-            //     }, body: JSON.stringify(userData)})
-            //     const data = await resp.json();
-                
-            
-            //     const auth = getAuth();
-            //     signInWithCustomToken(auth, data.customToken)
-            //     .then((userCredential) => {
-            //         // Signed in
-            //         const user = userCredential.user;
-            //         console.log("hey cool we logged in", user)
-            //     })
-            //     .catch((error) => {
-            //         console.error(error);
-            //     });
-                
-            // } catch (e) {
-            //     console.error("Error adding user: ", e);
-            // }
-            
-            navigate("/", {state: "justLoggedIn"})
+            navigate("/")
        }
     authenticate()
-    }, [/*location.search, navigate*/])
+    }, [location.search, navigate])
     
     return (
         <main><Loading/></main>
