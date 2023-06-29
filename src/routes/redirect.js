@@ -1,4 +1,3 @@
-// import { getAuth, signInWithCustomToken } from "firebase/auth";
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import Loading from "../components/Loading";
@@ -19,9 +18,9 @@ const Redirect = () => {
             const requestOptions = {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({})
+                body: JSON.stringify({client_id: REACT_APP_CLIENT_ID, client_secret: REACT_APP_CLIENT_SECRET, code: authToken, grant_type: 'authorization_code'})
             };
-            const response = await fetch(`https://www.strava.com/api/v3/oauth/token?client_id=${REACT_APP_CLIENT_ID}&client_secret=${REACT_APP_CLIENT_SECRET}&code=${authToken}&grant_type=authorization_code`, requestOptions)
+            const response = await fetch(`https://www.strava.com/api/v3/oauth/token`, requestOptions)
             const resp = await response.json()
             
             let user_id;

@@ -1,4 +1,4 @@
-import { BrowserRouter, Navigate, Redirect, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
 import About from "./components/About";
 import Footer from "./components/Footer";
@@ -10,7 +10,7 @@ import Settings from "./components/Settings";
 
 export default function App() {
   const user_id = localStorage.getItem("user_id");
-
+  console.log(user_id)
   return (
     <BrowserRouter>
     <div id="container">
