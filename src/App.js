@@ -10,7 +10,7 @@ import Settings from "./components/Settings";
 
 export default function App() {
   const user_id = localStorage.getItem("user_id");
-  console.log(user_id)
+
   return (
     <BrowserRouter>
     <div id="container">

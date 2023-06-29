@@ -9,7 +9,6 @@ const Nav = ({loggedIn}) => {
     const toggleMenu = () => {
         setDisplayMenu(!menuVisible)
     }
-    console.log(location)
 
     return (
         <nav className="navbar">
