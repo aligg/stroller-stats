@@ -42,6 +42,7 @@ const Leaderboard = () => {
     const [data, setData] = useState({})
     const currMonth = new Date().toLocaleString('default', { month: 'long' })
     const lastMonth = getPreviousMonth();
+    console.log(data)
 
     useEffect(() => {
         const retrieveData = async () => {

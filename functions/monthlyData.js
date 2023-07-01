@@ -34,9 +34,9 @@ const getOptedInUsers = async (db) => {
 };
 
 const updateLeaderboardData = async (userId, data, db) => {
-  const currDate = new Date().toLocaleDateString("en-US", {timeZone: "America/Los_Angeles"});
-  // eslint-disable-next-line no-unused-vars
-  const [currMonth, _, year] = currDate.split("/");
+  const currDate = new Date();
+  const currMonth = currDate.getMonth() + 1;
+  const year = currDate.getFullYear();
   const monthIdentifier = `${year}-${currMonth}`;
   const docRef = await db.collection("leaderboard").doc(monthIdentifier);
   docRef.collection("monthly-data").doc(userId.toString()).set(data, {merge: true});

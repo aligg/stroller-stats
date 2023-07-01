@@ -417,7 +417,10 @@ app.get("/leaderboard", async (request, response) => {
   // eslint-disable-next-line no-unused-vars
   const [currMonth, _, year] = currDate.split("/");
   const currMonthIdentifier = `${year}-${currMonth}`;
+  functions.logger.info("Found curr month:", currMonthIdentifier);
   const lastMonthIdentifier = getPrevMonthIdentifier();
+  functions.logger.info("Found last month:", lastMonthIdentifier);
+
 
   const currMonthData = [];
   const lastMonthData = [];
@@ -489,7 +492,7 @@ app.post("/sync-historical-data/:user_id", async (request, res) => {
 
 
 exports.app = functions.https.onRequest(app);
-exports.monthlyData = functions.pubsub.schedule("every 60 minutes from 7:00 to 20:00").onRun((context) => {
+exports.monthlyData = functions.pubsub.schedule("every 1 minutes from 7:00 to 20:00").onRun((context) => {
   writeMonthlyData(db).then(() => {
     functions.logger.info("Executed monthly data write");
   });
