@@ -492,7 +492,7 @@ app.post("/sync-historical-data/:user_id", async (request, res) => {
 
 
 exports.app = functions.https.onRequest(app);
-exports.monthlyData = functions.pubsub.schedule("every 1 minutes from 7:00 to 20:00").onRun((context) => {
+exports.monthlyData = functions.pubsub.schedule("every 60 minutes from 7:00 to 20:00").onRun((context) => {
   writeMonthlyData(db).then(() => {
     functions.logger.info("Executed monthly data write");
   });
