@@ -20,7 +20,7 @@ const LeaderboardTable = ({data, sport}) => {
                         <th>Miles</th>
                     </tr>
                     {
-                        sortedData.length === 0 && (<tr><p>No athletes on the board yet!</p></tr>)
+                        sortedData.length === 0 && (<tr><td>No athletes on the board yet!</td></tr>)
                     }
                     {sortedData.map((obj, i) => {
                         return (
