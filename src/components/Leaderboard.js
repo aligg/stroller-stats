@@ -19,6 +19,9 @@ const LeaderboardTable = ({data, sport}) => {
                         <th>Name</th>
                         <th>Miles</th>
                     </tr>
+                    {
+                        sortedData.length === 0 && (<tr><p>No athletes on the board yet!</p></tr>)
+                    }
                     {sortedData.map((obj, i) => {
                         return (
                             <tr key={obj.first_name+i}>

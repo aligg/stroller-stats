@@ -385,9 +385,9 @@ app.post("/create-user", async (request, response) => {
 });
 
 const getPrevMonthIdentifier = () => {
-  const currentDate = new Date(); // Get the current date
-  const currentYear = currentDate.getFullYear(); // Get the current year
-  const currentMonth = currentDate.getMonth() + 1; // Get the current month (0-indexed, so we add 1)
+  const currDate = new Date().toLocaleDateString("en-US", {timeZone: "America/Los_Angeles"});
+  // eslint-disable-next-line no-unused-vars
+  const [currentMonth, _, currentYear] = currDate.split("/");
   let previousMonth;
   let previousYear;
   // Handle the case where the current month is January (1)
@@ -413,9 +413,9 @@ app.get("/leaderboard", async (request, response) => {
     optedInUserIds.push(user.user_id);
   });
 
-  const currDate = new Date();
-  const currMonth = currDate.getMonth() + 1;
-  const year = currDate.getFullYear();
+  const currDate = new Date().toLocaleDateString("en-US", {timeZone: "America/Los_Angeles"});
+  // eslint-disable-next-line no-unused-vars
+  const [currMonth, _, year] = currDate.split("/");
   const currMonthIdentifier = `${year}-${currMonth}`;
   const lastMonthIdentifier = getPrevMonthIdentifier();
 
