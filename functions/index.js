@@ -302,13 +302,12 @@ app.get("/user-activity-data/:user_id", async (request, res) => {
 
   // populate speeds
   const minsPerMileRun = Math.floor((runTime / data["total_run_miles"]) / 60);
-  const minsPerMileWalk = Math.floor((walkTime / data["total_walk_miles"]) / 60);
-
   const secsPerMileRun = Math.floor((runTime / data["total_run_miles"]) % 60);
+  const minsPerMileWalk = Math.floor((walkTime / data["total_walk_miles"]) / 60);
   const secsPerMileWalk = Math.floor((runTime / data["total_walk_miles"]) % 60);
 
-  data["average_run_speed"] = minsPerMileRun + ":" + secsPerMileRun.toString().padStart(2, "0");
-  data["average_walk_speed"] = minsPerMileWalk + ":" + secsPerMileWalk.toString().padStart(2, "0");
+  data["average_run_speed"] = runTime > 0 ? minsPerMileRun + ":" + secsPerMileRun.toString().padStart(2, "0") : null;
+  data["average_walk_speed"] = walkTime > 0 ? minsPerMileWalk + ":" + secsPerMileWalk.toString().padStart(2, "0"): null;
 
   res.status(200).send(JSON.stringify(data));
 });
