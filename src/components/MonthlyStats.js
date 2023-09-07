@@ -26,46 +26,65 @@ const MonthlyStats = ({userId}) => {
         retrieveData()
     }, [userId])
 
+    const data = [
+        {
+        x: months,
+        y: runMiles,
+        type: 'scatter',
+        name: "Run miles",
+        mode: 'lines+markers',
+        marker: {color: '#03045e'},
+        line: {color: "#03045e", width: 3}
+        },
+        {
+            x: months,
+            y: walkMiles,
+            type: 'scatter',
+            name: "Walk miles",
+            mode: 'lines+markers',
+            marker: {color: "#00f5d4"},
+            line: {color: "#00f5d4", width: 3}
+        },
+    ]
+
+    const layout = { 
+        font: {family: "Inter", color: "black"}, 
+        font_color: "black", 
+        dragmode: false, 
+        xaxis: {
+            rangeselector: {
+                buttons: [{
+                    step: 'month',
+                    stepmode: 'backward',
+                    count: 6,
+                    label: '6m'
+                },{
+                    step: 'year',
+                    stepmode: 'todate',
+                    count: 1,
+                    label: 'YTD'
+                }, {step: 'all'}]
+            },
+            type: "date", 'tickformat': '%b', tickmode: "array", tickvals: months}, 
+        yaxis: {visible: true, hoverformat: ".2f"}, 
+        hovermode: "x", 
+        tickformat: ".0f",
+        legend: {
+            orientation: "h"
+        }, 
+        margin: { r: 0, l: 15, t: 0}
+    }
+
     return (
         <>
             <h1>Monthly stroller miles</h1>
             {loading ? <Loading /> :
-            <Plot  data={[
-                {
-                x: months,
-                y: runMiles,
-                type: 'scatter',
-                name: "Run miles",
-                mode: 'lines+markers',
-                marker: {color: '#03045e'},
-                line: {color: "#03045e", width: 3}
-                },
-                {
-                    x: months,
-                    y: walkMiles,
-                    type: 'scatter',
-                    name: "Walk miles",
-                    mode: 'lines+markers',
-                    marker: {color: "#00f5d4"},
-                    line: {color: "#00f5d4", width: 3}
-                },
-            ]}
-            layout={ { 
-                font: {family: "Inter", color: "black"}, 
-                font_color: "black", 
-                dragmode: false, 
-                xaxis: {type: "date", 'tickformat': '%b', tickmode: "array", tickvals: months}, 
-                yaxis: {visible: true, hoverformat: ".2f"}, 
-                hovermode: "x", 
-                tickformat: ".0f",
-                legend: {
-                    orientation: "h"
-                }, 
-                margin: { r: 0, l: 15, t: 0}
-            } }
-            useResizeHandler={true}
-            style={{width: "100%"}}
-            config={{displayModeBar: false}}
+            <Plot  
+                data={data}
+                layout={layout}
+                useResizeHandler={true}
+                style={{width: "100%"}}
+                config={{displayModeBar: false}}
             />}
         </>
     );
