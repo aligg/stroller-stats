@@ -58,12 +58,7 @@ const MonthlyStats = ({userId}) => {
                     stepmode: 'backward',
                     count: 6,
                     label: '6m'
-                },{
-                    step: 'year',
-                    stepmode: 'todate',
-                    count: 1,
-                    label: 'YTD'
-                }, {step: 'all'}]
+                }]
             },
             type: "date", 'tickformat': '%b', tickmode: "array", tickvals: months}, 
         yaxis: {visible: true, hoverformat: ".2f"}, 
