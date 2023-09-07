@@ -5,12 +5,14 @@ import Plot from 'react-plotly.js';
 import { PropTypes } from "prop-types";
 import React from "react";
 import { formatMonthData } from "../utils/formatMonthData";
+  
 
 const MonthlyStats = ({userId}) => {
     const [loading, setLoading] = useState(false);
     const [months, setMonths] = useState([])
     const [runMiles, setRuns] = useState([])
     const [walkMiles, setWalks] = useState([])
+    const [oneYear, setOneYear] = useState(true)
 
     useEffect(() => {
         const retrieveData = async () => {
@@ -28,8 +30,8 @@ const MonthlyStats = ({userId}) => {
 
     const data = [
         {
-        x: months,
-        y: runMiles,
+        x: oneYear ? months.slice(-12) : months,
+        y: oneYear ? runMiles.slice(-12) : runMiles,
         type: 'scatter',
         name: "Run miles",
         mode: 'lines+markers',
@@ -37,8 +39,8 @@ const MonthlyStats = ({userId}) => {
         line: {color: "#03045e", width: 3}
         },
         {
-            x: months,
-            y: walkMiles,
+            x: oneYear ? months.slice(-12) : months,
+            y: oneYear ? walkMiles.slice(-12) : walkMiles,
             type: 'scatter',
             name: "Walk miles",
             mode: 'lines+markers',
@@ -66,13 +68,22 @@ const MonthlyStats = ({userId}) => {
         <>
             <h1>Monthly stroller miles</h1>
             {loading ? <Loading /> :
+            <>
+              {months.length > 12 && (
+                  <div style={{display: "flex", alignItems: "center", justifyContent:"flex-end"}}>
+                <label className="switch">
+                    <input type="checkbox" onChange={() => setOneYear(!oneYear)} checked={oneYear}/>
+                    <span className="slider round"></span>
+                </label>
+                <p style={{paddingLeft: "15px"}}>{oneYear ? "1y" : "all"}</p>
+            </div>)}
             <Plot  
                 data={data}
                 layout={layout}
                 useResizeHandler={true}
                 style={{width: "100%"}}
                 config={{displayModeBar: false}}
-            />}
+            /></>}
         </>
     );
 }
