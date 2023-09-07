@@ -52,14 +52,6 @@ const MonthlyStats = ({userId}) => {
         font_color: "black", 
         dragmode: false, 
         xaxis: {
-            rangeselector: {
-                buttons: [{
-                    step: 'month',
-                    stepmode: 'backward',
-                    count: 6,
-                    label: '6m'
-                }]
-            },
             type: "date", 'tickformat': '%b', tickmode: "array", tickvals: months}, 
         yaxis: {visible: true, hoverformat: ".2f"}, 
         hovermode: "x", 
