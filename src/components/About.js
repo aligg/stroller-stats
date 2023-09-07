@@ -61,11 +61,11 @@ const About = () => {
             </a>
             . Code contributions are welcome! My{" "}
             <a
-              href="https://twitter.com/aliglenesk"
+              href="https://www.instagram.com/aliglenesk/"
               target="_blank"
               rel="noreferrer"
             >
-              Twitter DMs
+              Instagram DMs
             </a>{" "}
             are also open if that's an easier way for you to reach out.
           </p>
