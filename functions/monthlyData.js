@@ -3,14 +3,14 @@ const functions = require("firebase-functions");
 
 const getActivityDataForCurrMonth = async (userId, firstName, db) => {
   const currDate = new Date();
-  const firstDayOfMonth = new Date(currDate.getFullYear(),
+  const startOfMonth = new Date(currDate.getFullYear(),
       currDate.getMonth(), 1).toISOString();
-  const lastDayOfMonth = new Date(currDate.getFullYear(),
-      currDate.getMonth() + 1, 0).toISOString();
+  const startOfNextMonth = new Date(currDate.getFullYear(),
+      currDate.getMonth() + 1, 1).toISOString();
   const activities = await db.collection("activities")
       .where("user_id", "==", Number(userId))
-      .where("start_date", ">=", firstDayOfMonth)
-      .where("start_date", "<=", lastDayOfMonth)
+      .where("start_date", ">=", startOfMonth)
+      .where("start_date", "<", startOfNextMonth)
       .where("is_stroller", "==", true)
       .get();
   const monthlyData = {run_distance: 0, walk_distance: 0, first_name: firstName, user_id: userId};
