@@ -109,16 +109,16 @@ const retrieveMonthlyStrollerMiles = async (recentActivity) => {
   const userId = recentActivity.user_id;
   const sportType = recentActivity.sport_type;
   const date = new Date(recentActivity.start_date);
-  const firstDayOfMonth = new Date(date.getFullYear(),
+  const startOfMonth = new Date(date.getFullYear(),
       date.getMonth(), 1).toISOString();
-  const lastDayOfMonth = new Date(date.getFullYear(),
-      date.getMonth() + 1, 0).toISOString();
+  const startOfNextMonth = new Date(date.getFullYear(),
+      date.getMonth() + 1, 1).toISOString();
 
   const activityRef = db.collection("activities")
       .where("user_id", "==", userId)
       .where("sport_type", "==", sportType)
-      .where("start_date", ">=", firstDayOfMonth)
-      .where("start_date", "<=", lastDayOfMonth)
+      .where("start_date", ">=", startOfMonth)
+      .where("start_date", "<", startOfNextMonth)
       .where("is_stroller", "==", true);
   const activities = await activityRef.get();
 
