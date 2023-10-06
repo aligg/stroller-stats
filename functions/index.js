@@ -67,6 +67,9 @@ const formatActivity = (data) => {
   if (data["description"]) {
     isStroller = data["description"].toLowerCase().includes("strollerstats") || data["description"].toLowerCase().includes("strollermiles");
   }
+  if (data["name"]) {
+    isStroller = data["name"].toLowerCase().includes("strollerstats") || data["name"].toLowerCase().includes("strollermiles");
+  }
   return {
     activity_id: data["id"],
     title: data["name"],

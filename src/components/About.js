@@ -49,6 +49,12 @@ const About = () => {
             authorization step. You can change your choice at anytime by logging
             out and logging back in again and changing your selections.
           </p>
+          <h2>I added #strollerstats to my description but I don't think it worked. What should I do?</h2>
+          <p>Here are some suggestions to try:<br></br>
+            - Login to strollerstats.com and authorize stroller stats to sync with your strava<br></br>
+            - When you add #strollerstats to your activity description, you must modify the title in some way too (i.e if you leave it just as Morning Run it won't work)<br></br>
+            - Tag Ali Glenesk in a comment on your activity to get some help!<br></br>
+          </p>
           <h2>How can I report a bug or submit a feature request?</h2>
           <p>
             Feel free to file an issue in the{" "}
