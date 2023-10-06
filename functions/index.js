@@ -66,10 +66,12 @@ const formatActivity = (data) => {
   // eslint-disable-next-line max-len
   if (data["description"]) {
     isStroller = data["description"].toLowerCase().includes("strollerstats") || data["description"].toLowerCase().includes("strollermiles");
+  } else {
+    if (data["name"]) {
+      isStroller = data["name"].toLowerCase().includes("strollerstats") || data["name"].toLowerCase().includes("strollermiles");
+    }
   }
-  if (data["name"]) {
-    isStroller = data["name"].toLowerCase().includes("strollerstats") || data["name"].toLowerCase().includes("strollermiles");
-  }
+  functions.logger.info(`Evaluated isStroller as: ${isStroller} for activity titled: ${data["name"]}`);
   return {
     activity_id: data["id"],
     title: data["name"],
