@@ -53,7 +53,13 @@ const About = () => {
           <p>Here are some suggestions to try:<br></br>
             - Login to strollerstats.com and authorize stroller stats to sync with your strava<br></br>
             - When you add #strollerstats to your activity description, you must modify the title in some way too (i.e if you leave it just as Morning Run it won't work)<br></br>
-            - Tag Ali Glenesk in a comment on your activity to get some help!<br></br>
+            - Tag <a
+              href="https://www.strava.com/athletes/3438509"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Ali Glenesk
+            </a> in a comment on your activity to get some help!<br></br>
           </p>
           <h2>How can I report a bug or submit a feature request?</h2>
           <p>
