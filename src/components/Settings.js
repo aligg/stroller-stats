@@ -1,12 +1,18 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Settings = () => {
+    const navigate = useNavigate();
 
     const userId = localStorage.getItem("user_id");
     const [loading, setLoading] = useState(false)
     const [checked, setChecked] = useState(false);
 
     useEffect(() => {
+        // enforce login
+        if (!userId) {
+            navigate("/")
+        }
         const getUser = async () => {
             setLoading(true);
             const response = await fetch(`https://us-central1-stroller-stats.cloudfunctions.net/app/user/${userId}`)
@@ -15,7 +21,7 @@ const Settings = () => {
             setLoading(false);
         }
         getUser()
-    }, [userId])
+    }, [navigate, userId])
 
     const updateUser = async (evt) => {
         setChecked(evt.target.checked)

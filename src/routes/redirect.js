@@ -46,7 +46,7 @@ const Redirect = () => {
             } catch (e) {
                 console.error("Error adding user: ", e);
             }
-            navigate("/")
+            navigate("/", {state: "justLoggedIn"})
        }
     authenticate()
     }, [location.search, navigate])

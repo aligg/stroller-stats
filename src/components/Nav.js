@@ -1,10 +1,10 @@
 import {useLocation} from "react-router-dom"
-/* eslint-disable react/jsx-no-comment-textnodes */
 import {useState} from "react"
 
 const Nav = ({loggedIn}) => {
+
     const location = useLocation()
-    const isLoggedIn = loggedIn || location.state
+    let isLoggedIn = loggedIn || location.state
     const [menuVisible, setDisplayMenu] = useState(false)
     const toggleMenu = () => {
         setDisplayMenu(!menuVisible)
