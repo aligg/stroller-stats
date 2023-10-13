@@ -1,4 +1,27 @@
 import { getMiles } from "./getMiles";
+
+
+
+// helper sort function
+const sortData = (a, b) => {
+    // Extract the year and month from the strings
+    let [yearA, monthA] = a.month.split("-");
+    let [yearB, monthB] = b.month.split("-");
+
+    // Convert the strings to numbers for comparison
+    yearA = parseInt(yearA);
+    monthA = parseInt(monthA);
+    yearB = parseInt(yearB);
+    monthB = parseInt(monthB);
+
+    // Compare the years
+    if (yearA !== yearB) {
+        return yearA - yearB;
+    } else {
+        // If the years are the same, compare the months
+        return monthA - monthB;
+    }
+}
 // Helper function to get the month value from the "year-month" string
 const getMonthValue = (monthString) => {
     const [year, month] = monthString.split("-");
@@ -6,6 +29,7 @@ const getMonthValue = (monthString) => {
 }
     
 export const formatMonthData = (data) => {
+    data.sort(sortData)
     // Extracting months and distances separately
     const months = [];
     const runDistances = [];

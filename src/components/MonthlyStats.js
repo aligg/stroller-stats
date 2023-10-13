@@ -20,6 +20,7 @@ const MonthlyStats = ({userId}) => {
             const response = await fetch(`https://us-central1-stroller-stats.cloudfunctions.net/app/monthly-activities/${userId}`)
             const data = await response.json();
             const [months, runDistances, walkDistances] = formatMonthData(data)
+            console.log("MONTHS", months)
             setMonths(months)
             setRuns(runDistances)
             setWalks(walkDistances)
