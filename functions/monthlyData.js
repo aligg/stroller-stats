@@ -7,12 +7,14 @@ const getActivityDataForCurrMonth = async (userId, firstName, db) => {
       currDate.getMonth(), 1).toISOString();
   const startOfNextMonth = new Date(currDate.getFullYear(),
       currDate.getMonth() + 1, 1).toISOString();
+  functions.logger.info(`Currdate: ${currDate} startOfMonth ${startOfMonth} nextMonth ${startOfNextMonth}`);
   const activities = await db.collection("activities")
       .where("user_id", "==", Number(userId))
       .where("start_date", ">=", startOfMonth)
       .where("start_date", "<", startOfNextMonth)
       .where("is_stroller", "==", true)
       .get();
+  functions.logger.info("activities length", activities.length);
   const monthlyData = {run_distance: 0, walk_distance: 0, first_name: firstName, user_id: userId};
   activities.forEach((doc) => {
     const data = doc.data();
@@ -38,6 +40,7 @@ const updateLeaderboardData = async (userId, data, db) => {
   const currMonth = currDate.getMonth() + 1;
   const year = currDate.getFullYear();
   const monthIdentifier = `${year}-${currMonth}`;
+  functions.logger.info("MONTH IDENTIFIER", monthIdentifier);
   const docRef = await db.collection("leaderboard").doc(monthIdentifier);
   docRef.collection("monthly-data").doc(userId.toString()).set(data, {merge: true});
 };
@@ -49,7 +52,7 @@ const writeMonthlyData = async (db) => {
     const [userId, firstName] = user;
     getActivityDataForCurrMonth(userId, firstName, db).then((data) => {
       updateLeaderboardData(userId, data, db).then(() => {
-        functions.logger.info("Updated leaderboard for:", userId);
+        functions.logger.info(`Updated leaderboard for ${firstName}:`, userId);
       });
     });
   });

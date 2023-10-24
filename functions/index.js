@@ -446,7 +446,7 @@ app.get("/leaderboard", async (request, response) => {
   snapshot.forEach((doc) => {
     const userMonthlyData = doc.data();
     if (optedInUserIds.includes(userMonthlyData.user_id)) {
-      functions.logger.info("Found:", userMonthlyData);
+      functions.logger.info(`Found: ${userMonthlyData.first_name}`, userMonthlyData);
       lastMonthData.push(userMonthlyData);
     }
   });
