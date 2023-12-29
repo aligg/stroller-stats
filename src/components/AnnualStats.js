@@ -1,30 +1,34 @@
+import { useState } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { useData } from "../hooks/useData";
 import Loading from "./Loading";
 
+const getAffirmation = (name) => {
+    const affirmations = [`✨Nice work ${name}✨!`, `📈All the miles📈`, `💃🏽${name}, look at you go💃🏽`, `✨Amazing work ${name}✨!`, `✨Inspirational work ${name}✨!`, `✨Iconic work ${name}✨!`, `💅${name} let's be real - more miles than your spouse amiright?💅`, `🙇The way you did that🙇`]
+    return affirmations[(Math.floor(Math.random() * affirmations.length))]
+}
+
 
 const AnnualStats = ({userId}) => {
-
-    const currYear = new Date().getFullYear()
-    
+    const [index, setIndex] = useState(1)
+    const currYear = index === 1 ? new Date().getFullYear() : new Date().getFullYear() - 1
 
     const [data, dataLoading] = useData(userId, currYear)
 
     return (
     <>
-        <h1>Annual Stroller Miles</h1>
-            {dataLoading? <Loading/> : (
-            <Tabs defaultIndex={1} onSelect={(index) => {console.log(index)}}>
+        <h1>Annual stroller miles</h1>
+            <Tabs defaultIndex={index} onSelect={(index) => {setIndex(index)}}>
                 <TabList>
-                    <Tab>Last year</Tab>
-                    <Tab>{`${currYear}`}</Tab>
+                    <Tab>{`${new Date().getFullYear()-1}`}</Tab>
+                    <Tab>{`${new Date().getFullYear()}`}</Tab>
                 </TabList>
                 <TabPanel>Coming soon</TabPanel>
                 <TabPanel>
-                    <table>
+                    {dataLoading ? <Loading/> : (<table>
                         <tbody>
                             <tr>
-                                <th></th>
+                                <th>{getAffirmation(data.first_name)}</th>
                             </tr>  
                             <tr>
                                 <td>Total stroller run miles</td>
@@ -43,9 +47,10 @@ const AnnualStats = ({userId}) => {
                                 <td>{data["average_walk_speed"] === null ? "N/A" : `${data["average_walk_speed"]} min/mile`}</td>
                             </tr>
                         </tbody>
-                </table>
+                </table>)
+                    }      
         </TabPanel>
-        </Tabs>)}
+        </Tabs>
     </>
     )
 }
