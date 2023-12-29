@@ -264,8 +264,9 @@ app.post("/update-user/", async (request, res) => {
   res.status(200).send({"updated_user": userId});
 });
 
-app.get("/user-activity-data/:user_id", async (request, res) => {
+app.get("/user-activity-data/:user_id/:year", async (request, res) => {
   const userId = request.params.user_id;
+  const currYear = request.params.year || new Date().getFullYear().toString();
   const data = {
     "total_walk_miles": 0,
     "total_run_miles": 0,
@@ -273,7 +274,6 @@ app.get("/user-activity-data/:user_id", async (request, res) => {
     "average_walk_speed": null,
     "first_name": "",
   };
-  const currYear = new Date().getFullYear().toString();
   let walkTime = 0;
   let runTime = 0;
 

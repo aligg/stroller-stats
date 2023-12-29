@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-export const useData = (userId) => {
+export const useData = (userId, currYear) => {
 
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true)
@@ -13,7 +13,7 @@ export const useData = (userId) => {
             if (!userId) {
                 return;
             }
-            const response = await fetch(`https://us-central1-stroller-stats.cloudfunctions.net/app/user-activity-data/${userId}`)
+            const response = await fetch(`https://us-central1-stroller-stats.cloudfunctions.net/app/user-activity-data/${userId}/${currYear}`)
             const data = await response.json();
             
             setData(data)
@@ -22,7 +22,7 @@ export const useData = (userId) => {
        
         getData(userId)
     
-    }, [userId]);
+    }, [userId, currYear]);
     
     return [data, loading];
 };

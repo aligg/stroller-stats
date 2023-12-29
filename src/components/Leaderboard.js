@@ -48,7 +48,6 @@ const Leaderboard = () => {
             setLoading(true);
             const response = await fetch("https://us-central1-stroller-stats.cloudfunctions.net/app/leaderboard")
             const data = await response.json();
-            console.log(data)
             setData(data)
             setLoading(false);
         }
