@@ -20,7 +20,7 @@ const AnnualStats = ({userId}) => {
         <h1>Annual stroller miles</h1>
             <Tabs defaultIndex={index} onSelect={(index) => {setIndex(index)}}>
                 <TabList>
-                    <Tab>{`${new Date().getFullYear()-1}`}</Tab>
+                    <Tab>Last year</Tab>
                     <Tab>{`${new Date().getFullYear()}`}</Tab>
                 </TabList>
                 <TabPanel>Coming soon</TabPanel>
