@@ -267,6 +267,9 @@ app.post("/update-user/", async (request, res) => {
 app.get("/user-activity-data/:user_id/:year", async (request, res) => {
   const userId = request.params.user_id;
   const currYear = request.params.year || new Date().getFullYear().toString();
+  let nextYear = Number(currYear) + 1;
+  nextYear = nextYear.toString();
+
   const data = {
     "total_walk_miles": 0,
     "total_run_miles": 0,
@@ -286,6 +289,7 @@ app.get("/user-activity-data/:user_id/:year", async (request, res) => {
       .where("user_id", "==", Number(userId))
       .where("is_stroller", "==", true)
       .where("start_date", ">", currYear)
+      .where("start_date", "<", nextYear)
       .get();
 
   if (snapshot.size === 0) {
@@ -344,15 +348,6 @@ app.get("/monthly-activities/:user_id", async (request, res) => {
   });
   res.status(200).send(JSON.stringify(monthlyData));
 });
-
-const getBeginningOfYearTimestamp = () => {
-  const now = new Date(); // Get the current date
-  const year = now.getFullYear(); // Get the current year
-  const beginningOfYear = new Date(year, 0, 1); // Create a new Date object for January 1st of the current year
-  const timestamp = Math.floor(beginningOfYear.getTime() / 1000); // Get the epoch timestamp by dividing the milliseconds by 1000
-
-  return timestamp;
-};
 
 app.post("/auth-user", async (request, response) => {
   const accessToken = request.body.access_token;
@@ -452,47 +447,6 @@ app.get("/leaderboard", async (request, response) => {
     }
   });
   response.status(200).send(JSON.stringify({currMonthData, lastMonthData}));
-});
-
-/** TODO: below got super hacky - clean up and add tests */
-app.post("/sync-historical-data/:user_id", async (request, res) => {
-  const userId = Number(request.body.user_id);
-  const refreshToken = await getRefreshToken(userId);
-  const accessToken = await getAccessToken(refreshToken);
-  const begOfYear = getBeginningOfYearTimestamp();
-  const response = await fetch(`https://www.strava.com/api/v3/athlete/activities?after=${begOfYear}&per_page=20`, {
-    headers: {authorization: `Bearer ${accessToken}`},
-  });
-  const data = await response.json();
-  const firstActivity = data[0]["start_date"];
-  const lastActivity = data[data.length - 1]["start_date"];
-
-  // This doesn't update because the loop below is async.
-  let writes = 0;
-  data.forEach((activity) => {
-    const activityId = activity["id"].toString();
-    db.collection("activities").doc(activityId).get().then((doc) => {
-      if (doc.exists) {
-        functions.logger.info("Write skipped, doc already exists in database");
-      } else {
-        // Ping Strava API again b/c list API doesn't include description
-        getActivity(accessToken, activityId).then((activityWithDescription) => {
-          // if stroller handle side effects
-          if (activityWithDescription.is_stroller) {
-            functions.logger.info("GOT IN with stroller");
-            addActivityToDB(activityWithDescription).then((added) => {
-              writes += added;
-              updateDescription(activityWithDescription, accessToken);
-              functions.logger.info("writes now", writes);
-            }).then(() => {
-              functions.logger.info("writes now miau", writes);
-            });
-          }
-        });
-      }
-    });
-  });
-  res.status(200).send(JSON.stringify({writes: writes, activities_length: data.length, start_date: firstActivity, end_date: lastActivity}));
 });
 
 

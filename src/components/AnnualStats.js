@@ -17,7 +17,7 @@ const AnnualStats = ({userId}) => {
     useEffect(() => {
         
         const getData = async (userId) => {
-            
+
             setLoading(true)
             if (!userId) {
                 return;
