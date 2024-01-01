@@ -394,8 +394,9 @@ const getPrevMonthIdentifier = () => {
   const [currentMonth, _, currentYear] = currDate.split("/");
   let previousMonth;
   let previousYear;
+
   // Handle the case where the current month is January (1)
-  if (currentMonth === 1) {
+  if (Number(currentMonth) === 1) {
     previousYear = currentYear - 1; // Subtract 1 from the current year
     previousMonth = 12; // Set the previous month to December (12)
   } else {
