@@ -142,14 +142,14 @@ const retrieveMonthlyStrollerMiles = async (recentActivity) => {
 const updateDescription = async (recentActivity, accessToken) => {
   const description = recentActivity.description;
   // if already wrote, exit
-  if (description.includes("StrollerStats.com -") || description.includes("| strollerstats.com")) {
+  if (description.includes("StrollerStats.com -") || description.includes("| StrollerStats") || description.includes("| strollerstats")) {
     return;
   }
   const activityId = recentActivity.activity_id;
   const totalMiles = await retrieveMonthlyStrollerMiles(recentActivity);
   const currMonth = new Date(recentActivity.start_date).toLocaleString("default", {month: "long"});
   // eslint-disable-next-line max-len
-  const updatedDescription = description.concat("\n", `${totalMiles} ${currMonth} stroller ${recentActivity.sport_type.toLowerCase()} miles | strollerstats.com`);
+  const updatedDescription = description.concat("\n", `${totalMiles} ${currMonth} stroller ${recentActivity.sport_type.toLowerCase()} miles | StrollerStats`);
   const requestOptions = {
     method: "PUT",
     // eslint-disable-next-line max-len
