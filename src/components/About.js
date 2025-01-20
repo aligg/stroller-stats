@@ -59,7 +59,7 @@ const About = () => {
               rel="noreferrer"
             >
               Ali Glenesk
-            </a> in a comment on your activity to get some help!<br></br>
+            </a> in a comment on your activity to get some help, or send me an email.<br></br>
           </p>
           <h2>How can I report a bug or submit a feature request?</h2>
           <p>
@@ -71,15 +71,7 @@ const About = () => {
             >
               github project
             </a>
-            . Code contributions are welcome! My{" "}
-            <a
-              href="https://www.instagram.com/aliglenesk/"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Instagram DMs
-            </a>{" "}
-            are also open if that's an easier way for you to reach out.
+            . Code contributions are welcome! You can also reach me at <a href="mailto:ali@strollerstats.com">ali@strollerstats.com</a> with questions.
           </p>
         </div>
       )}
