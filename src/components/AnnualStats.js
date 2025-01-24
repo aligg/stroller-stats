@@ -2,17 +2,30 @@ import { useEffect, useState } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import Loading from "./Loading";
 
+
+const startYear = 2023;
+
 const getAffirmation = (name) => {
     const affirmations = [`✨Nice work ${name}✨!`, `📈All the miles📈`, `💃🏽${name}, look at you go💃🏽`, `✨Amazing work ${name}✨!`, `✨Inspirational work ${name}✨!`, `✨Iconic work ${name}✨!`, `💅${name} let's be real - more miles than your spouse amiright?💅`, `🙇The way you did that🙇`]
     return affirmations[(Math.floor(Math.random() * affirmations.length))]
 }
 
+const generateTabsForEachYear = () => {
+    const currYear = new Date().getFullYear()
+
+   let resp = []
+
+    for (let year = startYear; year <= currYear; year++) {
+        resp.push(<Tab>{year}</Tab>)
+    }
+    return resp
+}
 
 const AnnualStats = ({userId}) => {
-    const [index, setIndex] = useState(1)
+    const [index, setIndex] = useState((new Date().getFullYear() - startYear))
     const [data, setData] = useState(null)
     const [loading, setLoading] = useState(false)
-    const currYear = index === 1 ? new Date().getFullYear() : new Date().getFullYear() - 1
+    const currYear = startYear + index
 
     useEffect(() => {
         
@@ -65,21 +78,27 @@ const AnnualStats = ({userId}) => {
         )
     }
 
+    const generateTabConentForEachYear = () => {
+        const currYear = new Date().getFullYear()
+
+    let resp = []
+
+        for (let year = startYear; year <= currYear; year++) {
+            resp.push(<TabPanel>                  
+                {renderTabPanelContent()}
+            </TabPanel>)
+        }
+        return resp
+    }
 
     return (
     <>
         <h1>Annual stroller miles</h1>
             <Tabs defaultIndex={index} onSelect={(index) => {setIndex(index)}}>
                 <TabList>
-                    <Tab>Last year</Tab>
-                    <Tab>{`${new Date().getFullYear()}`}</Tab>
+                    {generateTabsForEachYear()}
                 </TabList>
-                <TabPanel>                  
-                    {renderTabPanelContent()}
-                </TabPanel>
-                <TabPanel>
-                  {renderTabPanelContent()}
-        </TabPanel>
+                {generateTabConentForEachYear()}
         </Tabs>
     </>
     )
