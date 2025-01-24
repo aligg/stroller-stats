@@ -20,3 +20,6 @@
 .env
 
 *.log
+
+# firebase
+firestore.rules
