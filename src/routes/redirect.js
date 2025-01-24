@@ -16,7 +16,6 @@ const Redirect = () => {
                 "Content-Type": "application/json",
               }, body: JSON.stringify({request_token: authToken})})
             const resp = await response.json()
-            console.log(resp)
             let user_id;
             let firstname;
             if (resp.athlete) {

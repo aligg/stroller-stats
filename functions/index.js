@@ -261,8 +261,6 @@ app.get("/user/:user_id", async (request, res) => {
 app.post("/get-access-token/", async (request, res) => {
   const refreshToken = request.body.request_token;
   const accessResp = await getAccessToken(refreshToken, "authorization_code");
-  functions.logger.info(accessResp);
-
   res.status(200).send(accessResp);
 });
 
