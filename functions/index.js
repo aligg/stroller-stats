@@ -45,20 +45,26 @@ const getRefreshToken = async (userId) => {
 /**
  * Call to Strava to get a fresh access token
  * @param {number} refreshToken
+ * @param {string} grantType
  * @return {number}
  */
-const getAccessToken = async (refreshToken) => {
+const getAccessToken = async (refreshToken, grantType) => {
+  const params = {
+    client_id: process.env.STRAVA_CLIENT_ID,
+    client_secret: process.env.STRAVA_CLIENT_SECRET,
+    grant_type: grantType,
+  };
+  if (grantType === "refresh_token") {
+    params.refresh_token = refreshToken;
+  } else {
+    params.code = refreshToken;
+  }
   const response = await fetch("https://www.strava.com/oauth/token", {
     method: "POST",
     headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({
-      client_id: process.env.STRAVA_CLIENT_ID,
-      client_secret: process.env.STRAVA_CLIENT_SECRET,
-      refresh_token: refreshToken,
-      grant_type: "refresh_token",
-    })});
+    body: JSON.stringify(params)});
   const data = await response.json();
-  return data.access_token;
+  return data;
 };
 
 const formatActivity = (data) => {
@@ -210,11 +216,11 @@ exports.stravaWebhook = functions.https.onRequest((request, response) => {
 
 const handlePost = async (userId, activityId) => {
   const refreshToken = await getRefreshToken(userId);
-  const accessToken = await getAccessToken(refreshToken);
-  const recentActivity = await getActivity(accessToken, activityId);
+  const accessResp = await getAccessToken(refreshToken, "refresh_token");
+  const recentActivity = await getActivity(accessResp.access_token, activityId);
   if (recentActivity.is_stroller) {
     await addActivityToDB(recentActivity);
-    updateDescription(recentActivity, accessToken);
+    updateDescription(recentActivity, accessResp.access_token);
   }
 };
 
@@ -254,9 +260,11 @@ app.get("/user/:user_id", async (request, res) => {
 
 app.post("/get-access-token/", async (request, res) => {
   const refreshToken = request.body.request_token;
-  const access_token = await getAccessToken();
-  res.status(200).send({"access_token": access_token})
-})
+  const accessResp = await getAccessToken(refreshToken, "authorization_code");
+  functions.logger.info(accessResp);
+
+  res.status(200).send(accessResp);
+});
 
 app.post("/update-user/", async (request, res) => {
   const userId = request.body.user_id;

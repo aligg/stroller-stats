@@ -5,8 +5,10 @@
   "dependencies": {
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/user-event": "^13.5.0",
+    "eslint-config-google": "^0.14.0",
     "firebase": "^9.22.1",
     "firebase-admin": "^11.7.0",
+    "firebase-functions": "^6.2.0",
     "plotly.js": "^2.22.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
