@@ -252,6 +252,12 @@ app.get("/user/:user_id", async (request, res) => {
   res.status(200).send(JSON.stringify(data));
 });
 
+app.post("/get-access-token/", async (request, res) => {
+  const refreshToken = request.body.request_token;
+  const access_token = await getAccessToken();
+  res.status(200).send({"access_token": access_token})
+})
+
 app.post("/update-user/", async (request, res) => {
   const userId = request.body.user_id;
 
