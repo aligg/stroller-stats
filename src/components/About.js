@@ -49,6 +49,12 @@ const About = () => {
             authorization step. You can change your choice at anytime by logging
             out and logging back in again and changing your selections.
           </p>
+          <h2>How can I track only part of my run as stroller miles?</h2>
+          <p>
+            Add the mileage in parentheses after #strollerstats - for example,
+            #strollerstats(1.5) will only log 1.5 miles of your activity as
+            stroller miles.
+          </p>
           <h2>I added #strollerstats to my description but I don't think it worked. What should I do?</h2>
           <p>Here are some suggestions to try:<br></br>
             - Login to strollerstats.com and authorize stroller stats to sync with your strava<br></br>
