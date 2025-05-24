@@ -22,15 +22,25 @@ const LeaderboardTable = ({data, sport}) => {
                     {
                         sortedData.length === 0 && (<tr><td>No athletes on the board yet!</td></tr>)
                     }
-                    {sortedData.map((obj, i) => {
-                        return (
-                            <tr key={obj.first_name+i}>
-                                <td>{i === 0 ? <p style={{margin: 0, padding: 0}}>{i+1} &#128081;</p> : i+1}</td>
-                                <td><a href={`https://www.strava.com/athletes/${obj.user_id}`} target="_blank" rel="noreferrer">{obj.first_name}</a></td>
-                                <td>{getMiles(obj[key]).toFixed(2)}</td>
-                            </tr>
-                        )
-                    })}               
+                 {sortedData.map((obj, i) => {
+                    const getMedal = (position) => {
+                        if (position === 0) return '👑'; // Crown for 1st place
+                        if (position === 1 || position === 2) return '🏆'; // Trophy for 2nd and 3rd
+                        return ''; // No medal for other positions
+                    };
+
+                    return (
+                        <tr key={obj.first_name+i}>
+                            <td>
+                                <p style={{margin: 0, padding: 0}}>
+                                    {i+1} {getMedal(i)}
+                                </p>
+                            </td>
+                            <td><a href={`https://www.strava.com/athletes/${obj.user_id}`} target="_blank" rel="noreferrer">{obj.first_name}</a></td>
+                            <td>{getMiles(obj[key]).toFixed(2)}</td>
+                        </tr>
+                    )
+                })}      
                  </tbody>
             </table>
         </>
