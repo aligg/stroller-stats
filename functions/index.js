@@ -74,14 +74,13 @@ const getAccessToken = async (refreshToken, grantType) => {
 
 const getPartialDistance = (text) => {
   const regex = /#?(?:strollerstats|strollermiles)\(([0-9.]+)\)/i;
-  
   const match = text.match(regex);
-  
+
   if (match !== null && !isNaN(Number(match[1]))) {
     logger.info(`GOT PARTIAL as ${Number(match[1])}`);
     return Number(match[1]);
   }
-  
+
   return null;
 };
 
