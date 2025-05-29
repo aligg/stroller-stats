@@ -72,6 +72,18 @@ const getAccessToken = async (refreshToken, grantType) => {
   return data;
 };
 
+const getPartialDistance = (text) => {
+  const regex = /(?:strollerstats|strollermiles)\(([0-9.]+)\)/i;
+  if (regex) {
+    const match = text.match(regex);
+    if (match !== null && !isNaN(Number(match[1]))) {
+      return Number(match[1]);
+    }
+  }
+  return null;
+};
+
+
 
 const formatActivity = (data) => {
   let isStroller = false;
@@ -84,11 +96,19 @@ const formatActivity = (data) => {
     }
   }
   logger.info(`Evaluated isStroller as: ${isStroller} for activity titled: ${data["name"]}`);
+  const partialDistance = getPartialDistance(data["description"]);
+  let distance = data["distance"];
+  if (partialDistance !== null) {
+    // partialDistance is in miles
+    if (getMeters(partialDistance) < distance) {
+      distance = getMeters(partialDistance);
+    }
+  }
 
   return {
     activity_id: data["id"],
     title: data["name"],
-    distance: data["distance"],
+    distance: distance,
     sport_type: data["sport_type"],
     start_date: data["start_date"],
     average_speed: data["average_speed"],
@@ -99,10 +119,14 @@ const formatActivity = (data) => {
 };
 
 const getActivity = async (accessToken, activityId) => {
+  logger.info("top of get Activity");
   const response = await fetch(`https://www.strava.com/api/v3/activities/${activityId}?include_all_efforts=false`, {
     headers: {authorization: `Bearer ${accessToken}`},
   });
+  logger.info(response);
   const data = await response.json();
+  logger.info("Got data");
+  logger.info(data);
   const activity = formatActivity(data);
   logger.info("HELLO");
   logger.info(activity);
@@ -191,13 +215,13 @@ const updateDescription = async (recentActivity, accessToken) => {
  * I ran creation request from the command line after deploying the GET portion
  *
  */
-exports.stravaWebhook = onRequest((request, response) => {
+exports.stravaWebhookv2 = onRequest((request, response) => {
   if (request.method === "POST") {
     logger.info("Received webhook event", {
       query: request.query,
       body: request.body,
     });
-
+    logger.info("Got here");
     const {owner_id: userId, object_id: activityId} = request.body;
 
     handlePost(userId, activityId).then(() => {
@@ -226,6 +250,7 @@ const handlePost = async (userId, activityId) => {
   const refreshToken = await getRefreshToken(userId);
   const accessResp = await getAccessToken(refreshToken, "refresh_token");
   const recentActivity = await getActivity(accessResp.access_token, activityId);
+  logger.info(recentActivity);
   if (recentActivity.is_stroller) {
     await addActivityToDB(recentActivity);
     updateDescription(recentActivity, accessResp.access_token);
@@ -235,6 +260,10 @@ const handlePost = async (userId, activityId) => {
 const getMiles = (meters) =>{
   return meters * 0.000621371192;
 };
+
+const getMeters = (miles) => {
+  return miles * 1609.344;
+}
 
 const getUser = async (userId) => {
   return db.collection("users")
@@ -386,6 +415,8 @@ app.post("/auth-user", async (request, response) => {
 
 app.post("/create-user", async (request, response) => {
   const userId = request.body.user_id;
+  logger.info(request.body);
+  logger.info(userId);
 
   const userData = {
     user_id: userId,
