@@ -104,8 +104,8 @@ const getActivity = async (accessToken, activityId) => {
   });
   const data = await response.json();
   const activity = formatActivity(data);
-  logger.info("HELLO")
-  logger.info(activity)
+  logger.info("HELLO");
+  logger.info(activity);
   return activity;
 };
 
