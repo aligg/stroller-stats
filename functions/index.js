@@ -205,7 +205,7 @@ const updateDescription = async (recentActivity, accessToken) => {
  * I ran creation request from the command line after deploying the GET portion
  *
  */
-exports.stravaWebhookv2 = onRequest((request, response) => {
+exports.stravaWebhook = onRequest((request, response) => {
   if (request.method === "POST") {
     logger.info("Received webhook event", {
       query: request.query,
@@ -488,8 +488,8 @@ app.get("/leaderboard", async (request, response) => {
 });
 
 
-exports.appv2 = onRequest(app);
-exports.writeMonthlyDatav2 = onSchedule({
+exports.app = onRequest(app);
+exports.writeMonthlyData= onSchedule({
   schedule: "every 60 minutes from 7:00 to 20:00",
   timeZone: "America/Los_Angeles",
 }, async () => {
