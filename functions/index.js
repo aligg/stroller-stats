@@ -73,16 +73,17 @@ const getAccessToken = async (refreshToken, grantType) => {
 };
 
 const getPartialDistance = (text) => {
-  const regex = /(?:strollerstats|strollermiles)\(([0-9.]+)\)/i;
-  if (regex) {
-    const match = text.match(regex);
-    if (match !== null && !isNaN(Number(match[1]))) {
-      return Number(match[1]);
-    }
+  const regex = /#?(?:strollerstats|strollermiles)\(([0-9.]+)\)/i;
+  
+  const match = text.match(regex);
+  
+  if (match !== null && !isNaN(Number(match[1]))) {
+    logger.info(`GOT PARTIAL as ${Number(match[1])}`);
+    return Number(match[1]);
   }
+  
   return null;
 };
-
 
 
 const formatActivity = (data) => {
@@ -123,13 +124,10 @@ const getActivity = async (accessToken, activityId) => {
   const response = await fetch(`https://www.strava.com/api/v3/activities/${activityId}?include_all_efforts=false`, {
     headers: {authorization: `Bearer ${accessToken}`},
   });
-  logger.info(response);
   const data = await response.json();
-  logger.info("Got data");
-  logger.info(data);
+
   const activity = formatActivity(data);
-  logger.info("HELLO");
-  logger.info(activity);
+
   return activity;
 };
 
@@ -263,7 +261,7 @@ const getMiles = (meters) =>{
 
 const getMeters = (miles) => {
   return miles * 1609.344;
-}
+};
 
 const getUser = async (userId) => {
   return db.collection("users")
