@@ -412,8 +412,6 @@ app.post("/auth-user", async (request, response) => {
 
 app.post("/create-user", async (request, response) => {
   const userId = request.body.user_id;
-  logger.info(request.body);
-  logger.info(userId);
 
   const userData = {
     user_id: userId,
