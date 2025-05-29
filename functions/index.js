@@ -7,6 +7,8 @@ const {applicationDefault} = require("firebase-admin/app");
 const {getAuth} = require("firebase-admin/auth");
 const {writeMonthlyData} = require("./monthlyData");
 
+
+
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_KEY,
   authDomain: "stroller-stats.firebaseapp.com",
@@ -19,7 +21,9 @@ const firebaseConfig = {
 };
 
 const firebaseApp = admin.initializeApp(firebaseConfig);
-const functions = require("firebase-functions");
+const {onRequest} = require("firebase-functions/v2/https");
+const {onSchedule} = require("firebase-functions/v2/scheduler");
+const {logger} = require("firebase-functions");
 const fetch = require("node-fetch");
 const db = admin.firestore();
 const express = require("express");
@@ -86,7 +90,7 @@ const formatActivity = (data) => {
       isStroller = data["name"].toLowerCase().includes("strollerstats") || data["name"].toLowerCase().includes("strollermiles");
     }
   }
-  functions.logger.info(`Evaluated isStroller as: ${isStroller} for activity titled: ${data["name"]}`);
+  logger.info(`Evaluated isStroller as: ${isStroller} for activity titled: ${data["name"]}`);
   const partialDistance = getPartialDistance(data["description"]);
   let distance = data["distance"];
   if (partialDistance !== null) {
@@ -123,12 +127,12 @@ const addActivityToDB = async (activityData) => {
     (activityData.sport_type === "Run" || activityData.sport_type === "Walk")) {
     await db.collection("activities").doc(activityData.activity_id.toString())
         .set(activityData).then(() => {
-          functions.logger.info("Wrote to DB", activityData);
+          logger.info("Wrote to DB", activityData);
         });
     return 1;
   } else {
     // eslint-disable-next-line max-len
-    functions.logger.info(`Skipped write to DB for ${activityData.activity_id} sport type ${activityData.sport_type}`);
+    logger.info(`Skipped write to DB for ${activityData.activity_id} sport type ${activityData.sport_type}`);
     return 0;
   }
 };
@@ -157,7 +161,7 @@ const retrieveMonthlyStrollerMiles = async (recentActivity) => {
   }
   const totalMiles = getMiles(totalMeters);
   const roundedTotalMiles = totalMiles.toFixed(2);
-  functions.logger.info(`Got total miles ${roundedTotalMiles}`);
+  logger.info(`Got total miles ${roundedTotalMiles}`);
 
   return roundedTotalMiles;
 };
@@ -182,14 +186,14 @@ const updateDescription = async (recentActivity, accessToken) => {
   fetch(`https://www.strava.com/api/v3/activities/${activityId}`, requestOptions).then((response) => {
     if (response.ok) {
       response.json().then((data) => {
-        functions.logger.info("Updated description", data);
+        logger.info("Updated description", data);
       });
     } else {
       // pass
-      functions.logger.info("potential problem with write to description.");
+      logger.info("potential problem with write to description.");
     }
   }).catch((err) => {
-    functions.logger.info(err);
+    logger.info(err);
   });
 };
 
@@ -200,9 +204,9 @@ const updateDescription = async (recentActivity, accessToken) => {
  * I ran creation request from the command line after deploying the GET portion
  *
  */
-exports.stravaWebhook = functions.https.onRequest((request, response) => {
+exports.stravaWebhook = onRequest((request, response) => {
   if (request.method === "POST") {
-    functions.logger.info("Received webhook event", {
+    logger.info("Received webhook event", {
       query: request.query,
       body: request.body,
     });
@@ -220,7 +224,7 @@ exports.stravaWebhook = functions.https.onRequest((request, response) => {
 
     if (mode && token) {
       if (mode === "subscribe" && token === VERIFY_TOKEN) {
-        functions.logger.info("Webhook verified");
+        logger.info("Webhook verified");
         response.status(200).json({"hub.challenge": challenge});
       } else {
         response.sendStatus(403);
@@ -247,7 +251,7 @@ const getMiles = (meters) =>{
 
 const getMeters = (miles) => {
   return miles * 1609.344;
-};
+}
 
 const getUser = async (userId) => {
   return db.collection("users")
@@ -271,11 +275,11 @@ const getUserName = async (userId) => {
 
 app.get("/user/:user_id", async (request, res) => {
   const userId = request.params.user_id;
-  functions.logger.info(userId);
+  logger.info(userId);
   const doc = await getUser(userId);
-  functions.logger.info("doc", doc);
+  logger.info("doc", doc);
   const data = await doc.data();
-  functions.logger.info("Data", data);
+  logger.info("Data", data);
   res.status(200).send(JSON.stringify(data));
 });
 
@@ -292,7 +296,7 @@ app.post("/update-user/", async (request, res) => {
 
   await db.collection("users").doc(userId.toString())
       .update(userData).then(() => {
-        functions.logger.info("Wrote user update to DB", userData);
+        logger.info("Wrote user update to DB", userData);
       });
   res.status(200).send({"updated_user": userId});
 });
@@ -386,14 +390,14 @@ app.post("/auth-user", async (request, response) => {
   const accessToken = request.body.access_token;
   // const userId = request.body.user_id;
   // Check that a user id exists with that access token.
-  functions.logger.info("top of /auth-user with: ", request.body, accessToken, typeof accessToken);
+  logger.info("top of /auth-user with: ", request.body, accessToken, typeof accessToken);
   getAuth(firebaseApp)
       .createCustomToken(accessToken)
       .then((customToken) => {
         response.status(200).send({customToken});
       })
       .catch((error) => {
-        functions.logger.info("Error creating custom token:", error);
+        logger.info("Error creating custom token:", error);
       });
 });
 
@@ -411,7 +415,7 @@ app.post("/create-user", async (request, response) => {
 
   await db.collection("users").doc(userId.toString())
       .set(userData, {merge: true}).then(() => {
-        functions.logger.info("Wrote user to DB", userData);
+        logger.info("Wrote user to DB", userData);
       });
   response.status(200).send("wrote");
 });
@@ -450,9 +454,9 @@ app.get("/leaderboard", async (request, response) => {
   // eslint-disable-next-line no-unused-vars
   const [currMonth, _, year] = currDate.split("/");
   const currMonthIdentifier = `${year}-${currMonth}`;
-  functions.logger.info("Found curr month:", currMonthIdentifier);
+  logger.info("Found curr month:", currMonthIdentifier);
   const lastMonthIdentifier = getPrevMonthIdentifier();
-  functions.logger.info("Found last month:", lastMonthIdentifier);
+  logger.info("Found last month:", lastMonthIdentifier);
 
 
   const currMonthData = [];
@@ -464,7 +468,7 @@ app.get("/leaderboard", async (request, response) => {
   currSnapshot.forEach((doc) => {
     const userMonthlyData = doc.data();
     if (optedInUserIds.includes(userMonthlyData.user_id)) {
-      functions.logger.info("Found:", userMonthlyData);
+      logger.info("Found:", userMonthlyData);
       currMonthData.push(userMonthlyData);
     }
   });
@@ -475,7 +479,7 @@ app.get("/leaderboard", async (request, response) => {
   snapshot.forEach((doc) => {
     const userMonthlyData = doc.data();
     if (optedInUserIds.includes(userMonthlyData.user_id)) {
-      functions.logger.info(`Found: ${userMonthlyData.first_name}`, userMonthlyData);
+      logger.info(`Found: ${userMonthlyData.first_name}`, userMonthlyData);
       lastMonthData.push(userMonthlyData);
     }
   });
@@ -483,10 +487,15 @@ app.get("/leaderboard", async (request, response) => {
 });
 
 
-exports.app = functions.https.onRequest(app);
-exports.monthlyData = functions.pubsub.schedule("every 60 minutes from 7:00 to 20:00").onRun((context) => {
-  writeMonthlyData(db).then(() => {
-    functions.logger.info("Executed monthly data write");
-  });
-  return null;
+exports.app = onRequest(app);
+exports.monthlyData = onSchedule({
+  schedule: "every 60 minutes from 7:00 to 20:00",
+  timeZone: 'America/Los_Angeles' // or your preferred timezone
+}, async () => {
+  try {
+    await writeMonthlyData(db);
+    logger.info("Executed monthly data write");
+  } catch (error) {
+    logger.error("Error in monthly data write:", error);
+  }
 });
