@@ -8,7 +8,6 @@ const {getAuth} = require("firebase-admin/auth");
 const {writeMonthlyData} = require("./monthlyData");
 
 
-
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_KEY,
   authDomain: "stroller-stats.firebaseapp.com",
@@ -19,8 +18,10 @@ const firebaseConfig = {
   measurementId: "G-L9CK7DZZQH",
   credential: applicationDefault(),
 };
-
-const firebaseApp = admin.initializeApp(firebaseConfig);
+let firebaseApp;
+if (!admin.apps.length) {
+  firebaseApp = admin.initializeApp(firebaseConfig);
+}
 const {onRequest} = require("firebase-functions/v2/https");
 const {onSchedule} = require("firebase-functions/v2/scheduler");
 const {logger} = require("firebase-functions");
@@ -204,7 +205,7 @@ const updateDescription = async (recentActivity, accessToken) => {
  * I ran creation request from the command line after deploying the GET portion
  *
  */
-exports.stravaWebhook = onRequest((request, response) => {
+exports.stravaWebhookv2 = onRequest((request, response) => {
   if (request.method === "POST") {
     logger.info("Received webhook event", {
       query: request.query,
@@ -251,7 +252,7 @@ const getMiles = (meters) =>{
 
 const getMeters = (miles) => {
   return miles * 1609.344;
-}
+};
 
 const getUser = async (userId) => {
   return db.collection("users")
@@ -487,10 +488,10 @@ app.get("/leaderboard", async (request, response) => {
 });
 
 
-exports.app = onRequest(app);
-exports.monthlyData = onSchedule({
+exports.appv2 = onRequest(app);
+exports.writeMonthlyDatav2 = onSchedule({
   schedule: "every 60 minutes from 7:00 to 20:00",
-  timeZone: 'America/Los_Angeles' // or your preferred timezone
+  timeZone: "America/Los_Angeles",
 }, async () => {
   try {
     await writeMonthlyData(db);

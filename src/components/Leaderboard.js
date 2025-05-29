@@ -56,7 +56,7 @@ const Leaderboard = () => {
     useEffect(() => {
         const retrieveData = async () => {
             setLoading(true);
-            const response = await fetch("https://us-central1-stroller-stats.cloudfunctions.net/app/leaderboard")
+            const response = await fetch("https://us-central1-stroller-stats.cloudfunctions.net/appv2/leaderboard")
             const data = await response.json();
             setData(data)
             setLoading(false);

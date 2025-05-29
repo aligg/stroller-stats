@@ -35,7 +35,7 @@ const AnnualStats = ({userId}) => {
             if (!userId) {
                 return;
             }
-            const response = await fetch(`https://us-central1-stroller-stats.cloudfunctions.net/app/user-activity-data/${userId}/${currYear}`)
+            const response = await fetch(`https://us-central1-stroller-stats.cloudfunctions.net/appv2/user-activity-data/${userId}/${currYear}`)
             const data = await response.json();
             
             setData(data)

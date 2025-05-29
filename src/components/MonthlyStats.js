@@ -17,7 +17,7 @@ const MonthlyStats = ({userId}) => {
     useEffect(() => {
         const retrieveData = async () => {
             setLoading(true);
-            const response = await fetch(`https://us-central1-stroller-stats.cloudfunctions.net/app/monthly-activities/${userId}`)
+            const response = await fetch(`https://us-central1-stroller-stats.cloudfunctions.net/appv2/monthly-activities/${userId}`)
             const data = await response.json();
             const [months, runDistances, walkDistances] = formatMonthData(data)
             setMonths(months)
