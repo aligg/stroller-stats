@@ -72,14 +72,6 @@ const getAccessToken = async (refreshToken, grantType) => {
   return data;
 };
 
-const getPartialDistance = (text) => {
-  const regex = /(?:strollerstats|strollermiles)\(([0-9.]+)\)/i;
-  const match = text.match(regex);
-  if (match !== null && !isNaN(Number(match[1]))) {
-    return Number(match[1]);
-  }
-  return null;
-};
 
 const formatActivity = (data) => {
   let isStroller = false;
@@ -92,18 +84,11 @@ const formatActivity = (data) => {
     }
   }
   logger.info(`Evaluated isStroller as: ${isStroller} for activity titled: ${data["name"]}`);
-  const partialDistance = getPartialDistance(data["description"]);
-  let distance = data["distance"];
-  if (partialDistance !== null) {
-    // partialDistance is in miles
-    if (getMeters(partialDistance) < distance) {
-      distance = getMeters(partialDistance);
-    }
-  }
+
   return {
     activity_id: data["id"],
     title: data["name"],
-    distance: distance,
+    distance: data["distance"],
     sport_type: data["sport_type"],
     start_date: data["start_date"],
     average_speed: data["average_speed"],
@@ -248,10 +233,6 @@ const handlePost = async (userId, activityId) => {
 
 const getMiles = (meters) =>{
   return meters * 0.000621371192;
-};
-
-const getMeters = (miles) => {
-  return miles * 1609.344;
 };
 
 const getUser = async (userId) => {
