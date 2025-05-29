@@ -247,7 +247,7 @@ const getMiles = (meters) =>{
 
 const getMeters = (miles) => {
   return miles * 1609.344;
-}
+};
 
 const getUser = async (userId) => {
   return db.collection("users")
