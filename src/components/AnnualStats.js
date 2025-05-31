@@ -26,7 +26,7 @@ const AnnualStats = ({userId}) => {
     const [data, setData] = useState(null)
     const [loading, setLoading] = useState(false)
     const currYear = startYear + index
-
+    console.log(data)
     useEffect(() => {
         
         const getData = async (userId) => {
@@ -59,19 +59,19 @@ const AnnualStats = ({userId}) => {
                             </tr>  
                             <tr>
                                 <td>Total stroller run miles</td>
-                                <td>{data["total_run_miles"].toFixed(2)}</td>
+                                <td>{data["total_run_distance"].toFixed(2)}</td>
                             </tr>
                             <tr>
                                 <td>Total stroller walk miles</td>
-                                <td>{data["total_walk_miles"].toFixed(2)}</td>
+                                <td>{data["total_walk_distance"].toFixed(2)}</td>
                             </tr>
                             <tr>
                                 <td>Average run pace with stroller</td>
-                                <td>{data["average_run_speed"] === null ? "N/A" : `${data["average_run_speed"]} min/mile`}</td>
+                                <td>{data["average_run_speed"] === null ? "N/A" : `${data["average_run_speed"]} min/${data["distance_unit"]}`}</td>
                             </tr>
                             <tr>
                                 <td>Average walk pace with stroller</td>
-                                <td>{data["average_walk_speed"] === null ? "N/A" : `${data["average_walk_speed"]} min/mile`}</td>
+                                <td>{data["average_walk_speed"] === null ? "N/A" : `${data["average_walk_speed"]} min/${data["distance_unit"]}`}</td>
                             </tr>
                         </tbody>
                 </table>
