@@ -7,7 +7,7 @@ import Loading from "./Loading";
 import { getDistance } from "../utils/getDistance";
 import { getPreviousMonth } from '../utils/getPreviousMonth';
 
-const LeaderboardTable = ({data, sport, optedInToKilometers}) => {
+const LeaderboardTable = ({data, sport, optedInToKilometers, userId}) => {
     const key = `${sport}_distance`
     const sortedData = data ? data.sort((a, b) => b[key] - a[key]).filter((obj) => {return obj[key] !== 0}) : [];
     const unitLabel = optedInToKilometers ? "Kilometers" : "Miles"
@@ -28,6 +28,7 @@ const LeaderboardTable = ({data, sport, optedInToKilometers}) => {
                     const getMedal = (position) => {
                         if (position === 0) return '👑'; // Crown for 1st place
                         if (position === 1 || position === 2) return '🏆'; // Trophy for 2nd and 3rd
+                        if (Number(userId) === Number(obj['user_id'])) return '❤️'
                         return '';
                     };
 
@@ -60,7 +61,6 @@ const Leaderboard = ({userId, optedInToKilometers}) => {
             setLoading(true);
             const response = await fetch("https://us-central1-stroller-stats.cloudfunctions.net/app/leaderboard")
             const data = await response.json();
-            console.log(data)
             setData(data)
             setLoading(false);
         }
@@ -77,10 +77,10 @@ const Leaderboard = ({userId, optedInToKilometers}) => {
             <Tab>{currMonth} Walk Leaderboard</Tab>
             <Tab>{currMonth} Run Leaderboard</Tab>
         </TabList>
-            <TabPanel>{loading ? <Loading/> : <LeaderboardTable data={data.lastMonthData} sport="walk" optedInToKilometers={optedInToKilometers}/>}</TabPanel>
-            <TabPanel>{loading ? <Loading/> : <LeaderboardTable data={data.lastMonthData} sport="run" optedInToKilometers={optedInToKilometers}/>}</TabPanel>
-            <TabPanel>{loading ? <Loading/> : <LeaderboardTable data={data.currMonthData} sport="walk" optedInToKilometers={optedInToKilometers}/>}</TabPanel>
-            <TabPanel>{loading ? <Loading/> : <LeaderboardTable data={data.currMonthData} sport="run" optedInToKilometers={optedInToKilometers}/>}</TabPanel>
+            <TabPanel>{loading ? <Loading/> : <LeaderboardTable data={data.lastMonthData} sport="walk" optedInToKilometers={optedInToKilometers} userId={userId}/>}</TabPanel>
+            <TabPanel>{loading ? <Loading/> : <LeaderboardTable data={data.lastMonthData} sport="run" optedInToKilometers={optedInToKilometers} userId={userId}/>}</TabPanel>
+            <TabPanel>{loading ? <Loading/> : <LeaderboardTable data={data.currMonthData} sport="walk" optedInToKilometers={optedInToKilometers} userId={userId}/>}</TabPanel>
+            <TabPanel>{loading ? <Loading/> : <LeaderboardTable data={data.currMonthData} sport="run" optedInToKilometers={optedInToKilometers} userId={userId}/>}</TabPanel>
         </Tabs>
             <p style={{textAlign: "right"}}>Please note that the leaderboard updates hourly. Opt in to the leaderboard in <a href="/settings">settings</a>.</p>
     </>)
