@@ -35,8 +35,7 @@ const About = () => {
           </p>
           <h2>How can I add stroller miles from past activities?</h2>
           <p>
-            I haven't made a 'click to pull in all your past activities'
-            mechanism yet. However, if you add #strollerstats to your activity
+            If you add #strollerstats to your activity
             description and also make a small title change at the same time, the
             app will pull it in. Unfortunately you do have to change the title
             at the same time due to how Strava webhooks work!
@@ -53,7 +52,15 @@ const About = () => {
           <p>
             Add the mileage in parentheses after #strollerstats - for example,
             #strollerstats(1.5) will only log 1.5 miles of your activity as
-            stroller miles.
+            stroller miles. Note that the partial miles feature currently only works with units in miles regardless of preferred distance unit settings.
+          </p>
+          <h2>How can I switch my stroller stats preference to kilometers?</h2>
+          <p>
+           Head on over to <a href="/settings">settings</a> and make your selection. Note that this is a new feature and does not yet apply to the leaderboard or partial distance feature. Send me your feedback!
+          </p>
+          <h2>How do I opt in to the leaderboard?</h2>
+          <p>
+           Head on over to <a href="/settings">settings</a> and make your selection. Everyone is opted out of the leaderboard to start - you need to opt in :)
           </p>
           <h2>I added #strollerstats to my description but I don't think it worked. What should I do?</h2>
           <p>Here are some suggestions to try:<br></br>
