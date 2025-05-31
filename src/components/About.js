@@ -9,7 +9,7 @@ const About = () => {
       <ul>
         <li>
           Add #strollerstats to the description of any Strava walk or run and
-          we'll track your stroller miles automatically.
+          we'll track your stroller miles (or kilometers) automatically.
         </li>
         <li>
           When you grant write access, we'll also update your description to
