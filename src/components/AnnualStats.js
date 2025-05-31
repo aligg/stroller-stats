@@ -26,7 +26,7 @@ const AnnualStats = ({userId}) => {
     const [data, setData] = useState(null)
     const [loading, setLoading] = useState(false)
     const currYear = startYear + index
-    const distanceLabel = data["distance_unit"]
+    const distanceLabel = data ? data["distance_unit"] : "Miles"
 
     useEffect(() => {
         
@@ -79,7 +79,7 @@ const AnnualStats = ({userId}) => {
         )
     }
 
-    const generateTabConentForEachYear = () => {
+    const generateTabContentForEachYear = () => {
         const currYear = new Date().getFullYear()
 
     let resp = []
@@ -99,7 +99,7 @@ const AnnualStats = ({userId}) => {
                 <TabList>
                     {generateTabsForEachYear()}
                 </TabList>
-                {generateTabConentForEachYear()}
+                {generateTabContentForEachYear()}
         </Tabs>
     </>
     )
