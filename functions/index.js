@@ -96,6 +96,8 @@ const formatActivity = (data) => {
     }
   }
   logger.info(`Evaluated isStroller as: ${isStroller} for activity titled: ${data["name"]}`);
+
+  // TODO - add support for kms on partial distance feature
   const partialDistance = getPartialDistance(data["description"]);
   let distance = data["distance"];
   if (partialDistance !== null) {
@@ -145,7 +147,7 @@ const addActivityToDB = async (activityData) => {
   }
 };
 
-const retrieveMonthlyStrollerMiles = async (recentActivity) => {
+const retrieveMonthlyStrollerDistance = async (recentActivity, isKilometersUser = false) => {
   const userId = recentActivity.user_id;
   const sportType = recentActivity.sport_type;
   const date = new Date(recentActivity.start_date);
@@ -167,24 +169,28 @@ const retrieveMonthlyStrollerMiles = async (recentActivity) => {
     const data = doc.data();
     totalMeters += data.distance;
   }
-  const totalMiles = getMiles(totalMeters);
-  const roundedTotalMiles = totalMiles.toFixed(2);
-  logger.info(`Got total miles ${roundedTotalMiles}`);
+  const totalDistance = getDistance(totalMeters, isKilometersUser);
+  const roundedTotalDistance = totalDistance.toFixed(2);
+  logger.info(`Got total distance ${roundedTotalDistance}. isKilometers: ${isKilometersUser}`);
 
-  return roundedTotalMiles;
+  return roundedTotalDistance;
 };
 
 const updateDescription = async (recentActivity, accessToken) => {
   const description = recentActivity.description;
+
   // if already wrote, exit
   if (description.includes("StrollerStats.com -") || description.includes("| StrollerStats") || description.includes("| strollerstats")) {
     return;
   }
+  const userId = recentActivity.user_id;
+  const isKilometersUser = await getIsKilometersUser(userId);
+  const distanceUnit = isKilometersUser ? "kilometers" : "miles";
   const activityId = recentActivity.activity_id;
-  const totalMiles = await retrieveMonthlyStrollerMiles(recentActivity);
+  const totalDistance = await retrieveMonthlyStrollerDistance(recentActivity, isKilometersUser);
   const currMonth = new Date(recentActivity.start_date).toLocaleString("default", {month: "long"});
   // eslint-disable-next-line max-len
-  const updatedDescription = description.concat("\n", `${totalMiles} ${currMonth} stroller ${recentActivity.sport_type.toLowerCase()} miles | StrollerStats`);
+  const updatedDescription = description.concat("\n", `${totalDistance} ${currMonth} stroller ${recentActivity.sport_type.toLowerCase()} ${distanceUnit} | StrollerStats`);
   const requestOptions = {
     method: "PUT",
     // eslint-disable-next-line max-len
@@ -253,8 +259,16 @@ const handlePost = async (userId, activityId) => {
     updateDescription(recentActivity, accessResp.access_token);
   }
 };
-
-const getMiles = (meters) =>{
+/**
+ *
+ * @param {*} meters
+ * @param {*} isKilometersUser
+ * @return {number} units in miles or kilometers per user preference
+ */
+const getDistance = (meters, isKilometersUser = false) =>{
+  if (isKilometersUser) {
+    return meters / 1000;
+  }
   return meters * 0.000621371192;
 };
 
@@ -280,6 +294,25 @@ const getUserName = async (userId) => {
       .then((data) => {
         return data.docs[0].get("first_name");
       });
+};
+
+const getIsKilometersUser = async (userId) => {
+  try {
+    const userDoc = await db.collection("users")
+        .where("user_id", "==", Number(userId))
+        .where("opted_in_kilometers", "==", true)
+        .limit(1)
+        .get();
+
+    if (userDoc.empty) {
+      return false;
+    } else {
+      return true;
+    }
+  } catch (error) {
+    logger.info("Error checking kilometers opt-in status:", error);
+    return false;
+  }
 };
 
 app.get("/user/:user_id", async (request, res) => {
@@ -317,18 +350,21 @@ app.get("/user-activity-data/:user_id/:year", async (request, res) => {
   nextYear = nextYear.toString();
 
   const data = {
-    "total_walk_miles": 0,
-    "total_run_miles": 0,
+    "total_walk_distance": 0,
+    "total_run_distance": 0,
     "average_run_speed": null,
     "average_walk_speed": null,
     "first_name": "",
+    "distance_unit": "Mile",
   };
   let walkTime = 0;
   let runTime = 0;
 
   // populate user
   const name = await getUserName(userId);
+  const isKilometersUser = await getIsKilometersUser(userId);
   data["first_name"] = name;
+  data["distance_unit"] = isKilometersUser ? "kilometer" : "mile";
 
   // retrieve activities
   const snapshot = await admin.firestore().collection("activities")
@@ -342,27 +378,27 @@ app.get("/user-activity-data/:user_id/:year", async (request, res) => {
     res.status(200).send(JSON.stringify(data));
   }
 
-  // populate annual mileage data
+  // populate annual distance data
   snapshot.forEach((doc) => {
     const dbData = doc.data();
     if (dbData.sport_type === "Run") {
-      data["total_run_miles"] += getMiles(dbData.distance);
+      data["total_run_distance"] += getDistance(dbData.distance, isKilometersUser);
       // run_time_seconds = distance (meters) / average_speed (m/s)
       runTime += dbData.distance / dbData.average_speed;
     } else if (dbData.sport_type === "Walk") {
-      data["total_walk_miles"] += getMiles(dbData.distance);
+      data["total_walk_distance"] += getDistance(dbData.distance, isKilometersUser);
       walkTime += dbData.distance / dbData.average_speed;
     }
   });
 
   // populate speeds
-  const minsPerMileRun = Math.floor((runTime / data["total_run_miles"]) / 60);
-  const secsPerMileRun = Math.floor((runTime / data["total_run_miles"]) % 60);
-  const minsPerMileWalk = Math.floor((walkTime / data["total_walk_miles"]) / 60);
-  const secsPerMileWalk = Math.floor((runTime / data["total_walk_miles"]) % 60);
+  const minsPerUnitRun = Math.floor((runTime / data["total_run_distance"]) / 60);
+  const secsPerUnitRun = Math.floor((runTime / data["total_run_distance"]) % 60);
+  const minsPerUnitWalk = Math.floor((walkTime / data["total_walk_distance"]) / 60);
+  const secsPerUnitWalk = Math.floor((runTime / data["total_walk_distance"]) % 60);
 
-  data["average_run_speed"] = runTime > 0 ? minsPerMileRun + ":" + secsPerMileRun.toString().padStart(2, "0") : null;
-  data["average_walk_speed"] = walkTime > 0 ? minsPerMileWalk + ":" + secsPerMileWalk.toString().padStart(2, "0"): null;
+  data["average_run_speed"] = runTime > 0 ? minsPerUnitRun + ":" + secsPerUnitRun.toString().padStart(2, "0") : null;
+  data["average_walk_speed"] = walkTime > 0 ? minsPerUnitWalk + ":" + secsPerUnitWalk.toString().padStart(2, "0"): null;
 
   res.status(200).send(JSON.stringify(data));
 });
