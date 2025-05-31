@@ -56,7 +56,7 @@ const About = () => {
           </p>
           <h2>How can I switch my stroller stats preference to kilometers?</h2>
           <p>
-           Head on over to <a href="/settings">settings</a> and make your selection. Note that this is a new feature and does not yet apply to the leaderboard or partial distance feature. Send me your feedback!
+           Head on over to <a href="/settings">settings</a> and make your selection. Note this is a new feature - send me your feedback!
           </p>
           <h2>How do I opt in to the leaderboard?</h2>
           <p>

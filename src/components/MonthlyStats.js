@@ -7,13 +7,12 @@ import React from "react";
 import { formatMonthData } from "../utils/formatMonthData";
   
 
-const MonthlyStats = ({userId}) => {
+const MonthlyStats = ({userId, optedInToKilometers}) => {
     const [loading, setLoading] = useState(false);
     const [months, setMonths] = useState([])
     const [runMiles, setRuns] = useState([])
     const [walkMiles, setWalks] = useState([])
     const [oneYear, setOneYear] = useState(true)
-    const [optedInToKilometers, setOptedInToKilometers] = useState(false);
     const unitLabel = optedInToKilometers ? "kilometer" : "mile"
 
     useEffect(() => {
@@ -22,18 +21,11 @@ const MonthlyStats = ({userId}) => {
             const response = await fetch(`https://us-central1-stroller-stats.cloudfunctions.net/app/monthly-activities/${userId}`)
             const data = await response.json();
             
-          
-            const userResponse = await fetch(`https://us-central1-stroller-stats.cloudfunctions.net/app/user/${userId}`)
-            const userData = await userResponse.json();
-            const optedInToKms = userData.opted_in_kilometers || false
-            setOptedInToKilometers(optedInToKms)
-
-            const [months, runDistances, walkDistances] = formatMonthData(data, optedInToKms)
+            const [months, runDistances, walkDistances] = formatMonthData(data, optedInToKilometers)
             setMonths(months)
             setRuns(runDistances)
             setWalks(walkDistances)
             
-           
             setLoading(false);
         }
         retrieveData()

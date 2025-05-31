@@ -1,4 +1,4 @@
-import { getDistance } from "./getMiles";
+import { getDistance } from "./getDistance";
 
 
 // helper sort function

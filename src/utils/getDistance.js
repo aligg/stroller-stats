@@ -1,6 +1,4 @@
-export const getMiles = (meters) =>{
-    return meters * 0.000621371192;
-}
+
 
 export const getDistance = (meters, isKilometersUser = false) =>{
     if (isKilometersUser) {
