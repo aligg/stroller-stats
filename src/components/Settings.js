@@ -21,6 +21,7 @@ const Settings = () => {
             const data = await response.json();
             setOptedInToLeaderboard(data.opted_in_leaderboard || false)
             setOptedInToKilometers(data.opted_in_kilometers || false)
+
             setLoading(false);
         }
         getUser()

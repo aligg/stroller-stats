@@ -1,5 +1,4 @@
-import { getMiles } from "./getMiles";
-
+import { getDistance } from "./getMiles";
 
 
 // helper sort function
@@ -28,7 +27,7 @@ const getMonthValue = (monthString) => {
     return parseInt(year) * 12 + parseInt(month);
 }
     
-export const formatMonthData = (data) => {
+export const formatMonthData = (data, optedInToKilometers = false) => {
     data.sort(sortData)
     // Extracting months and distances separately
     const months = [];
@@ -39,8 +38,8 @@ export const formatMonthData = (data) => {
     for (let i = 0; i < data.length; i++) {
         const current = data[i];
         const currentMonth = current.month;
-        const currentRunDistance = getMiles(current.run_distance);
-        const currentWalkDistance = getMiles(current.walk_distance);
+        const currentRunDistance = getDistance(current.run_distance, optedInToKilometers);
+        const currentWalkDistance = getDistance(current.walk_distance, optedInToKilometers);
 
         months.push(currentMonth);
         runDistances.push(currentRunDistance);

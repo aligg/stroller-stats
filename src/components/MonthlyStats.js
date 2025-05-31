@@ -13,16 +13,27 @@ const MonthlyStats = ({userId}) => {
     const [runMiles, setRuns] = useState([])
     const [walkMiles, setWalks] = useState([])
     const [oneYear, setOneYear] = useState(true)
+    const [optedInToKilometers, setOptedInToKilometers] = useState(false);
+    const unitLabel = optedInToKilometers ? "kilometer" : "mile"
 
     useEffect(() => {
         const retrieveData = async () => {
             setLoading(true);
             const response = await fetch(`https://us-central1-stroller-stats.cloudfunctions.net/app/monthly-activities/${userId}`)
             const data = await response.json();
-            const [months, runDistances, walkDistances] = formatMonthData(data)
+            
+          
+            const userResponse = await fetch(`https://us-central1-stroller-stats.cloudfunctions.net/app/user/${userId}`)
+            const userData = await userResponse.json();
+            const optedInToKms = userData.opted_in_kilometers || false
+            setOptedInToKilometers(optedInToKms)
+
+            const [months, runDistances, walkDistances] = formatMonthData(data, optedInToKms)
             setMonths(months)
             setRuns(runDistances)
             setWalks(walkDistances)
+            
+           
             setLoading(false);
         }
         retrieveData()
@@ -33,7 +44,7 @@ const MonthlyStats = ({userId}) => {
         x: oneYear ? months.slice(-12) : months,
         y: oneYear ? runMiles.slice(-12) : runMiles,
         type: 'scatter',
-        name: "Run miles",
+        name: `Run ${unitLabel}s`,
         mode: 'lines+markers',
         marker: {color: '#03045e'},
         line: {color: "#03045e", width: 3}
@@ -42,7 +53,7 @@ const MonthlyStats = ({userId}) => {
             x: oneYear ? months.slice(-12) : months,
             y: oneYear ? walkMiles.slice(-12) : walkMiles,
             type: 'scatter',
-            name: "Walk miles",
+            name: `Walk ${unitLabel}s`,
             mode: 'lines+markers',
             marker: {color: "#00f5d4"},
             line: {color: "#00f5d4", width: 3}
@@ -66,7 +77,7 @@ const MonthlyStats = ({userId}) => {
 
     return (
         <>
-            <h1>Monthly stroller miles</h1>
+            <h1>{`Monthly stroller ${unitLabel}s`}</h1>
             {loading ? <Loading /> :
             <>
               {months.length > 12 && (
