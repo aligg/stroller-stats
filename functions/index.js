@@ -30,6 +30,9 @@ const db = admin.firestore();
 const express = require("express");
 const app = express();
 const cors = require("cors")({origin: true});
+
+// Constants
+const STROLLER_STATS_URL = "https://www.strollerstats.com";
 app.use(cors);
 
 /**
@@ -176,11 +179,29 @@ const retrieveMonthlyStrollerDistance = async (recentActivity, isKilometersUser 
   return roundedTotalDistance;
 };
 
+/**
+ * Check if an activity description has already been processed by StrollerStats
+ * @param {string} description - The activity description to check
+ * @return {boolean} - True if already processed, false otherwise
+ */
+const isAlreadyProcessed = (description) => {
+  if (!description) return false;
+
+  const alreadyProcessedMarkers = [
+    "StrollerStats.com -",
+    "| StrollerStats",
+    "| strollerstats",
+    `| ${STROLLER_STATS_URL}`,
+  ];
+
+  return alreadyProcessedMarkers.some(marker => description.includes(marker));
+};
+
 const updateDescription = async (recentActivity, accessToken) => {
   const description = recentActivity.description;
 
   // if already wrote, exit
-  if (description.includes("StrollerStats.com -") || description.includes("| StrollerStats") || description.includes("| strollerstats")) {
+  if (isAlreadyProcessed(description)) {
     return;
   }
   const userId = recentActivity.user_id;
@@ -190,7 +211,7 @@ const updateDescription = async (recentActivity, accessToken) => {
   const totalDistance = await retrieveMonthlyStrollerDistance(recentActivity, isKilometersUser);
   const currMonth = new Date(recentActivity.start_date).toLocaleString("default", {month: "long"});
   // eslint-disable-next-line max-len
-  const updatedDescription = description.concat("\n", `${totalDistance} ${currMonth} stroller ${recentActivity.sport_type.toLowerCase()} ${distanceUnit} | StrollerStats`);
+  const updatedDescription = description.concat("\n", `${totalDistance} ${currMonth} stroller ${recentActivity.sport_type.toLowerCase()} ${distanceUnit} | ${STROLLER_STATS_URL}`);
   const requestOptions = {
     method: "PUT",
     // eslint-disable-next-line max-len
@@ -544,3 +565,6 @@ exports.writeMonthlyData= onSchedule({
     logger.error("Error in monthly data write:", error);
   }
 });
+
+// Export for testing
+exports.isAlreadyProcessed = isAlreadyProcessed;
