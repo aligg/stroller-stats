@@ -26,7 +26,7 @@ const AnnualStats = ({userId}) => {
     const [data, setData] = useState(null)
     const [loading, setLoading] = useState(false)
     const currYear = startYear + index
-    const distanceLabel = data ? data["distance_unit"] : "Miles"
+    const distanceLabel = data ? data["distance_unit"] : ""
 
     useEffect(() => {
         
@@ -94,7 +94,7 @@ const AnnualStats = ({userId}) => {
 
     return (
     <>
-        <h1>{`Annual stroller ${distanceLabel}s`}</h1>
+        {!loading && <h1>{`Annual stroller ${distanceLabel}s`}</h1>}
             <Tabs defaultIndex={index} onSelect={(index) => {setIndex(index)}}>
                 <TabList>
                     {generateTabsForEachYear()}
