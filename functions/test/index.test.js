@@ -1,9 +1,9 @@
-const { describe, it, afterEach } = require("node:test");
+const {describe, it, afterEach} = require("node:test");
 const assert = require("node:assert");
 const firebaseTest = require("firebase-functions-test")();
 
 // We need to import the function after initializing firebase-functions-test
-const { isAlreadyProcessed } = require("../index");
+const {isAlreadyProcessed} = require("../index");
 
 describe("isAlreadyProcessed", () => {
   afterEach(() => {
@@ -60,7 +60,6 @@ Great way to start the day!`;
   });
 
   it("should handle case sensitivity correctly", () => {
-
     // These SHOULD match (exact case)
     assert.strictEqual(isAlreadyProcessed("contains | strollerstats marker"), true);
   });

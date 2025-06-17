@@ -194,7 +194,9 @@ const isAlreadyProcessed = (description) => {
     `| ${STROLLER_STATS_URL}`,
   ];
 
-  return alreadyProcessedMarkers.some(marker => description.includes(marker));
+  return alreadyProcessedMarkers.some((marker) => {
+    return description.includes(marker);
+  });
 };
 
 const updateDescription = async (recentActivity, accessToken) => {
