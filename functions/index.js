@@ -90,7 +90,6 @@ const getPartialDistance = (text) => {
 
 const formatActivity = (data, isKilometersUser) => {
   let isStroller = false;
-  // eslint-disable-next-line max-len
   if (data["description"]) {
     isStroller = data["description"].toLowerCase().includes("strollerstats") || data["description"].toLowerCase().includes("strollermiles");
   } else {
@@ -100,7 +99,6 @@ const formatActivity = (data, isKilometersUser) => {
   }
   logger.info(`Evaluated isStroller as: ${isStroller} for activity titled: ${data["name"]}`);
 
-  // TODO - add support for kms on partial distance feature
   const partialDistance = getPartialDistance(data["description"]);
   let distance = data["distance"];
   if (partialDistance !== null) {
