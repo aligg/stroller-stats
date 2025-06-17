@@ -88,7 +88,7 @@ const getPartialDistance = (text) => {
 };
 
 
-const formatActivity = (data) => {
+const formatActivity = (data, isKilometersUser) => {
   let isStroller = false;
   // eslint-disable-next-line max-len
   if (data["description"]) {
@@ -104,9 +104,9 @@ const formatActivity = (data) => {
   const partialDistance = getPartialDistance(data["description"]);
   let distance = data["distance"];
   if (partialDistance !== null) {
-    // partialDistance is in miles
-    if (getMeters(partialDistance) < distance) {
-      distance = getMeters(partialDistance);
+    // partialDistance is in miles or kilometers
+    if (getMeters(partialDistance, isKilometersUser) < distance) {
+      distance = getMeters(partialDistance, isKilometersUser);
     }
   }
 
@@ -123,14 +123,14 @@ const formatActivity = (data) => {
   };
 };
 
-const getActivity = async (accessToken, activityId) => {
+const getActivity = async (accessToken, activityId, isKilometersUser) => {
   logger.info("top of get Activity");
   const response = await fetch(`https://www.strava.com/api/v3/activities/${activityId}?include_all_efforts=false`, {
     headers: {authorization: `Bearer ${accessToken}`},
   });
   const data = await response.json();
 
-  const activity = formatActivity(data);
+  const activity = formatActivity(data, isKilometersUser);
 
   return activity;
 };
@@ -275,7 +275,8 @@ exports.stravaWebhookv2 = onRequest((request, response) => {
 const handlePost = async (userId, activityId) => {
   const refreshToken = await getRefreshToken(userId);
   const accessResp = await getAccessToken(refreshToken, "refresh_token");
-  const recentActivity = await getActivity(accessResp.access_token, activityId);
+  const isKilometersUser = await getIsKilometersUser(userId);
+  const recentActivity = await getActivity(accessResp.access_token, activityId, isKilometersUser);
   logger.info(recentActivity);
   if (recentActivity.is_stroller) {
     await addActivityToDB(recentActivity);
@@ -295,8 +296,11 @@ const getDistance = (meters, isKilometersUser = false) =>{
   return meters * 0.000621371192;
 };
 
-const getMeters = (miles) => {
-  return miles * 1609.344;
+const getMeters = (distance, isKilometersUser = false) => {
+  if (isKilometersUser) {
+    return distance * 1000;
+  }
+  return distance * 1609.344;
 };
 
 const getUser = async (userId) => {

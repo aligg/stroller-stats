@@ -52,7 +52,7 @@ const About = () => {
           <p>
             Add the mileage in parentheses after #strollerstats - for example,
             #strollerstats(1.5) will only log 1.5 miles of your activity as
-            stroller miles. Note that the partial miles feature currently only works with units in miles regardless of preferred distance unit settings.
+            stroller miles (or 1.5 kilometers if your preference is set to kilometers).
           </p>
           <h2>How can I switch my stroller stats preference to kilometers?</h2>
           <p>
