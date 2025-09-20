@@ -86,6 +86,18 @@ const About = () => {
             </a>
             . Code contributions are welcome! You can also reach me at <a href="mailto:ali@strollerstats.com">ali@strollerstats.com</a> with questions.
           </p>
+          <h2>Want to know your estimated energy expendinture for your stroller run and other cool research-backed stats?</h2>
+          <p>
+            Check out our friends at {" "}
+            <a
+              href="https://strollerrunningcalculator.com"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Stroller Running Calculator
+            </a>
+            .
+          </p>
         </div>
       )}
     </main>

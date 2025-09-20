@@ -23,3 +23,6 @@
 
 # firebase
 firestore.rules
+
+
+.vscode/settings.json
