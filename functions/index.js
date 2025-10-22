@@ -524,7 +524,7 @@ app.get("/leaderboard", async (request, response) => {
   // eslint-disable-next-line no-unused-vars
   const [currMonth, _, year] = currDate.split("/");
   const currMonthIdentifier = `${year}-${currMonth}`;
-  logger.info("Found curr month:", currMonthIdentifier);
+  logger.info("Found curr month:", currMonthIdentifier)
   const lastMonthIdentifier = getPrevMonthIdentifier();
   logger.info("Found last month:", lastMonthIdentifier);
 
@@ -554,6 +554,132 @@ app.get("/leaderboard", async (request, response) => {
     }
   });
   response.status(200).send(JSON.stringify({currMonthData, lastMonthData}));
+});
+
+/* eslint-disable camelcase */
+app.get("/hall-of-fame", async (req, res) => {
+  try {
+    // 1️⃣ Get all leaderboard-eligible users
+    const optInSnap = await db.collection("users")
+        .where("opted_in_leaderboard", "==", true)
+        .get();
+    const optInUserIds = new Set(optInSnap.docs.map((d) => Number(d.data().user_id)));
+
+    if (optInUserIds.size === 0) {
+      return res.status(200).send({message: "No leaderboard participants found."});
+    }
+
+    // 2️⃣ Top 3 longest stroller RUN/WALK ever (with title + start_date)
+    const getTopActivities = async (sportType) => {
+      const snap = await db.collection("activities")
+          .where("is_stroller", "==", true)
+          .where("sport_type", "==", sportType)
+          .orderBy("distance", "desc")
+          .limit(10) // fetch extra to ensure opted-in users included
+          .get();
+
+      return snap.docs
+          .map((d) => d.data())
+          .filter((a) => optInUserIds.has(Number(a.user_id)))
+          .slice(0, 5);
+    };
+
+    const topRunsEver = await getTopActivities("Run");
+    const topWalksEver = await getTopActivities("Walk");
+
+    // 3️⃣ Lifetime totals & This year totals
+    const activitiesSnap = await db.collection("activities")
+        .where("is_stroller", "==", true)
+        .get();
+
+    const runTotals = {};
+    const walkTotals = {};
+    const thisYear = new Date().getFullYear();
+    const runTotalsThisYear = {};
+    const walkTotalsThisYear = {};
+
+    activitiesSnap.forEach((doc) => {
+      const data = doc.data();
+      const uid = Number(data.user_id);
+      if (!optInUserIds.has(uid)) return;
+
+      if (data.sport_type === "Run") {
+        runTotals[uid] = (runTotals[uid] || 0) + data.distance;
+        if (new Date(data.start_date).getFullYear() === thisYear) {
+          runTotalsThisYear[uid] = (runTotalsThisYear[uid] || 0) + data.distance;
+        }
+      } else if (data.sport_type === "Walk") {
+        walkTotals[uid] = (walkTotals[uid] || 0) + data.distance;
+        if (new Date(data.start_date).getFullYear() === thisYear) {
+          walkTotalsThisYear[uid] = (walkTotalsThisYear[uid] || 0) + data.distance;
+        }
+      }
+    });
+
+    const formatTopTotals = (totals) =>
+      Object.entries(totals)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 5)
+          .map(([user_id, total_distance]) => ({user_id: Number(user_id), total_distance}));
+
+    const topLifetimeRuns = formatTopTotals(runTotals);
+    const topLifetimeWalks = formatTopTotals(walkTotals);
+    const topThisYearRuns = formatTopTotals(runTotalsThisYear);
+    const topThisYearWalks = formatTopTotals(walkTotalsThisYear);
+
+    // 4️⃣ Attach first names for all relevant users
+    const allUserIds = [
+      ...topRunsEver.map((x) => x.user_id),
+      ...topWalksEver.map((x) => x.user_id),
+      ...topLifetimeRuns.map((x) => x.user_id),
+      ...topLifetimeWalks.map((x) => x.user_id),
+      ...topThisYearRuns.map((x) => x.user_id),
+      ...topThisYearWalks.map((x) => x.user_id),
+    ].filter(Boolean);
+
+    const usersSnap = await db.collection("users")
+        .where("user_id", "in", allUserIds)
+        .get();
+
+    const userMap = {};
+    usersSnap.forEach((doc) => {
+      const u = doc.data();
+      userMap[Number(u.user_id)] = u.first_name;
+    });
+
+    const attachName = (obj) => ({...obj, first_name: userMap[obj.user_id] || "Unknown"});
+
+    // 5️⃣ Response
+    res.status(200).send({
+      top_runs_ever: topRunsEver.map((a) => ({
+        activity_id: a.activity_id,
+        user_id: a.user_id,
+        distance: a.distance,
+        title: a.title,
+        start_date: a.start_date,
+        first_name: userMap[a.user_id] || "Unknown",
+      })),
+      top_walks_ever: topWalksEver.map((a) => ({
+        activity_id: a.activity_id,
+        user_id: a.user_id,
+        distance: a.distance,
+        title: a.title,
+        start_date: a.start_date,
+        first_name: userMap[a.user_id] || "Unknown",
+      })),
+      lifetime_totals: {
+        runs: topLifetimeRuns.map(attachName),
+        walks: topLifetimeWalks.map(attachName),
+      },
+      this_year_totals: {
+        runs: topThisYearRuns.map(attachName),
+        walks: topThisYearWalks.map(attachName),
+      },
+    });
+  } catch (err) {
+    console.error("Error generating Hall of Fame:", err);
+    res.status(500).send({error: err.message});
+  }
 });
 
 

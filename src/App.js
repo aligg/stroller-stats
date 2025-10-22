@@ -7,6 +7,7 @@ import Nav from "./components/Nav";
 import React from "react";
 import RedirectComponent from "./routes/redirect";
 import Settings from "./components/Settings";
+import HallOfFame from "./components/HallOfFame"
 
 export default function App() {
   const user_id = localStorage.getItem("user_id");
@@ -36,6 +37,12 @@ export default function App() {
             path="/settings"
             element={
                 <Settings />
+            }
+          />
+             <Route
+            path="/hall-of-fame"
+            element={
+                <HallOfFame />
             }
           />
           <Route path="*" element={<Navigate to="/"/>}/>
