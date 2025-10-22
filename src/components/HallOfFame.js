@@ -51,8 +51,8 @@ const HallOfFame = () => {
       <div style={{ marginLeft: "1rem" }}>
         <div style={{ fontWeight: "bold", marginBottom: "0.25rem" }}>Winner</div>
         <div style={winnerStyle}>
-          ✨<span style={sparkleStyle}>✨</span>
-          1. 👑 {winner.first_name}:{" "}
+          <span style={sparkleStyle}>✨</span>
+          👑 {winner.first_name}:{" "}
           <a
             href={`https://www.strava.com/activities/${winner.activity_id}`}
             target="_blank"
@@ -99,8 +99,8 @@ const HallOfFame = () => {
       <div style={{ marginLeft: "1rem" }}>
         <div style={{ fontWeight: "bold", marginBottom: "0.25rem" }}>Winner</div>
         <div style={winnerStyle}>
-          ✨<span style={sparkleStyle}>✨</span>
-          1. 👑{" "}
+          <span style={sparkleStyle}>✨</span>
+          👑{" "}
           <a
             href={`https://www.strava.com/athletes/${winner.user_id}`}
             target="_blank"
