@@ -16,13 +16,13 @@ const HallOfFame = () => {
     retrieveData();
   }, []);
 
-  if (!data) return <Loading />;
+  if (!data) return <main><Loading /><p>Just a sec! Crunching awesome hall of famer data</p></main>;
 
   const winnerStyle = {
     fontWeight: "bold",
     fontSize: "1.2rem",
     padding: "0.75rem 1rem",
-    background: "linear-gradient(135deg, #ffd6f0, #c6b7ff)", // pastel pink to purple
+    background: "linear-gradient(135deg, #ffd6f0, #c6b7ff)",
     borderRadius: "12px",
     boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
     marginBottom: "0.75rem",
