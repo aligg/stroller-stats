@@ -60,7 +60,7 @@ const Settings = () => {
             <h1>Settings</h1>
             <h2>Leaderboard</h2>
             <div className="toggle-container">
-                <p style={{marginBlockEnd: 0, maxWidth: "60%"}}>Include me in the leaderboard. This means that other users will see your first name and monthly mileage. Optining into the leaderboard also makes you <a href="hall-of-fame">Hall of Fame</a> eligible</p>
+                <p style={{marginBlockEnd: 0, maxWidth: "60%"}}>Include me in the leaderboard. This means that other users will see your first name and monthly mileage. Opting into the leaderboard also makes you <a href="hall-of-fame">Hall of Fame</a> eligible. Your activity title will display if you enter the longest run or walk hall of fame.</p>
                 <div style={{display: "flex", alignItems: "center"}}>
                     <label className="switch">
                         <input type="checkbox" onChange={updateUserLeaderboard} checked={optedInToLeaderboard}/>
