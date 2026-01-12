@@ -13,7 +13,7 @@ const About = () => {
         </li>
         <li>
           When you grant write access, we'll also update your description to
-          share month to date stroller mileage from your activity. If you'd like
+          share month-to-date stroller mileage from your activity. If you'd like
           stroller stats to be counted for "Only Me" activities, keep "View data
           about your private activities" checked.
         </li>
@@ -31,14 +31,18 @@ const About = () => {
             Add #strollerstats to your activity description. #strollermiles will
             work too! You have to update your description at the same time that
             you make a title change so that Strava's webhook will send your
-            changes.
+            changes. Tracking stroller stats works for Run or Walk activity types.
           </p>
           <h2>How can I add stroller miles from past activities?</h2>
           <p>
             If you add #strollerstats to your activity
             description and also make a small title change at the same time, the
             app will pull it in. Unfortunately you do have to change the title
-            at the same time due to how Strava webhooks work!
+            at the same time due to how Strava webhooks work.
+          </p>
+          <h2>Can I track when I have the baby in the frontpack or backpack?</h2>
+          <p>
+            New in 2026 (inspired by my second baby!) you can add #packmiles or #packstats to your activity to track your pack distance. Tracking pack distance works for walk and hike activity types. Pack activities are not currently included in monthly data, leaderboards, or hall of fame. Since this is a new feature, <a href="mailto:ali@strollerstats.com">let me know</a> if you have requests, bug reports or feedback.
           </p>
           <h2>Does stroller stats work for activities visible to "Only Me"?</h2>
           <p>
@@ -50,7 +54,7 @@ const About = () => {
           </p>
           <h2>How can I track only part of my run as stroller miles?</h2>
           <p>
-            Add the mileage in parentheses after #strollerstats - for example,
+            Did you share stroller duties with another adult? Add your mileage in parentheses after #strollerstats - for example,
             #strollerstats(1.5) will only log 1.5 miles of your activity as
             stroller miles (or 1.5 kilometers if your preference is set to kilometers).
           </p>

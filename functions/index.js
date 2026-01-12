@@ -95,18 +95,18 @@ const formatActivity = (data, isKilometersUser) => {
   let isPack = false;
 
   if (data["description"]) {
-    isStroller = data["description"].toLowerCase().includes("strollerstats") || data["description"].toLowerCase().includes("strollermiles");
+    isStroller = data["description"].toLowerCase().includes("#strollerstats") || data["description"].toLowerCase().includes("#strollermiles");
   } else {
     if (data["name"]) {
-      isStroller = data["name"].toLowerCase().includes("strollerstats") || data["name"].toLowerCase().includes("strollermiles");
+      isStroller = data["name"].toLowerCase().includes("#strollerstats") || data["name"].toLowerCase().includes("#strollermiles");
     }
   }
 
   if (data["description"]) {
-    isPack = data["description"].toLowerCase().includes("packmiles") || data["description"].toLowerCase().includes("packstats");
+    isPack = data["description"].toLowerCase().includes("#packmiles") || data["description"].toLowerCase().includes("#packstats");
   } else {
     if (data["name"]) {
-      isPack = data["name"].toLowerCase().includes("packmiles") || data["name"].toLowerCase().includes("packstats");
+      isPack = data["name"].toLowerCase().includes("#packmiles") || data["name"].toLowerCase().includes("#packstats");
     }
   }
 
@@ -441,6 +441,7 @@ app.get("/user-activity-data/:user_id/:year", async (request, res) => {
     "average_walk_speed": null,
     "first_name": "",
     "distance_unit": "Mile",
+    "total_pack_distance": 0,
   };
   let walkTime = 0;
   let runTime = 0;
@@ -460,7 +461,22 @@ app.get("/user-activity-data/:user_id/:year", async (request, res) => {
       .get();
 
   if (snapshot.size === 0) {
-    res.status(200).send(JSON.stringify(data));
+    return res.status(200).send(JSON.stringify(data));
+  }
+
+  // Retrieve pack activities (all sport types combined)
+  const packSnapshot = await admin.firestore().collection("activities")
+      .where("user_id", "==", Number(userId))
+      .where("is_pack", "==", true)
+      .where("start_date", ">", currYear)
+      .where("start_date", "<", nextYear)
+      .get();
+
+  if (packSnapshot.size > 0) {
+    packSnapshot.forEach((doc) => {
+      const dbData = doc.data();
+      data["total_pack_distance"] += getDistance(dbData.distance, isKilometersUser);
+    });
   }
 
   // populate annual distance data
@@ -480,7 +496,7 @@ app.get("/user-activity-data/:user_id/:year", async (request, res) => {
   const minsPerUnitRun = Math.floor((runTime / data["total_run_distance"]) / 60);
   const secsPerUnitRun = Math.floor((runTime / data["total_run_distance"]) % 60);
   const minsPerUnitWalk = Math.floor((walkTime / data["total_walk_distance"]) / 60);
-  const secsPerUnitWalk = Math.floor((runTime / data["total_walk_distance"]) % 60);
+  const secsPerUnitWalk = Math.floor((walkTime / data["total_walk_distance"]) % 60);
 
   data["average_run_speed"] = runTime > 0 ? minsPerUnitRun + ":" + secsPerUnitRun.toString().padStart(2, "0") : null;
   data["average_walk_speed"] = walkTime > 0 ? minsPerUnitWalk + ":" + secsPerUnitWalk.toString().padStart(2, "0"): null;

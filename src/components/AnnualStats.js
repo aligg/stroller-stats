@@ -16,7 +16,7 @@ const generateTabsForEachYear = () => {
    let resp = []
 
     for (let year = startYear; year <= currYear; year++) {
-        resp.push(<Tab>{year}</Tab>)
+        resp.push(<Tab key={year}>{year}</Tab>)
     }
     return resp
 }
@@ -67,6 +67,10 @@ const AnnualStats = ({userId}) => {
                                 <td>{data["total_walk_distance"].toFixed(2)}</td>
                             </tr>
                             <tr>
+                                <td>{`Total pack ${distanceLabel}s`}</td>
+                                <td>{data.total_pack_distance.toFixed(2)}</td>
+                            </tr>
+                            <tr>
                                 <td>Average run pace with stroller</td>
                                 <td>{data["average_run_speed"] === null ? "N/A" : `${data["average_run_speed"]} min/${distanceLabel}`}</td>
                             </tr>
@@ -85,7 +89,7 @@ const AnnualStats = ({userId}) => {
     let resp = []
 
         for (let year = startYear; year <= currYear; year++) {
-            resp.push(<TabPanel>                  
+            resp.push(<TabPanel key={year}>                  
                 {renderTabPanelContent()}
             </TabPanel>)
         }
