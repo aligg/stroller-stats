@@ -76,11 +76,13 @@ const getAccessToken = async (refreshToken, grantType) => {
 };
 
 const getPartialDistance = (text) => {
+  if (!text) return null;
+
   const regex = /#?(?:strollerstats|strollermiles)\(([0-9.]+)\)/i;
   const match = text.match(regex);
 
   if (match !== null && !isNaN(Number(match[1]))) {
-    logger.info(`GOT PARTIAL as ${Number(match[1])}`);
+    logger.info(`Got partial as ${Number(match[1])}`);
     return Number(match[1]);
   }
 
@@ -90,6 +92,8 @@ const getPartialDistance = (text) => {
 
 const formatActivity = (data, isKilometersUser) => {
   let isStroller = false;
+  let isPack = false;
+
   if (data["description"]) {
     isStroller = data["description"].toLowerCase().includes("strollerstats") || data["description"].toLowerCase().includes("strollermiles");
   } else {
@@ -97,7 +101,23 @@ const formatActivity = (data, isKilometersUser) => {
       isStroller = data["name"].toLowerCase().includes("strollerstats") || data["name"].toLowerCase().includes("strollermiles");
     }
   }
-  logger.info(`Evaluated isStroller as: ${isStroller} for activity titled: ${data["name"]}`);
+
+  if (data["description"]) {
+    isPack = data["description"].toLowerCase().includes("packmiles") || data["description"].toLowerCase().includes("packstats");
+  } else {
+    if (data["name"]) {
+      isPack = data["name"].toLowerCase().includes("packmiles") || data["name"].toLowerCase().includes("packstats");
+    }
+  }
+
+  // Stroller always wins over pack
+  if (isStroller) {
+    isPack = false;
+  }
+
+
+  logger.info(`Evaluated isStroller as: ${isStroller} for activity titled: ${data["name"]} (isPack: ${isPack})`);
+
 
   const partialDistance = getPartialDistance(data["description"]);
   let distance = data["distance"];
@@ -118,11 +138,12 @@ const formatActivity = (data, isKilometersUser) => {
     user_id: data["athlete"]["id"],
     description: data["description"],
     is_stroller: isStroller,
+    is_pack: isPack,
   };
 };
 
 const getActivity = async (accessToken, activityId, isKilometersUser) => {
-  logger.info("top of get Activity");
+  logger.info("top of get activity");
   const response = await fetch(`https://www.strava.com/api/v3/activities/${activityId}?include_all_efforts=false`, {
     headers: {authorization: `Bearer ${accessToken}`},
   });
@@ -138,7 +159,13 @@ const addActivityToDB = async (activityData) => {
     (activityData.sport_type === "Run" || activityData.sport_type === "Walk")) {
     await db.collection("activities").doc(activityData.activity_id.toString())
         .set(activityData).then(() => {
-          logger.info("Wrote to DB", activityData);
+          logger.info("Wrote to DB with stroller activity", activityData);
+        });
+    return 1;
+  } else if (activityData.is_pack && (activityData.sport_type === "Walk" || activityData.sport_type === "Hike")) {
+    await db.collection("activities").doc(activityData.activity_id.toString())
+        .set(activityData).then(() => {
+          logger.info("Wrote to DB with pack activity", activityData);
         });
     return 1;
   } else {
@@ -146,6 +173,30 @@ const addActivityToDB = async (activityData) => {
     logger.info(`Skipped write to DB for ${activityData.activity_id} sport type ${activityData.sport_type}`);
     return 0;
   }
+};
+
+const retrieveMonthlyPackDistance = async (recentActivity, isKilometersUser = false) => {
+  const userId = recentActivity.user_id;
+  const date = new Date(recentActivity.start_date);
+  const startOfMonth = new Date(date.getFullYear(),
+      date.getMonth(), 1).toISOString();
+  const startOfNextMonth = new Date(date.getFullYear(),
+      date.getMonth() + 1, 1).toISOString();
+
+  const activityRef = db.collection("activities")
+      .where("user_id", "==", userId)
+      .where("start_date", ">=", startOfMonth)
+      .where("start_date", "<", startOfNextMonth)
+      .where("is_pack", "==", true);
+
+  const activities = await activityRef.get();
+
+  let totalMeters = 0;
+  for (const doc of activities.docs) {
+    totalMeters += doc.data().distance;
+  }
+
+  return getDistance(totalMeters, isKilometersUser).toFixed(2);
 };
 
 const retrieveMonthlyStrollerDistance = async (recentActivity, isKilometersUser = false) => {
@@ -162,7 +213,8 @@ const retrieveMonthlyStrollerDistance = async (recentActivity, isKilometersUser 
       .where("sport_type", "==", sportType)
       .where("start_date", ">=", startOfMonth)
       .where("start_date", "<", startOfNextMonth)
-      .where("is_stroller", "==", true);
+      .where("is_stroller", "==", true)
+      .where("is_pack", "==", false);
   const activities = await activityRef.get();
 
   let totalMeters = 0;
@@ -208,10 +260,19 @@ const updateDescription = async (recentActivity, accessToken) => {
   const isKilometersUser = await getIsKilometersUser(userId);
   const distanceUnit = isKilometersUser ? "kilometers" : "miles";
   const activityId = recentActivity.activity_id;
-  const totalDistance = await retrieveMonthlyStrollerDistance(recentActivity, isKilometersUser);
   const currMonth = new Date(recentActivity.start_date).toLocaleString("default", {month: "long"});
-  // eslint-disable-next-line max-len
-  const updatedDescription = description.concat("\n", `${totalDistance} ${currMonth} stroller ${recentActivity.sport_type.toLowerCase()} ${distanceUnit} | ${STROLLER_STATS_URL}`);
+
+  let totalDistance;
+  let updatedDescription;
+
+  if (recentActivity.is_pack) {
+    totalDistance = await retrieveMonthlyPackDistance(recentActivity, isKilometersUser);
+    updatedDescription = description.concat("\n", `${totalDistance} ${currMonth} pack ${distanceUnit} | ${STROLLER_STATS_URL}`);
+  } else {
+    totalDistance = await retrieveMonthlyStrollerDistance(recentActivity, isKilometersUser);
+    updatedDescription = description.concat("\n", `${totalDistance} ${currMonth} stroller ${recentActivity.sport_type.toLowerCase()} ${distanceUnit} | ${STROLLER_STATS_URL}`);
+  }
+
   const requestOptions = {
     method: "PUT",
     // eslint-disable-next-line max-len
@@ -245,7 +306,6 @@ exports.stravaWebhookv2 = onRequest((request, response) => {
       query: request.query,
       body: request.body,
     });
-    logger.info("Got here");
     const {owner_id: userId, object_id: activityId} = request.body;
 
     handlePost(userId, activityId).then(() => {
@@ -276,7 +336,7 @@ const handlePost = async (userId, activityId) => {
   const isKilometersUser = await getIsKilometersUser(userId);
   const recentActivity = await getActivity(accessResp.access_token, activityId, isKilometersUser);
   logger.info(recentActivity);
-  if (recentActivity.is_stroller) {
+  if (recentActivity.is_stroller || recentActivity.is_pack) {
     await addActivityToDB(recentActivity);
     updateDescription(recentActivity, accessResp.access_token);
   }
@@ -431,7 +491,7 @@ app.get("/user-activity-data/:user_id/:year", async (request, res) => {
 app.get("/monthly-activities/:user_id", async (request, res) => {
   const userId = request.params.user_id;
 
-  const snapshot = await admin.firestore().collection("activities").where("user_id", "==", Number(userId)).get();
+  const snapshot = await admin.firestore().collection("activities").where("user_id", "==", Number(userId)).where("is_stroller", "==", true).get();
   const monthlyData = [];
   snapshot.forEach((doc) => {
     const data = doc.data();
