@@ -1,9 +1,9 @@
-const {describe, it, afterEach} = require("node:test");
+const {describe, it, afterEach, beforeEach} = require("node:test");
 const assert = require("node:assert");
 const firebaseTest = require("firebase-functions-test")();
 
 // We need to import the function after initializing firebase-functions-test
-const {isAlreadyProcessed} = require("../index");
+const {isAlreadyProcessed, retrieveMonthlyStrollerDistance, db} = require("../index");
 
 describe("isAlreadyProcessed", () => {
   afterEach(() => {
@@ -64,3 +64,58 @@ Great way to start the day!`;
     assert.strictEqual(isAlreadyProcessed("contains | strollerstats marker"), true);
   });
 });
+
+
+describe("retrieveMonthlyStrollerDistance", () => {
+  beforeEach(async () => {
+    // Clear activities collection
+    const snapshot = await db.collection("activities").get();
+    await Promise.all(snapshot.docs.map(doc => doc.ref.delete()));
+  });
+
+  afterEach(() => {
+    firebaseTest.cleanup();
+  });
+
+  it("includes historical stroller activities where is_pack is missing", async () => {
+    const userId = "user_123";
+    const sportType = "Run";
+
+    const startDate = new Date("2025-01-15T08:00:00Z").toISOString();
+
+    // Historical stroller activity (NO is_pack field)
+    await db.collection("activities").add({
+      user_id: userId,
+      sport_type: sportType,
+      start_date: startDate,
+      distance: 5000, // meters
+      is_stroller: true,
+      // is_pack intentionally missing
+    });
+
+    // Pack activity that should NOT be included
+    await db.collection("activities").add({
+      user_id: userId,
+      sport_type: sportType,
+      start_date: startDate,
+      distance: 3000,
+      is_stroller: false,
+      is_pack: true,
+    });
+
+    const recentActivity = {
+      user_id: userId,
+      sport_type: sportType,
+      start_date: startDate,
+    };
+
+    const total = await retrieveMonthlyStrollerDistance(
+      recentActivity,
+      false // miles
+    );
+
+    // 5000 meters ≈ 3.11 miles
+    assert.strictEqual(Number(total), 3.11);
+  });
+});
+

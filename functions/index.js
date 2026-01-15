@@ -94,35 +94,33 @@ const formatActivity = (data, isKilometersUser) => {
   let isStroller = false;
   let isPack = false;
 
-  if (data["description"]) {
-    isStroller = data["description"].toLowerCase().includes("#strollerstats") || data["description"].toLowerCase().includes("#strollermiles");
-  } else {
-    if (data["name"]) {
-      isStroller = data["name"].toLowerCase().includes("#strollerstats") || data["name"].toLowerCase().includes("#strollermiles");
-    }
-  }
+  const description = (data["description"] || "").toLowerCase();
+  const title = (data["name"] || "").toLowerCase();
 
-  if (data["description"]) {
-    isPack = data["description"].toLowerCase().includes("#packmiles") || data["description"].toLowerCase().includes("#packstats");
-  } else {
-    if (data["name"]) {
-      isPack = data["name"].toLowerCase().includes("#packmiles") || data["name"].toLowerCase().includes("#packstats");
-    }
-  }
+  isStroller =
+    description.includes("#strollerstats") ||
+    description.includes("#strollermiles") ||
+    title.includes("#strollerstats") ||
+    title.includes("#strollermiles");
+
+  isPack =
+    description.includes("#packmiles") ||
+    description.includes("#packstats") ||
+    title.includes("#packmiles") ||
+    title.includes("#packstats");
 
   // Stroller always wins over pack
   if (isStroller) {
     isPack = false;
   }
 
-
-  logger.info(`Evaluated isStroller as: ${isStroller} for activity titled: ${data["name"]} (isPack: ${isPack})`);
-
+  logger.info(
+      `Evaluated isStroller as: ${isStroller} for activity titled: ${data["name"]} (isPack: ${isPack})`,
+  );
 
   const partialDistance = getPartialDistance(data["description"]);
   let distance = data["distance"];
   if (partialDistance !== null) {
-    // partialDistance is in miles or kilometers
     if (getMeters(partialDistance, isKilometersUser) < distance) {
       distance = getMeters(partialDistance, isKilometersUser);
     }
@@ -131,7 +129,7 @@ const formatActivity = (data, isKilometersUser) => {
   return {
     activity_id: data["id"],
     title: data["name"],
-    distance: distance,
+    distance,
     sport_type: data["sport_type"],
     start_date: data["start_date"],
     average_speed: data["average_speed"],
@@ -213,8 +211,7 @@ const retrieveMonthlyStrollerDistance = async (recentActivity, isKilometersUser 
       .where("sport_type", "==", sportType)
       .where("start_date", ">=", startOfMonth)
       .where("start_date", "<", startOfNextMonth)
-      .where("is_stroller", "==", true)
-      .where("is_pack", "==", false);
+      .where("is_stroller", "==", true);
   const activities = await activityRef.get();
 
   let totalMeters = 0;
@@ -766,3 +763,5 @@ exports.writeMonthlyData= onSchedule({
 
 // Export for testing
 exports.isAlreadyProcessed = isAlreadyProcessed;
+exports.db = db
+exports.retrieveMonthlyStrollerDistance = retrieveMonthlyStrollerDistance
