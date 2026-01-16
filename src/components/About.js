@@ -1,5 +1,4 @@
 import React from "react";
-import { useLocation } from "react-router-dom";
 
 export const Intro = () => {
   return (
@@ -24,7 +23,6 @@ export const Intro = () => {
 }
 
 const About = () => {
-  const location = useLocation();
   return (
     <main>
       <h1>Track your stroller miles with Stroller Stats.</h1>
