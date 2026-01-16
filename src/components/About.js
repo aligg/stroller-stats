@@ -1,29 +1,34 @@
 import React from "react";
 import { useLocation } from "react-router-dom";
 
+export const Intro = () => {
+  return (
+    <ul>
+    <li>
+      Add #strollerstats to the description of any Strava walk or run and
+      we'll track your stroller miles (or kilometers) automatically.
+    </li>
+    <li>
+      When you grant write access, we'll also update your description to
+      share month-to-date stroller mileage from your activity. If you'd like
+      stroller stats to be counted for "Only Me" activities, keep "View data
+      about your private activities" checked.
+    </li>
+    <li>You can revoke access anytime.</li>
+    <li>
+      Compete with friends and family to see who is getting that baby out
+      the most!
+    </li>
+  </ul>
+  )
+}
+
 const About = () => {
   const location = useLocation();
   return (
     <main>
       <h1>Track your stroller miles with Stroller Stats.</h1>
-      <ul>
-        <li>
-          Add #strollerstats to the description of any Strava walk or run and
-          we'll track your stroller miles (or kilometers) automatically.
-        </li>
-        <li>
-          When you grant write access, we'll also update your description to
-          share month-to-date stroller mileage from your activity. If you'd like
-          stroller stats to be counted for "Only Me" activities, keep "View data
-          about your private activities" checked.
-        </li>
-        <li>You can revoke access anytime.</li>
-        <li>
-          Compete with friends and family to see who is getting that baby out
-          the most!
-        </li>
-      </ul>
-      {location.pathname === "/about" && (
+        <Intro />
         <div>
           <h1>FAQ</h1>
           <h2>How do I track my stroller stats?</h2>
@@ -103,7 +108,6 @@ const About = () => {
             .
           </p>
         </div>
-      )}
     </main>
   );
 };

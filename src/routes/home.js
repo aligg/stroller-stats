@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react"; // Import useEffect and useState
-import About from "../components/About";
+import {Intro} from "../components/About";
 import AnnualStats from "../components/AnnualStats";
 import Leaderboard from "../components/Leaderboard";
 import MonthlyStats from "../components/MonthlyStats";
@@ -46,11 +46,13 @@ const Home = () => {
         if (user_id == null) {
             return (
                 <div>
-                    <About />
+                    <h1>Track your stroller miles with Stroller Stats.</h1>
+                    <Intro />
+                    <br></br>
                     <button className="authButton" onClick={handleLogin}>
                         <img src="/btn_strava_connect_with_orange.png" alt="Connect with Strava" />
-                    </button>
-                    <h1>Sign in with Strava and let's get rolling! <div className="bounceArrow">^</div></h1>
+                    </button><br></br>
+                    <h2>Sign in with Strava and let's get rolling! <div className="bounceArrow">^</div></h2>
                     {/* <PreviewCarousel /> */}
                 </div>
             );
