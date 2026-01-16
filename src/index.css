@@ -293,3 +293,71 @@ td > a {
   transform: translateY(-2px);
   cursor: pointer;
 }
+
+.bounceArrow {
+  font-size: 2rem;           /* size of arrow */
+  text-align: center;
+  margin-top: 8px;            /* space above button */
+  color: #fc4c02;             /* match Strava orange */
+  animation: bounce 1s infinite;
+  display: inline-block;
+}
+
+/* Bounce keyframes */
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px); /* move arrow up */
+  }
+}
+
+
+.previewCarousel {
+  width: 100%;
+  overflow: hidden; /* prevents horizontal scroll */
+}
+
+.previewCarousel .swiper {
+  width: 100%;
+  height: 520px; /* desktop height */
+}
+
+.previewCarousel .swiper-slide {
+  display: flex;
+  align-items: flex-start; /* top-align images */
+  justify-content: center;
+}
+
+.previewImage {
+  width: 100%;
+  max-height: 100%;
+  object-fit: cover;
+  object-position: top center; /* crop bottom only */
+  background: white;
+  padding: 12px;
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12), 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.previewCarousel .swiper-pagination {
+  bottom: 16px !important;
+}
+
+/* Mobile overrides */
+@media (max-width: 768px) {
+  .previewCarousel .swiper {
+    height: min(70vh, 420px);
+  }
+
+  .previewCarousel .swiper-pagination {
+    bottom: 8px !important;
+  }
+
+  .previewImage {
+    object-fit: contain; /* preserve full image on mobile */
+    height: auto;
+  }
+}
+

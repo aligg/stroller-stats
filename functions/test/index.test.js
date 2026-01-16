@@ -70,7 +70,7 @@ describe("retrieveMonthlyStrollerDistance", () => {
   beforeEach(async () => {
     // Clear activities collection
     const snapshot = await db.collection("activities").get();
-    await Promise.all(snapshot.docs.map(doc => doc.ref.delete()));
+    await Promise.all(snapshot.docs.map((doc) => doc.ref.delete()));
   });
 
   afterEach(() => {
@@ -110,8 +110,8 @@ describe("retrieveMonthlyStrollerDistance", () => {
     };
 
     const total = await retrieveMonthlyStrollerDistance(
-      recentActivity,
-      false // miles
+        recentActivity,
+        false, // miles
     );
 
     // 5000 meters ≈ 3.11 miles

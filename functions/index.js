@@ -763,5 +763,5 @@ exports.writeMonthlyData= onSchedule({
 
 // Export for testing
 exports.isAlreadyProcessed = isAlreadyProcessed;
-exports.db = db
-exports.retrieveMonthlyStrollerDistance = retrieveMonthlyStrollerDistance
+exports.db = db;
+exports.retrieveMonthlyStrollerDistance = retrieveMonthlyStrollerDistance;

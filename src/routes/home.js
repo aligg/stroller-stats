@@ -4,6 +4,7 @@ import AnnualStats from "../components/AnnualStats";
 import Leaderboard from "../components/Leaderboard";
 import MonthlyStats from "../components/MonthlyStats";
 import Loading from "../components/Loading"; // Assuming you have a Loading component
+import PreviewCarousel from "../components/PreviewCarousel";
 
 const Home = () => {
     const { REACT_APP_CLIENT_ID } = process.env;
@@ -47,8 +48,10 @@ const Home = () => {
                 <div>
                     <About />
                     <button className="authButton" onClick={handleLogin}>
-                        <img src="/strava-button.png" alt="Connect with Strava" />
+                        <img src="/btn_strava_connect_with_orange.png" alt="Connect with Strava" />
                     </button>
+                    <h1>Connect with Strava to get started <div className="bounceArrow">^</div></h1>
+                    {/* <PreviewCarousel /> */}
                 </div>
             );
         } else {

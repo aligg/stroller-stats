@@ -10,6 +10,8 @@ From the project directory run `npm  start` to run the project locally. Open [ht
 
 From the functions directory, run `firebase deploy --only functions` in order to deploy function changes to google firebase.
 
+Run `firebase emulators:start --only firestore` to run google functions tests
+
 ## Feature requests and code contributions
 
 These are welcome! File an issue and we'll see what we can do.
