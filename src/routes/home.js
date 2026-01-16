@@ -50,7 +50,7 @@ const Home = () => {
                     <button className="authButton" onClick={handleLogin}>
                         <img src="/btn_strava_connect_with_orange.png" alt="Connect with Strava" />
                     </button>
-                    <h1>Connect with Strava to get rolling <div className="bounceArrow">^</div></h1>
+                    <h1>Connect with Strava and let's get rolling! <div className="bounceArrow">^</div></h1>
                     {/* <PreviewCarousel /> */}
                 </div>
             );
