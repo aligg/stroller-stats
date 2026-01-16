@@ -29,7 +29,7 @@ const MonthlyStats = ({userId, optedInToKilometers}) => {
             setLoading(false);
         }
         retrieveData()
-    }, [userId])
+    }, [userId, optedInToKilometers])
 
     const data = [
         {
