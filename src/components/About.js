@@ -3,6 +3,9 @@ import React from "react";
 export const Intro = () => {
   return (
     <ul>
+      <li>
+      Connect with Strava to get started.
+    </li>
     <li>
       Add #strollerstats to the description of any Strava walk or run and
       we'll track your stroller miles (or kilometers) automatically.
