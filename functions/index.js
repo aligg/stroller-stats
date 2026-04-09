@@ -33,7 +33,7 @@ const cors = require("cors")({origin: true});
 
 // Constants
 const STROLLER_STATS_URL = "https://www.strollerstats.com";
-const RUN_TYPES = ["Run", "TrainRun"]
+const RUN_TYPES = ["Run", "TrailRun"];
 app.use(cors);
 
 /**
