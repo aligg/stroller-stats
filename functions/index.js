@@ -272,7 +272,8 @@ const updateDescription = async (recentActivity, accessToken) => {
     updatedDescription = description.concat("\n", `${totalDistance} ${currMonth} pack ${distanceUnit} | ${STROLLER_STATS_URL}`);
   } else {
     totalDistance = await retrieveMonthlyStrollerDistance(recentActivity, isKilometersUser);
-    updatedDescription = description.concat("\n", `${totalDistance} ${currMonth} stroller ${recentActivity.sport_type.toLowerCase()} ${distanceUnit} | ${STROLLER_STATS_URL}`);
+    const activityName = RUN_TYPES.includes(recentActivity.sport_type) ? 'run' : 'walk';
+    updatedDescription = description.concat("\n", `${totalDistance} ${currMonth} stroller ${activityName} ${distanceUnit} | ${STROLLER_STATS_URL}`);
   }
 
   const requestOptions = {
