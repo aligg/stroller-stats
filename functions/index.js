@@ -33,6 +33,7 @@ const cors = require("cors")({origin: true});
 
 // Constants
 const STROLLER_STATS_URL = "https://www.strollerstats.com";
+const RUN_TYPES = ["Run", "TrainRun"]
 app.use(cors);
 
 /**
@@ -91,6 +92,8 @@ const getPartialDistance = (text) => {
 
 
 const formatActivity = (data, isKilometersUser) => {
+  logger.info("DATA");
+  logger.info(data);
   let isStroller = false;
   let isPack = false;
 
@@ -154,7 +157,7 @@ const getActivity = async (accessToken, activityId, isKilometersUser) => {
 
 const addActivityToDB = async (activityData) => {
   if (activityData.is_stroller &&
-    (activityData.sport_type === "Run" || activityData.sport_type === "Walk")) {
+    (RUN_TYPES.includes(activityData.sport_type) || activityData.sport_type === "Walk")) {
     await db.collection("activities").doc(activityData.activity_id.toString())
         .set(activityData).then(() => {
           logger.info("Wrote to DB with stroller activity", activityData);
@@ -248,9 +251,11 @@ const isAlreadyProcessed = (description) => {
 
 const updateDescription = async (recentActivity, accessToken) => {
   const description = recentActivity.description;
+  logger.info("top of update description");
 
   // if already wrote, exit
   if (isAlreadyProcessed(description)) {
+    logger.info("already processed");
     return;
   }
   const userId = recentActivity.user_id;
@@ -479,7 +484,7 @@ app.get("/user-activity-data/:user_id/:year", async (request, res) => {
   // populate annual distance data
   snapshot.forEach((doc) => {
     const dbData = doc.data();
-    if (dbData.sport_type === "Run") {
+    if (RUN_TYPES.includes(dbData.sport_type)) {
       data["total_run_distance"] += getDistance(dbData.distance, isKilometersUser);
       // run_time_seconds = distance (meters) / average_speed (m/s)
       runTime += dbData.distance / dbData.average_speed;
@@ -518,7 +523,7 @@ app.get("/monthly-activities/:user_id", async (request, res) => {
       existingObject[key] += data.distance;
     } else {
       let newObject ={};
-      if (data.sport_type === "Run") {
+      if (RUN_TYPES.includes(data.sport_type)) {
         newObject = {month: monthIdentifier, run_distance: data.distance, walk_distance: 0};
       } else {
         newObject = {month: monthIdentifier, run_distance: 0, walk_distance: data.distance};
