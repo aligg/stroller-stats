@@ -1,6 +1,9 @@
 /* eslint-disable max-len */
 const functions = require("firebase-functions");
 
+// Keep in sync with RUN_TYPES in index.js.
+const RUN_TYPES = ["Run", "TrailRun"];
+
 const getActivityDataForCurrMonth = async (userId, firstName, db) => {
   const currDate = new Date();
   const startOfMonth = new Date(currDate.getFullYear(),
@@ -18,7 +21,8 @@ const getActivityDataForCurrMonth = async (userId, firstName, db) => {
   const monthlyData = {run_distance: 0, walk_distance: 0, first_name: firstName, user_id: userId};
   activities.forEach((doc) => {
     const data = doc.data();
-    const key = `${data.sport_type.toLowerCase()}_distance`;
+    // Collapse all run types into run_distance; everything else is a walk.
+    const key = RUN_TYPES.includes(data.sport_type) ? "run_distance" : "walk_distance";
     monthlyData[key] += data.distance;
   });
   return monthlyData;
@@ -59,3 +63,4 @@ const writeMonthlyData = async (db) => {
 };
 
 exports.writeMonthlyData = writeMonthlyData;
+exports.getActivityDataForCurrMonth = getActivityDataForCurrMonth;

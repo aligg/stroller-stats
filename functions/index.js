@@ -202,25 +202,30 @@ const retrieveMonthlyPackDistance = async (recentActivity, isKilometersUser = fa
 
 const retrieveMonthlyStrollerDistance = async (recentActivity, isKilometersUser = false) => {
   const userId = recentActivity.user_id;
-  const sportType = recentActivity.sport_type;
+  // Treat all run types as one: a run activity sums every RUN_TYPES variant
+  // (Run + TrailRun) for the month.
+  const sportTypes = RUN_TYPES.includes(recentActivity.sport_type) ?
+    RUN_TYPES : [recentActivity.sport_type];
   const date = new Date(recentActivity.start_date);
   const startOfMonth = new Date(date.getFullYear(),
       date.getMonth(), 1).toISOString();
   const startOfNextMonth = new Date(date.getFullYear(),
       date.getMonth() + 1, 1).toISOString();
 
-  const activityRef = db.collection("activities")
-      .where("user_id", "==", userId)
-      .where("sport_type", "==", sportType)
-      .where("start_date", ">=", startOfMonth)
-      .where("start_date", "<", startOfNextMonth)
-      .where("is_stroller", "==", true);
-  const activities = await activityRef.get();
-
   let totalMeters = 0;
-  for (const doc of activities.docs) {
-    const data = doc.data();
-    totalMeters += data.distance;
+  for (const sportType of sportTypes) {
+    const activityRef = db.collection("activities")
+        .where("user_id", "==", userId)
+        .where("sport_type", "==", sportType)
+        .where("start_date", ">=", startOfMonth)
+        .where("start_date", "<", startOfNextMonth)
+        .where("is_stroller", "==", true);
+    const activities = await activityRef.get();
+
+    for (const doc of activities.docs) {
+      const data = doc.data();
+      totalMeters += data.distance;
+    }
   }
   const totalDistance = getDistance(totalMeters, isKilometersUser);
   const roundedTotalDistance = totalDistance.toFixed(2);
@@ -520,7 +525,8 @@ app.get("/monthly-activities/:user_id", async (request, res) => {
     const monthIdentifier = `${year}-${month}`;
     const existingObject = monthlyData.find((obj) => obj.month === monthIdentifier);
     if (existingObject) {
-      const key = `${data.sport_type.toLowerCase()}_distance`;
+      // Collapse all run types into run_distance; everything else is a walk.
+      const key = RUN_TYPES.includes(data.sport_type) ? "run_distance" : "walk_distance";
       existingObject[key] += data.distance;
     } else {
       let newObject ={};

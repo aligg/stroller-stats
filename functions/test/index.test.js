@@ -4,6 +4,7 @@ const firebaseTest = require("firebase-functions-test")();
 
 // We need to import the function after initializing firebase-functions-test
 const {isAlreadyProcessed, retrieveMonthlyStrollerDistance, db} = require("../index");
+const {getActivityDataForCurrMonth} = require("../monthlyData");
 
 describe("isAlreadyProcessed", () => {
   afterEach(() => {
@@ -116,6 +117,131 @@ describe("retrieveMonthlyStrollerDistance", () => {
 
     // 5000 meters ≈ 3.11 miles
     assert.strictEqual(Number(total), 3.11);
+  });
+
+  it("combines Run and TrailRun stroller distance for a run activity", async () => {
+    const userId = "user_456";
+    const startDate = new Date("2025-01-15T08:00:00Z").toISOString();
+
+    // Road run
+    await db.collection("activities").add({
+      user_id: userId,
+      sport_type: "Run",
+      start_date: startDate,
+      distance: 5000, // meters
+      is_stroller: true,
+      is_pack: false,
+    });
+
+    // Trail run in the same month should be added to the run total
+    await db.collection("activities").add({
+      user_id: userId,
+      sport_type: "TrailRun",
+      start_date: startDate,
+      distance: 3000, // meters
+      is_stroller: true,
+      is_pack: false,
+    });
+
+    // A walk that must NOT be counted toward the run total
+    await db.collection("activities").add({
+      user_id: userId,
+      sport_type: "Walk",
+      start_date: startDate,
+      distance: 2000,
+      is_stroller: true,
+      is_pack: false,
+    });
+
+    // Triggered by either run type, the total should cover both
+    const fromRun = await retrieveMonthlyStrollerDistance(
+        {user_id: userId, sport_type: "Run", start_date: startDate}, false);
+    const fromTrailRun = await retrieveMonthlyStrollerDistance(
+        {user_id: userId, sport_type: "TrailRun", start_date: startDate}, false);
+
+    // 8000 meters ≈ 4.97 miles
+    assert.strictEqual(Number(fromRun), 4.97);
+    assert.strictEqual(Number(fromTrailRun), 4.97);
+  });
+
+  it("sums only walks for a walk activity", async () => {
+    const userId = "user_789";
+    const startDate = new Date("2025-01-15T08:00:00Z").toISOString();
+
+    await db.collection("activities").add({
+      user_id: userId,
+      sport_type: "Walk",
+      start_date: startDate,
+      distance: 4000, // meters
+      is_stroller: true,
+      is_pack: false,
+    });
+
+    // Runs must not leak into the walk total
+    await db.collection("activities").add({
+      user_id: userId,
+      sport_type: "Run",
+      start_date: startDate,
+      distance: 5000,
+      is_stroller: true,
+      is_pack: false,
+    });
+
+    const total = await retrieveMonthlyStrollerDistance(
+        {user_id: userId, sport_type: "Walk", start_date: startDate}, false);
+
+    // 4000 meters ≈ 2.49 miles
+    assert.strictEqual(Number(total), 2.49);
+  });
+});
+
+describe("getActivityDataForCurrMonth", () => {
+  beforeEach(async () => {
+    const snapshot = await db.collection("activities").get();
+    await Promise.all(snapshot.docs.map((doc) => doc.ref.delete()));
+  });
+
+  afterEach(() => {
+    firebaseTest.cleanup();
+  });
+
+  it("rolls TrailRun into run_distance and keeps walks separate", async () => {
+    const userId = 12345;
+    // Use the current month so the function's date window includes them.
+    const startDate = new Date().toISOString();
+
+    await db.collection("activities").add({
+      user_id: userId,
+      sport_type: "Run",
+      start_date: startDate,
+      distance: 5000,
+      is_stroller: true,
+      is_pack: false,
+    });
+    await db.collection("activities").add({
+      user_id: userId,
+      sport_type: "TrailRun",
+      start_date: startDate,
+      distance: 3000,
+      is_stroller: true,
+      is_pack: false,
+    });
+    await db.collection("activities").add({
+      user_id: userId,
+      sport_type: "Walk",
+      start_date: startDate,
+      distance: 2000,
+      is_stroller: true,
+      is_pack: false,
+    });
+
+    const data = await getActivityDataForCurrMonth(userId, "Tester", db);
+
+    // Distances stay in meters here (conversion happens on read elsewhere).
+    assert.strictEqual(data.run_distance, 8000);
+    assert.strictEqual(data.walk_distance, 2000);
+    // No junk trailrun_distance field should be created.
+    assert.strictEqual(data.trailrun_distance, undefined);
   });
 });
 
