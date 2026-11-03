@@ -29,7 +29,7 @@ Firebase Cloud Functions + Firestore.
   hook, so deploys fail on lint errors.
 - `npm run deploy` — `firebase deploy --only functions`
 - `npm run logs` — tail deployed function logs
-- Backend uses Node 20.
+- Backend uses Node 22.
 
 ## Architecture
 

@@ -66,7 +66,10 @@ const Leaderboard = ({userId, optedInToKilometers}) => {
         }
         retrieveData()
     }, []);
-    
+
+    // Units arrive from a separate request; wait for them so labels don't flash miles -> km.
+    if (optedInToKilometers === null) return <Loading />
+
     return (
     <>
         <h1>Leaderboard</h1>

@@ -1,17 +1,17 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import Loading from "./Loading";
-import Plot from 'react-plotly.js';
+import Plotly from "plotly.js-basic-dist-min";
+import createPlotlyComponent from "react-plotly.js/factory";
 import { PropTypes } from "prop-types";
 import React from "react";
 import { formatMonthData } from "../utils/formatMonthData";
-  
+
+const Plot = createPlotlyComponent(Plotly);
 
 const MonthlyStats = ({userId, optedInToKilometers}) => {
     const [loading, setLoading] = useState(false);
-    const [months, setMonths] = useState([])
-    const [runMiles, setRuns] = useState([])
-    const [walkMiles, setWalks] = useState([])
+    const [monthlyData, setMonthlyData] = useState([])
     const [oneYear, setOneYear] = useState(true)
     const unitLabel = optedInToKilometers ? "kilometer" : "mile"
 
@@ -20,16 +20,19 @@ const MonthlyStats = ({userId, optedInToKilometers}) => {
             setLoading(true);
             const response = await fetch(`https://us-central1-stroller-stats.cloudfunctions.net/app/monthly-activities/${userId}`)
             const data = await response.json();
-            
-            const [months, runDistances, walkDistances] = formatMonthData(data, optedInToKilometers)
-            setMonths(months)
-            setRuns(runDistances)
-            setWalks(walkDistances)
-            
+            setMonthlyData(data)
             setLoading(false);
         }
         retrieveData()
-    }, [userId, optedInToKilometers])
+    }, [userId])
+
+    const [months, runMiles, walkMiles] = useMemo(
+        () => formatMonthData([...monthlyData], optedInToKilometers),
+        [monthlyData, optedInToKilometers]
+    )
+
+    // Units arrive from a separate request; wait for them so labels don't flash miles -> km.
+    if (optedInToKilometers === null) return <Loading />
 
     const data = [
         {

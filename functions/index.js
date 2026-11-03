@@ -412,10 +412,12 @@ app.get("/user/:user_id", async (request, res) => {
   const userId = request.params.user_id;
   logger.info(userId);
   const doc = await getUser(userId);
-  logger.info("doc", doc);
-  const data = await doc.data();
-  logger.info("Data", data);
-  res.status(200).send(JSON.stringify(data));
+  // Only return non-sensitive fields; the full doc includes Strava tokens.
+  const data = doc.data();
+  res.status(200).send(JSON.stringify({
+    opted_in_leaderboard: data.opted_in_leaderboard,
+    opted_in_kilometers: data.opted_in_kilometers,
+  }));
 });
 
 app.post("/get-access-token/", async (request, res) => {
@@ -427,7 +429,16 @@ app.post("/get-access-token/", async (request, res) => {
 app.post("/update-user/", async (request, res) => {
   const userId = request.body.user_id;
 
-  const userData = request.body;
+  // Allowlist so callers can't overwrite tokens or other fields on the user doc.
+  const userData = {};
+  for (const field of ["opted_in_leaderboard", "opted_in_kilometers"]) {
+    if (typeof request.body[field] === "boolean") {
+      userData[field] = request.body[field];
+    }
+  }
+  if (Object.keys(userData).length === 0) {
+    return res.status(400).send({error: "No updatable fields provided"});
+  }
 
   await db.collection("users").doc(userId.toString())
       .update(userData).then(() => {

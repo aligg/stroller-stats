@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from "react"; // Import useEffect and useState
+import React, { Suspense, lazy, useEffect, useState } from "react"; // Import useEffect and useState
 import {Intro} from "../components/About";
 import AnnualStats from "../components/AnnualStats";
 import Leaderboard from "../components/Leaderboard";
-import MonthlyStats from "../components/MonthlyStats";
 import Loading from "../components/Loading"; // Assuming you have a Loading component
 // import PreviewCarousel from "../components/PreviewCarousel";
+
+// Plotly is large; only logged-in users see the chart, so keep it out of the main bundle.
+const MonthlyStats = lazy(() => import("../components/MonthlyStats"));
 
 const Home = () => {
     const { REACT_APP_CLIENT_ID } = process.env;
@@ -15,13 +17,11 @@ const Home = () => {
     const user_id = localStorage.getItem("user_id");
 
     const [optedInToKilometers, setOptedInToKilometers] = useState(null); // null initially, will be true/false after fetch
-    const [loadingUserPreference, setLoadingUserPreference] = useState(true); // To indicate if user preference is being fetched
 
     useEffect(() => {
         const fetchUserPreference = async () => {
             if (user_id) {
                 try {
-                    setLoadingUserPreference(true);
                     const userResponse = await fetch(`https://us-central1-stroller-stats.cloudfunctions.net/app/user/${user_id}`);
                     if (!userResponse.ok) {
                         throw new Error(`HTTP error! status: ${userResponse.status}`);
@@ -31,11 +31,7 @@ const Home = () => {
                 } catch (error) {
                     console.error("Error fetching user preferences:", error);
                     setOptedInToKilometers(false);
-                } finally {
-                    setLoadingUserPreference(false);
                 }
-            } else {
-                setLoadingUserPreference(false);
             }
         };
 
@@ -60,8 +56,10 @@ const Home = () => {
             return (
                 <>
                     <AnnualStats userId={user_id} />
-                    {loadingUserPreference ? <Loading /> : <MonthlyStats userId={user_id} optedInToKilometers={optedInToKilometers} />}
-                    {loadingUserPreference ? <Loading /> : <Leaderboard userId={user_id} optedInToKilometers={optedInToKilometers} />}
+                    <Suspense fallback={<Loading />}>
+                        <MonthlyStats userId={user_id} optedInToKilometers={optedInToKilometers} />
+                    </Suspense>
+                    <Leaderboard userId={user_id} optedInToKilometers={optedInToKilometers} />
                 </>
             );
         }
