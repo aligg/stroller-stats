@@ -6,6 +6,7 @@ import createPlotlyComponent from "react-plotly.js/factory";
 import { PropTypes } from "prop-types";
 import React from "react";
 import { formatMonthData } from "../utils/formatMonthData";
+import { authFetch } from "../utils/api";
 
 const Plot = createPlotlyComponent(Plotly);
 
@@ -18,7 +19,7 @@ const MonthlyStats = ({userId, optedInToKilometers}) => {
     useEffect(() => {
         const retrieveData = async () => {
             setLoading(true);
-            const response = await fetch(`https://us-central1-stroller-stats.cloudfunctions.net/app/monthly-activities/${userId}`)
+            const response = await authFetch("/me/monthly-activities")
             const data = await response.json();
             setMonthlyData(data)
             setLoading(false);

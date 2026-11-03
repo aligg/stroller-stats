@@ -1,4 +1,4 @@
-import { getFirestore } from "firebase/firestore";
+import { browserLocalPersistence, indexedDBLocalPersistence, initializeAuth } from "firebase/auth";
 import { initializeApp } from "firebase/app";
 
 const firebaseConfig = {
@@ -13,4 +13,8 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app);
+// initializeAuth instead of getAuth leaves out the popup/redirect sign-in code,
+// which we don't use (sign-in is a custom token), to keep the main bundle small.
+export const auth = initializeAuth(app, {
+  persistence: [indexedDBLocalPersistence, browserLocalPersistence],
+});

@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { authFetch } from "../utils/api";
+import { useAuth } from "../utils/auth";
 
 const Settings = () => {
     const navigate = useNavigate();
 
-    const userId = localStorage.getItem("user_id");
+    const { user } = useAuth();
     const [loading, setLoading] = useState(false)
     const [optedInToLeaderboard, setOptedInToLeaderboard] = useState(false);
     const [optedInToKilometers, setOptedInToKilometers] = useState(false);
@@ -12,12 +14,13 @@ const Settings = () => {
 
     useEffect(() => {
         // enforce login
-        if (!userId) {
+        if (!user) {
             navigate("/")
+            return
         }
         const getUser = async () => {
             setLoading(true);
-            const response = await fetch(`https://us-central1-stroller-stats.cloudfunctions.net/app/user/${userId}`)
+            const response = await authFetch("/me")
             const data = await response.json();
             setOptedInToLeaderboard(data.opted_in_leaderboard || false)
             setOptedInToKilometers(data.opted_in_kilometers || false)
@@ -25,22 +28,22 @@ const Settings = () => {
             setLoading(false);
         }
         getUser()
-    }, [navigate, userId])
+    }, [navigate, user])
 
     const updateUserLeaderboard = async (evt) => {
         setOptedInToLeaderboard(evt.target.checked)
         const optedIn = evt.target.checked;
-        await fetch(`https://us-central1-stroller-stats.cloudfunctions.net/app/update-user`, {method: "POST", headers: {
+        await authFetch("/me/settings", {method: "POST", headers: {
             "Content-Type": "application/json",
-          }, body: JSON.stringify({user_id: Number(userId), opted_in_leaderboard: optedIn})})
+          }, body: JSON.stringify({opted_in_leaderboard: optedIn})})
     }
 
     const updateUserKms = async (evt) => {
         setOptedInToKilometers(evt.target.checked)
         const optedIn = evt.target.checked;
-        await fetch(`https://us-central1-stroller-stats.cloudfunctions.net/app/update-user`, {method: "POST", headers: {
+        await authFetch("/me/settings", {method: "POST", headers: {
             "Content-Type": "application/json",
-          }, body: JSON.stringify({user_id: Number(userId), opted_in_kilometers: optedIn})})
+          }, body: JSON.stringify({opted_in_kilometers: optedIn})})
     }
 
 

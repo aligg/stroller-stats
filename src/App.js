@@ -7,18 +7,28 @@ import Nav from "./components/Nav";
 import RedirectComponent from "./routes/redirect";
 import React, { Suspense, lazy } from "react";
 import Loading from "./components/Loading";
+import { AuthProvider, useAuth } from "./utils/auth";
 
 const Settings = lazy(() => import("./components/Settings"));
 const HallOfFame = lazy(() => import("./components/HallOfFame"));
 
 export default function App() {
-  const user_id = localStorage.getItem("user_id");
+  return (
+    <AuthProvider>
+      <AppRoutes />
+    </AuthProvider>
+  );
+}
+
+function AppRoutes() {
+  const { user, loading } = useAuth();
 
   return (
     <BrowserRouter>
     <div id="container">
-    <Nav loggedIn={!!user_id}/>
+    <Nav loggedIn={!!user}/>
         <Suspense fallback={<Loading />}>
+        {loading ? <Loading /> : (
         <Routes>
           <Route
             path="/"
@@ -50,6 +60,7 @@ export default function App() {
           />
           <Route path="*" element={<Navigate to="/"/>}/>
         </Routes>
+        )}
         </Suspense>
         <Footer />
         </div>

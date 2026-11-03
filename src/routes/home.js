@@ -3,6 +3,8 @@ import {Intro} from "../components/About";
 import AnnualStats from "../components/AnnualStats";
 import Leaderboard from "../components/Leaderboard";
 import Loading from "../components/Loading"; // Assuming you have a Loading component
+import { authFetch } from "../utils/api";
+import { useAuth } from "../utils/auth";
 // import PreviewCarousel from "../components/PreviewCarousel";
 
 // Plotly is large; only logged-in users see the chart, so keep it out of the main bundle.
@@ -14,7 +16,10 @@ const Home = () => {
     const handleLogin = () => {
         window.location = `http://www.strava.com/oauth/authorize?client_id=${REACT_APP_CLIENT_ID}&response_type=code&redirect_uri=${redirectUrl}/exchange_token&approval_prompt=force&scope=read,activity:read,activity:write,activity:read_all`;
     };
-    const user_id = localStorage.getItem("user_id");
+    const { user } = useAuth();
+    const user_id = user ? user.uid : null;
+    // Set by the old localStorage-only login; those users need to sign in again once.
+    const needsReconnect = !user && localStorage.getItem("user_id") !== null;
 
     const [optedInToKilometers, setOptedInToKilometers] = useState(null); // null initially, will be true/false after fetch
 
@@ -22,7 +27,7 @@ const Home = () => {
         const fetchUserPreference = async () => {
             if (user_id) {
                 try {
-                    const userResponse = await fetch(`https://us-central1-stroller-stats.cloudfunctions.net/app/user/${user_id}`);
+                    const userResponse = await authFetch("/me");
                     if (!userResponse.ok) {
                         throw new Error(`HTTP error! status: ${userResponse.status}`);
                     }
@@ -42,6 +47,9 @@ const Home = () => {
         if (user_id == null) {
             return (
                 <div>
+                    {needsReconnect && (
+                        <h2>We upgraded how sign-in works. Please reconnect with Strava to see your stats. Your miles are all still here!</h2>
+                    )}
                     <h1>Track your stroller miles with Stroller Stats.</h1>
                     <Intro />
                     <br></br>
