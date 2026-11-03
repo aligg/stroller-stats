@@ -4,10 +4,12 @@ import About from "./components/About";
 import Footer from "./components/Footer";
 import Home from "./routes/home";
 import Nav from "./components/Nav";
-import React from "react";
 import RedirectComponent from "./routes/redirect";
-import Settings from "./components/Settings";
-import HallOfFame from "./components/HallOfFame"
+import React, { Suspense, lazy } from "react";
+import Loading from "./components/Loading";
+
+const Settings = lazy(() => import("./components/Settings"));
+const HallOfFame = lazy(() => import("./components/HallOfFame"));
 
 export default function App() {
   const user_id = localStorage.getItem("user_id");
@@ -16,6 +18,7 @@ export default function App() {
     <BrowserRouter>
     <div id="container">
     <Nav loggedIn={!!user_id}/>
+        <Suspense fallback={<Loading />}>
         <Routes>
           <Route
             path="/"
@@ -47,6 +50,7 @@ export default function App() {
           />
           <Route path="*" element={<Navigate to="/"/>}/>
         </Routes>
+        </Suspense>
         <Footer />
         </div>
     </BrowserRouter>

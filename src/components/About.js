@@ -34,10 +34,12 @@ const About = () => {
           <h1>FAQ</h1>
           <h2>How do I track my stroller stats?</h2>
           <p>
-            Add #strollerstats to your activity description. #strollermiles will
+            After <a href="/">connecting with Strava</a> and granting Stroller Stats
+            permission to access your activities, add #strollerstats to your
+            activity description. #strollermiles will
             work too! You have to update your description at the same time that
             you make a title change so that Strava's webhook will send your
-            changes. Tracking stroller stats works for Run or Walk activity types.
+            changes. Tracking stroller stats works for Run, Trail Run, or Walk activity types.
           </p>
           <h2>How can I add stroller miles from past activities?</h2>
           <p>
