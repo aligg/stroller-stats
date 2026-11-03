@@ -12,7 +12,7 @@
     "test": "FIRESTORE_EMULATOR_HOST=localhost:8080 node --test test/index.test.js"
   },
   "engines": {
-    "node": "20"
+    "node": "22"
   },
   "main": "index.js",
   "dependencies": {
