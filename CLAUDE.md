@@ -35,10 +35,12 @@ Firebase Cloud Functions + Firestore.
 
 ### Three deployed functions (`functions/index.js`)
 1. **`app`** (`onRequest`) — an Express app serving all REST endpoints under
-   `https://us-central1-stroller-stats.cloudfunctions.net/app/...`. Endpoints include
-   `/get-access-token`, `/create-user`, `/update-user`, `/user/:id`,
-   `/user-activity-data/:id/:year`, `/monthly-activities/:id`, `/leaderboard`, `/hall-of-fame`,
-   `/auth-user`.
+   `https://us-central1-stroller-stats.cloudfunctions.net/app/...`. `POST /auth/strava`
+   exchanges the Strava OAuth code server-side and returns a Firebase custom token. The
+   per-user endpoints (`/me`, `/me/settings`, `/me/activity-data/:year`,
+   `/me/monthly-activities`) sit behind `requireAuth`, which verifies the Firebase ID token and
+   sets `request.userId`; never take a user id from the URL or body. `/leaderboard` and
+   `/hall-of-fame` are public.
 2. **`stravaWebhookv2`** (`onRequest`) — Strava webhook receiver. GET handles subscription
    verification (`VERIFY_TOKEN = "STROLLER-STATS"`); POST processes new activity events via
    `handlePost`.
@@ -74,8 +76,10 @@ convert-on-read pattern.
 
 ### Frontend
 React Router app (`src/App.js`) with routes: `/` (home), `/redirect/exchange_token` (Strava OAuth
-callback), `/about`, `/settings`, `/hall-of-fame`. Auth state is just `localStorage.user_id` set
-during the OAuth redirect (`src/routes/redirect.js`). Components fetch data directly from the
+callback), `/about`, `/settings`, `/hall-of-fame`. Auth is Firebase Auth: the OAuth redirect
+(`src/routes/redirect.js`) calls `/auth/strava` and signs in with the custom token; `useAuth()`
+(`src/utils/auth.js`) exposes the user (uid = Strava athlete id), and `authFetch`
+(`src/utils/api.js`) adds the Bearer token. Components fetch data directly from the
 deployed Cloud Function URLs (hardcoded `https://us-central1-stroller-stats.cloudfunctions.net/app/...`)
 rather than from a local backend — note this when developing against local emulators. Charts use
 Plotly via `react-plotly.js`.

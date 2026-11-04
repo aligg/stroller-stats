@@ -18,9 +18,8 @@ const firebaseConfig = {
   measurementId: "G-L9CK7DZZQH",
   credential: applicationDefault(),
 };
-let firebaseApp;
 if (!admin.apps.length) {
-  firebaseApp = admin.initializeApp(firebaseConfig);
+  admin.initializeApp(firebaseConfig);
 }
 const {onRequest} = require("firebase-functions/v2/https");
 const {onSchedule} = require("firebase-functions/v2/scheduler");
@@ -454,11 +453,6 @@ const pickUserSettings = (body) => {
   return userData;
 };
 
-// TODO: remove once the frontend uses /me (unauthenticated).
-app.get("/user/:user_id", async (request, res) => {
-  res.status(200).send(JSON.stringify(await getUserSettings(request.params.user_id)));
-});
-
 app.get("/me", requireAuth, async (request, res) => {
   try {
     res.status(200).send(JSON.stringify(await getUserSettings(request.userId)));
@@ -480,28 +474,6 @@ app.post("/me/settings", requireAuth, async (request, res) => {
     logger.error("Error updating user settings:", error);
     res.status(500).send({error: "Could not update user"});
   }
-});
-
-// TODO: remove once the frontend uses /auth/strava.
-app.post("/get-access-token/", async (request, res) => {
-  const refreshToken = request.body.request_token;
-  const accessResp = await getAccessToken(refreshToken, "authorization_code");
-  res.status(200).send(accessResp);
-});
-
-// TODO: remove once the frontend uses /me/settings (unauthenticated).
-app.post("/update-user/", async (request, res) => {
-  const userId = request.body.user_id;
-  const userData = pickUserSettings(request.body);
-  if (Object.keys(userData).length === 0) {
-    return res.status(400).send({error: "No updatable fields provided"});
-  }
-
-  await db.collection("users").doc(userId.toString())
-      .update(userData).then(() => {
-        logger.info("Wrote user update to DB", userData);
-      });
-  res.status(200).send({"updated_user": userId});
 });
 
 const getAnnualActivityData = async (userId, year) => {
@@ -579,11 +551,6 @@ const getAnnualActivityData = async (userId, year) => {
   return data;
 };
 
-// TODO: remove once the frontend uses /me/activity-data (unauthenticated).
-app.get("/user-activity-data/:user_id/:year", async (request, res) => {
-  res.status(200).send(JSON.stringify(await getAnnualActivityData(request.params.user_id, request.params.year)));
-});
-
 app.get("/me/activity-data/:year", requireAuth, async (request, res) => {
   try {
     res.status(200).send(JSON.stringify(await getAnnualActivityData(request.userId, request.params.year)));
@@ -619,11 +586,6 @@ const getMonthlyActivityData = async (userId) => {
   });
   return monthlyData;
 };
-
-// TODO: remove once the frontend uses /me/monthly-activities (unauthenticated).
-app.get("/monthly-activities/:user_id", async (request, res) => {
-  res.status(200).send(JSON.stringify(await getMonthlyActivityData(request.params.user_id)));
-});
 
 app.get("/me/monthly-activities", requireAuth, async (request, res) => {
   try {
@@ -664,42 +626,6 @@ app.post("/auth/strava", async (request, res) => {
     logger.error("Error signing in with Strava:", error);
     res.status(500).send({error: "Sign-in failed"});
   }
-});
-
-// TODO: remove; mints a token for any caller-supplied id and is unused.
-app.post("/auth-user", async (request, response) => {
-  const accessToken = request.body.access_token;
-  // const userId = request.body.user_id;
-  // Check that a user id exists with that access token.
-  logger.info("top of /auth-user with: ", request.body, accessToken, typeof accessToken);
-  getAuth(firebaseApp)
-      .createCustomToken(accessToken)
-      .then((customToken) => {
-        response.status(200).send({customToken});
-      })
-      .catch((error) => {
-        logger.info("Error creating custom token:", error);
-      });
-});
-
-// TODO: remove once the frontend uses /auth/strava (unauthenticated).
-app.post("/create-user", async (request, response) => {
-  const userId = request.body.user_id;
-
-  const userData = {
-    user_id: userId,
-    access_token: request.body.access_token,
-    refresh_token: request.body.refresh_token,
-    scopes: request.body.scopes,
-    expires_at: request.body.expires_at,
-    first_name: request.body.first_name,
-  };
-
-  await db.collection("users").doc(userId.toString())
-      .set(userData, {merge: true}).then(() => {
-        logger.info("Wrote user to DB", userData);
-      });
-  response.status(200).send("wrote");
 });
 
 const getPrevMonthIdentifier = () => {
@@ -750,7 +676,6 @@ app.get("/leaderboard", async (request, response) => {
   currSnapshot.forEach((doc) => {
     const userMonthlyData = doc.data();
     if (optedInUserIds.includes(userMonthlyData.user_id)) {
-      logger.info("Found:", userMonthlyData);
       currMonthData.push(userMonthlyData);
     }
   });
@@ -761,7 +686,6 @@ app.get("/leaderboard", async (request, response) => {
   snapshot.forEach((doc) => {
     const userMonthlyData = doc.data();
     if (optedInUserIds.includes(userMonthlyData.user_id)) {
-      logger.info(`Found: ${userMonthlyData.first_name}`, userMonthlyData);
       lastMonthData.push(userMonthlyData);
     }
   });
