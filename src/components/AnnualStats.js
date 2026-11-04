@@ -26,30 +26,44 @@ const AnnualStats = ({userId}) => {
     const [index, setIndex] = useState((new Date().getFullYear() - startYear))
     const [data, setData] = useState(null)
     const [loading, setLoading] = useState(false)
+    const [error, setError] = useState(false)
     const currYear = startYear + index
     const distanceLabel = data ? data["distance_unit"] : ""
 
     useEffect(() => {
-        
-        const getData = async (userId) => {
-
-            setLoading(true)
-            if (!userId) {
-                return;
-            }
-            const response = await authFetch(`/me/activity-data/${currYear}`)
-            const data = await response.json();
-            
-            setData(data)
-            setLoading(false)
+        if (!userId) {
+            return;
         }
-       
-        getData(userId)
-    
+        // Ignore responses for a year the user has already tabbed away from.
+        let ignore = false;
+
+        const getData = async () => {
+            setLoading(true)
+            setError(false)
+            try {
+                const response = await authFetch(`/me/activity-data/${currYear}`)
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                if (!ignore) setData(data)
+            } catch (e) {
+                console.error("Error fetching annual stats:", e);
+                if (!ignore) setError(true)
+            } finally {
+                if (!ignore) setLoading(false)
+            }
+        }
+
+        getData()
+        return () => { ignore = true; }
     }, [userId, currYear]);
 
     const renderTabPanelContent = () => {
 
+        if (error) {
+            return <p>Couldn't load your stats. Try refreshing the page.</p>
+        }
         if (loading || data === null) {
             return <Loading/>
         }
@@ -99,7 +113,7 @@ const AnnualStats = ({userId}) => {
 
     return (
     <>
-        {!loading && <h1>{`Annual stroller ${distanceLabel}s`}</h1>}
+        {!loading && data && <h1>{`Annual stroller ${distanceLabel}s`}</h1>}
             <Tabs defaultIndex={index} onSelect={(index) => {setIndex(index)}}>
                 <TabList>
                     {generateTabsForEachYear()}
