@@ -507,10 +507,6 @@ const getAnnualActivityData = async (userId, year) => {
       .where("start_date", "<", nextYear)
       .get();
 
-  if (snapshot.size === 0) {
-    return data;
-  }
-
   // Retrieve pack activities (all sport types combined)
   const packSnapshot = await admin.firestore().collection("activities")
       .where("user_id", "==", Number(userId))
