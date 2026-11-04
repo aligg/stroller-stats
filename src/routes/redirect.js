@@ -24,8 +24,6 @@ const Redirect = () => {
                 }
                 const { customToken } = await response.json()
                 await signInWithCustomToken(auth, customToken)
-                // Pre-Firebase-auth sessions stored only this id; clear it so the reconnect prompt goes away.
-                localStorage.removeItem("user_id");
                 navigate("/", {state: "justLoggedIn"})
             } catch (e) {
                 console.error("Error signing in: ", e);

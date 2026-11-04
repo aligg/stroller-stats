@@ -18,8 +18,6 @@ const Home = () => {
     };
     const { user } = useAuth();
     const user_id = user ? user.uid : null;
-    // Set by the old localStorage-only login; those users need to sign in again once.
-    const needsReconnect = !user && localStorage.getItem("user_id") !== null;
 
     const [optedInToKilometers, setOptedInToKilometers] = useState(null); // null initially, will be true/false after fetch
 
@@ -47,9 +45,6 @@ const Home = () => {
         if (user_id == null) {
             return (
                 <div>
-                    {needsReconnect && (
-                        <h2>We upgraded how sign-in works. Please reconnect with Strava to see your stats. Your miles are all still here!</h2>
-                    )}
                     <h1>Track your stroller miles with Stroller Stats.</h1>
                     <Intro />
                     <br></br>
