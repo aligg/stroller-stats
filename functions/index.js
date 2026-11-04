@@ -37,6 +37,29 @@ const RUN_TYPES = ["Run", "TrailRun"];
 app.use(cors);
 
 /**
+ * Express middleware: verifies the Firebase ID token in the Authorization
+ * header and sets request.userId to the signed-in Strava athlete id.
+ * @param {object} request
+ * @param {object} res
+ * @param {function} next
+ * @return {void}
+ */
+const requireAuth = async (request, res, next) => {
+  const match = (request.get("Authorization") || "").match(/^Bearer (.+)$/);
+  if (!match) {
+    return res.status(401).send({error: "Missing auth token"});
+  }
+  try {
+    const decoded = await getAuth().verifyIdToken(match[1]);
+    request.userId = decoded.uid;
+    return next();
+  } catch (error) {
+    logger.info("Rejected auth token:", error.code);
+    return res.status(401).send({error: "Invalid auth token"});
+  }
+};
+
+/**
  * Retrieve refresh token from the db
  * @param {number} userId
  * @return {number}
@@ -408,34 +431,68 @@ const getIsKilometersUser = async (userId) => {
   }
 };
 
-app.get("/user/:user_id", async (request, res) => {
-  const userId = request.params.user_id;
-  logger.info(userId);
+const getUserSettings = async (userId) => {
   const doc = await getUser(userId);
   // Only return non-sensitive fields; the full doc includes Strava tokens.
   const data = doc.data();
-  res.status(200).send(JSON.stringify({
+  return {
     opted_in_leaderboard: data.opted_in_leaderboard,
     opted_in_kilometers: data.opted_in_kilometers,
-  }));
+  };
+};
+
+// Allowlist so callers can't overwrite tokens or other fields on the user doc.
+const UPDATABLE_USER_FIELDS = ["opted_in_leaderboard", "opted_in_kilometers"];
+
+const pickUserSettings = (body) => {
+  const userData = {};
+  for (const field of UPDATABLE_USER_FIELDS) {
+    if (typeof body[field] === "boolean") {
+      userData[field] = body[field];
+    }
+  }
+  return userData;
+};
+
+// TODO: remove once the frontend uses /me (unauthenticated).
+app.get("/user/:user_id", async (request, res) => {
+  res.status(200).send(JSON.stringify(await getUserSettings(request.params.user_id)));
 });
 
+app.get("/me", requireAuth, async (request, res) => {
+  try {
+    res.status(200).send(JSON.stringify(await getUserSettings(request.userId)));
+  } catch (error) {
+    logger.error("Error fetching user settings:", error);
+    res.status(500).send({error: "Could not load user"});
+  }
+});
+
+app.post("/me/settings", requireAuth, async (request, res) => {
+  const userData = pickUserSettings(request.body);
+  if (Object.keys(userData).length === 0) {
+    return res.status(400).send({error: "No updatable fields provided"});
+  }
+  try {
+    await db.collection("users").doc(request.userId).update(userData);
+    res.status(200).send({"updated_user": request.userId});
+  } catch (error) {
+    logger.error("Error updating user settings:", error);
+    res.status(500).send({error: "Could not update user"});
+  }
+});
+
+// TODO: remove once the frontend uses /auth/strava.
 app.post("/get-access-token/", async (request, res) => {
   const refreshToken = request.body.request_token;
   const accessResp = await getAccessToken(refreshToken, "authorization_code");
   res.status(200).send(accessResp);
 });
 
+// TODO: remove once the frontend uses /me/settings (unauthenticated).
 app.post("/update-user/", async (request, res) => {
   const userId = request.body.user_id;
-
-  // Allowlist so callers can't overwrite tokens or other fields on the user doc.
-  const userData = {};
-  for (const field of ["opted_in_leaderboard", "opted_in_kilometers"]) {
-    if (typeof request.body[field] === "boolean") {
-      userData[field] = request.body[field];
-    }
-  }
+  const userData = pickUserSettings(request.body);
   if (Object.keys(userData).length === 0) {
     return res.status(400).send({error: "No updatable fields provided"});
   }
@@ -447,9 +504,8 @@ app.post("/update-user/", async (request, res) => {
   res.status(200).send({"updated_user": userId});
 });
 
-app.get("/user-activity-data/:user_id/:year", async (request, res) => {
-  const userId = request.params.user_id;
-  const currYear = request.params.year || new Date().getFullYear().toString();
+const getAnnualActivityData = async (userId, year) => {
+  const currYear = year || new Date().getFullYear().toString();
   let nextYear = Number(currYear) + 1;
   nextYear = nextYear.toString();
 
@@ -480,7 +536,7 @@ app.get("/user-activity-data/:user_id/:year", async (request, res) => {
       .get();
 
   if (snapshot.size === 0) {
-    return res.status(200).send(JSON.stringify(data));
+    return data;
   }
 
   // Retrieve pack activities (all sport types combined)
@@ -520,12 +576,24 @@ app.get("/user-activity-data/:user_id/:year", async (request, res) => {
   data["average_run_speed"] = runTime > 0 ? minsPerUnitRun + ":" + secsPerUnitRun.toString().padStart(2, "0") : null;
   data["average_walk_speed"] = walkTime > 0 ? minsPerUnitWalk + ":" + secsPerUnitWalk.toString().padStart(2, "0"): null;
 
-  res.status(200).send(JSON.stringify(data));
+  return data;
+};
+
+// TODO: remove once the frontend uses /me/activity-data (unauthenticated).
+app.get("/user-activity-data/:user_id/:year", async (request, res) => {
+  res.status(200).send(JSON.stringify(await getAnnualActivityData(request.params.user_id, request.params.year)));
 });
 
-app.get("/monthly-activities/:user_id", async (request, res) => {
-  const userId = request.params.user_id;
+app.get("/me/activity-data/:year", requireAuth, async (request, res) => {
+  try {
+    res.status(200).send(JSON.stringify(await getAnnualActivityData(request.userId, request.params.year)));
+  } catch (error) {
+    logger.error("Error fetching annual activity data:", error);
+    res.status(500).send({error: "Could not load activity data"});
+  }
+});
 
+const getMonthlyActivityData = async (userId) => {
   const snapshot = await admin.firestore().collection("activities").where("user_id", "==", Number(userId)).where("is_stroller", "==", true).get();
   const monthlyData = [];
   snapshot.forEach((doc) => {
@@ -549,9 +617,56 @@ app.get("/monthly-activities/:user_id", async (request, res) => {
       monthlyData.push(newObject);
     }
   });
-  res.status(200).send(JSON.stringify(monthlyData));
+  return monthlyData;
+};
+
+// TODO: remove once the frontend uses /me/monthly-activities (unauthenticated).
+app.get("/monthly-activities/:user_id", async (request, res) => {
+  res.status(200).send(JSON.stringify(await getMonthlyActivityData(request.params.user_id)));
 });
 
+app.get("/me/monthly-activities", requireAuth, async (request, res) => {
+  try {
+    res.status(200).send(JSON.stringify(await getMonthlyActivityData(request.userId)));
+  } catch (error) {
+    logger.error("Error fetching monthly activity data:", error);
+    res.status(500).send({error: "Could not load monthly data"});
+  }
+});
+
+// Exchanges a Strava OAuth code server-side so Strava tokens never reach the
+// browser, then returns a Firebase custom token keyed to the athlete id.
+app.post("/auth/strava", async (request, res) => {
+  const {code, scope} = request.body;
+  if (!code) {
+    return res.status(400).send({error: "Missing code"});
+  }
+  try {
+    const tokenResp = await getAccessToken(code, "authorization_code");
+    if (!tokenResp.athlete) {
+      logger.info("Strava code exchange failed:", tokenResp.message);
+      return res.status(401).send({error: "Strava authorization failed"});
+    }
+    const userId = tokenResp.athlete.id;
+    await db.collection("users").doc(userId.toString()).set({
+      user_id: userId,
+      access_token: tokenResp.access_token,
+      refresh_token: tokenResp.refresh_token,
+      scopes: scope,
+      expires_at: tokenResp.expires_at,
+      first_name: tokenResp.athlete.firstname,
+    }, {merge: true});
+    logger.info("Signed in user", userId);
+
+    const customToken = await getAuth().createCustomToken(userId.toString());
+    res.status(200).send({customToken});
+  } catch (error) {
+    logger.error("Error signing in with Strava:", error);
+    res.status(500).send({error: "Sign-in failed"});
+  }
+});
+
+// TODO: remove; mints a token for any caller-supplied id and is unused.
 app.post("/auth-user", async (request, response) => {
   const accessToken = request.body.access_token;
   // const userId = request.body.user_id;
@@ -567,6 +682,7 @@ app.post("/auth-user", async (request, response) => {
       });
 });
 
+// TODO: remove once the frontend uses /auth/strava (unauthenticated).
 app.post("/create-user", async (request, response) => {
   const userId = request.body.user_id;
 

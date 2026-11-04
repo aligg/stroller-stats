@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import Loading from "./Loading";
+import { authFetch } from "../utils/api";
 
 
 const startYear = 2023;
@@ -36,7 +37,7 @@ const AnnualStats = ({userId}) => {
             if (!userId) {
                 return;
             }
-            const response = await fetch(`https://us-central1-stroller-stats.cloudfunctions.net/app/user-activity-data/${userId}/${currYear}`)
+            const response = await authFetch(`/me/activity-data/${currYear}`)
             const data = await response.json();
             
             setData(data)
