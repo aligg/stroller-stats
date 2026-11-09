@@ -783,7 +783,7 @@ app.get("/hall-of-fame", async (req, res) => {
     const runSnap = await db
         .collection("activities")
         .where("is_stroller", "==", true)
-        .where("sport_type", "==", "Run")
+        .where("sport_type", "in", RUN_TYPES)
         .orderBy("distance", "desc")
         .limit(20) // get extra in case some are not opted-in
         .get();
@@ -821,7 +821,7 @@ app.get("/hall-of-fame", async (req, res) => {
       if (!optInUserIds.has(data.user_id)) return;
 
       const year = new Date(data.start_date).getFullYear();
-      if (data.sport_type === "Run") {
+      if (RUN_TYPES.includes(data.sport_type)) {
         runTotals[data.user_id] = (runTotals[data.user_id] || 0) + data.distance;
         if (year === currentYear) runTotalsThisYear[data.user_id] = (runTotalsThisYear[data.user_id] || 0) + data.distance;
       } else if (data.sport_type === "Walk") {
