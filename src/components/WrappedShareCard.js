@@ -19,7 +19,7 @@ const WrappedShareCard = forwardRef(({ data }, ref) => {
     return (
         <div className="wrapped-card" ref={ref}>
             <img className="wrapped-card-logo" src="/logo.png" alt="Stroller Stats" />
-            <p className="wrapped-card-eyebrow">STROLLER_WRAPPED_{year}</p>
+            <p className="wrapped-card-eyebrow">STROLLER WRAPPED {year}</p>
             <p className="wrapped-card-name">{data.first_name.toLowerCase()}'s year</p>
             <p className="wrapped-card-big">
                 {formatDistance(hasStroller ? stroller.total_distance : pack.total_distance, isKm)}
@@ -33,10 +33,10 @@ const WrappedShareCard = forwardRef(({ data }, ref) => {
                         <Stat label="RUNS" value={`${stroller.run_count} · ${formatDistance(stroller.run_distance, isKm, 0)} ${unitShort}`} />
                         <Stat label="WALKS" value={`${stroller.walk_count} · ${formatDistance(stroller.walk_distance, isKm, 0)} ${unitShort}`} />
                         <Stat
-                            label="LONGEST_PUSH"
+                            label="LONGEST PUSH"
                             value={`${formatDistance(stroller.longest.distance, isKm)} ${unitShort}`}
                         />
-                        <Stat label="BUSIEST_MONTH" value={monthName(stroller.busiest_month.month)} />
+                        <Stat label="BUSIEST MONTH" value={monthName(stroller.busiest_month.month)} />
                     </>
                 )}
                 {hasStroller && pack && (

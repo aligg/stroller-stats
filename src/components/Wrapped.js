@@ -99,7 +99,7 @@ const ShareView = ({ data }) => {
             <div className="wrapped-card-offscreen" aria-hidden="true">
                 <WrappedShareCard ref={cardRef} data={data} />
             </div>
-            <p className="wrapped-eyebrow">SHARE_YOUR_WRAPPED</p>
+            <p className="wrapped-eyebrow">SHARE YOUR WRAPPED</p>
             {error && <p>Couldn't make your image. Try refreshing the page.</p>}
             {!error && !previewUrl && <Loading />}
             {previewUrl && (
@@ -174,7 +174,7 @@ const Wrapped = () => {
         return (
             <main className="wrapped">
                 <section className="wrapped-slide">
-                    <p className="wrapped-eyebrow">STROLLER_WRAPPED_{data.year}</p>
+                    <p className="wrapped-eyebrow">STROLLER WRAPPED {data.year}</p>
                     <p className="wrapped-emoji">👀</p>
                     <h1 className="wrapped-headline">no stroller {data.distance_unit}s in {data.year} yet.</h1>
                     <p className="wrapped-sub">add #strollerstats to your next Strava run or walk and we'll start counting.</p>

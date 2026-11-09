@@ -68,7 +68,7 @@ export const buildSlides = (data) => {
     const slides = [{
         key: "intro",
         emoji: "🐣",
-        eyebrow: `STROLLER_WRAPPED_${year}`,
+        eyebrow: `STROLLER WRAPPED ${year}`,
         headline: `hey ${data.first_name} 👋`,
         sub: `let's look back at your ${year} ${hasStroller ? "stroller" : "carrier"} ${unit}s.`,
     }];
@@ -76,14 +76,14 @@ export const buildSlides = (data) => {
     if (hasStroller) {
         slides.push({
             key: "total",
-            eyebrow: "TOTAL_DISTANCE",
+            eyebrow: "TOTAL DISTANCE",
             big: formatDistance(stroller.total_distance, isKm),
             headline: `stroller ${unit}s this year.`,
             sub: distanceComparison(stroller.total_distance),
         });
         slides.push({
             key: "split",
-            eyebrow: "RUN_VS_WALK",
+            eyebrow: "RUN VS WALK",
             headline: `${stroller.run_count} stroller runs + ${stroller.walk_count} stroller walks`,
             sub: `${formatDistance(stroller.run_distance, isKm)} ${unit}s running, ${formatDistance(stroller.walk_distance, isKm)} ${unit}s walking. that's giving cardio.`,
         });
@@ -91,7 +91,7 @@ export const buildSlides = (data) => {
         const title = cleanTitle(longest.title);
         slides.push({
             key: "longest",
-            eyebrow: "LONGEST_PUSH",
+            eyebrow: "LONGEST PUSH",
             big: formatDistance(longest.distance, isKm),
             headline: `${unit}s on ${new Date(longest.start_date).toLocaleDateString("en-US", { month: "long", day: "numeric" })}.`,
             sub: `${title ? `"${title}" — ` : ""}one whole ${sportLabel(longest.sport_type)} with the stroller. the baby slept through it (probably).`,
@@ -99,7 +99,7 @@ export const buildSlides = (data) => {
         const { busiest_month: busiest } = stroller;
         slides.push({
             key: "busiest",
-            eyebrow: "BUSIEST_MONTH",
+            eyebrow: "BUSIEST MONTH",
             headline: `${monthName(busiest.month)} was your month.`,
             sub: `${formatDistance(busiest.distance, isKm)} ${unit}s. hot stroller ${seasonForMonth(busiest.month)} 🔥`,
         });
@@ -108,7 +108,7 @@ export const buildSlides = (data) => {
     if (pack) {
         slides.push({
             key: "pack",
-            eyebrow: "CARRIER_MILES",
+            eyebrow: `CARRIER ${unit.toUpperCase()}S`,
             big: formatDistance(pack.total_distance, isKm),
             headline: `${unit}s with baby in the carrier.`,
             sub: "core strength unlocked 💪",
