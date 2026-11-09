@@ -3,6 +3,7 @@ import {
     cleanTitle,
     defaultWrappedYear,
     distanceComparison,
+    formatPace,
     rankLine,
     shareText,
 } from "../../utils/wrapped";
@@ -45,6 +46,12 @@ describe("copy helpers", () => {
     test("compares small totals to track laps", () => {
         expect(distanceComparison(10000)).toBe("that's 25 laps around a track 🏟️");
     });
+    test("formats pace per mile or km", () => {
+        // 2.75 m/s
+        expect(formatPace(2.75, false)).toBe("9:45 /mi");
+        expect(formatPace(2.75, true)).toBe("6:04 /km");
+        expect(formatPace(null, false)).toBeNull();
+    });
     test("rank lines by placement", () => {
         expect(rankLine(1, 87)).toMatch("main character");
         expect(rankLine(3, 87)).toMatch("podium");
@@ -82,7 +89,7 @@ describe("buildSlides", () => {
 
     test("rank slide says which year it covers", () => {
         const rank = buildSlides(baseData).find((s) => s.key === "rank");
-        expect(rank.eyebrow).toBe("2026 RANK");
+        expect(rank.eyebrow).toBe("2026 LEADERBOARD RANK");
         expect(rank.headline).toBe("of 87 stroller pushers in 2026");
     });
 

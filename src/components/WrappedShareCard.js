@@ -1,5 +1,5 @@
 import { forwardRef } from "react";
-import { cleanTitle, distanceComparison, formatDistance, monthName } from "../utils/wrapped";
+import { cleanTitle, distanceComparison, formatDistance, formatPace, monthName } from "../utils/wrapped";
 
 const Stat = ({ label, value }) => (
     <div className="wrapped-card-stat">
@@ -15,6 +15,21 @@ const WrappedShareCard = forwardRef(({ data }, ref) => {
     const isKm = unit === "kilometer";
     const unitShort = isKm ? "km" : "mi";
     const hasStroller = stroller.total_distance > 0;
+
+    // Carrier and rank are optional. If only one shows, fill the other slot so the grid stays even.
+    const extras = [];
+    if (hasStroller && pack) {
+        extras.push(<Stat key="carrier" label="CARRIER" value={`${formatDistance(pack.total_distance, isKm)} ${unitShort}`} />);
+    }
+    if (leaderboard.opted_in && leaderboard.rank) {
+        extras.push(<Stat key="rank" label={`${year} RANK`} value={`#${leaderboard.rank} of ${leaderboard.participants}${leaderboard.rank === 1 ? " 👑" : ""}`} />);
+    }
+    if (hasStroller && extras.length === 1) {
+        const pace = formatPace(stroller.average_run_speed, isKm);
+        extras.unshift(pace
+            ? <Stat key="pace" label="AVG RUN PACE" value={pace} />
+            : <Stat key="outings" label="STROLLER OUTINGS" value={stroller.activity_count} />);
+    }
 
     return (
         <div className="wrapped-card" ref={ref}>
@@ -39,12 +54,7 @@ const WrappedShareCard = forwardRef(({ data }, ref) => {
                         <Stat label="BUSIEST MONTH" value={monthName(stroller.busiest_month.month)} />
                     </>
                 )}
-                {hasStroller && pack && (
-                    <Stat label="CARRIER" value={`${formatDistance(pack.total_distance, isKm)} ${unitShort}`} />
-                )}
-                {leaderboard.opted_in && leaderboard.rank && (
-                    <Stat label={`${year} RANK`} value={`#${leaderboard.rank} of ${leaderboard.participants}${leaderboard.rank === 1 ? " 👑" : ""}`} />
-                )}
+                {extras}
             </div>
 
             {hasStroller && cleanTitle(stroller.longest.title) && (

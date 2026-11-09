@@ -11,6 +11,18 @@ export const defaultWrappedYear = (now = new Date()) =>
 export const formatDistance = (meters, isKilometers, maxDigits = 1) =>
     getDistance(meters, isKilometers).toLocaleString("en-US", { maximumFractionDigits: maxDigits });
 
+// speed is meters/second; returns e.g. "9:45 /mi", or null without a speed.
+export const formatPace = (speed, isKilometers) => {
+    if (!speed) {
+        return null;
+    }
+    const unitMeters = isKilometers ? 1000 : 1609.344;
+    const totalSeconds = Math.round(unitMeters / speed);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = String(totalSeconds % 60).padStart(2, "0");
+    return `${minutes}:${seconds} /${isKilometers ? "km" : "mi"}`;
+};
+
 export const monthName = (month) =>
     new Date(Date.UTC(2000, month - 1, 1)).toLocaleString("en-US", { month: "long", timeZone: "UTC" });
 
@@ -128,7 +140,7 @@ export const buildSlides = (data) => {
     if (leaderboard.opted_in && leaderboard.rank) {
         slides.push({
             key: "rank",
-            eyebrow: `${year} RANK`,
+            eyebrow: `${year} LEADERBOARD RANK`,
             big: `#${leaderboard.rank}`,
             headline: `of ${leaderboard.participants} stroller pushers in ${year}`,
             sub: rankLine(leaderboard.rank, leaderboard.participants),
