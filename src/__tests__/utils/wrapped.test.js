@@ -79,7 +79,9 @@ describe("buildSlides", () => {
     });
 
     test("rank slide says which year it covers", () => {
-        expect(buildSlides(baseData).find((s) => s.key === "rank").headline).toBe("of 87 stroller pushers in 2026.");
+        const rank = buildSlides(baseData).find((s) => s.key === "rank");
+        expect(rank.eyebrow).toBe("2026 RANK");
+        expect(rank.headline).toBe("of 87 stroller pushers in 2026.");
     });
 
     test("adds a pack slide when there are pack miles", () => {

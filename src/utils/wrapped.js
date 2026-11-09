@@ -128,7 +128,7 @@ export const buildSlides = (data) => {
     if (leaderboard.opted_in && leaderboard.rank) {
         slides.push({
             key: "rank",
-            eyebrow: "LEADERBOARD",
+            eyebrow: `${year} RANK`,
             big: `#${leaderboard.rank}`,
             headline: `of ${leaderboard.participants} stroller pushers in ${year}.`,
             sub: rankLine(leaderboard.rank, leaderboard.participants),
