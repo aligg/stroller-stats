@@ -49,7 +49,7 @@ export const shareText = (data) => {
     const total = stroller.total_distance > 0
         ? `${formatDistance(stroller.total_distance, isKm)} stroller ${data.distance_unit}s`
         : `${formatDistance(pack.total_distance, isKm)} carrier ${data.distance_unit}s`;
-    return `my ${data.year} stroller wrapped: ${total} 🍼 get yours at strollerstats.com`;
+    return `my ${data.year} stroller wrapped: ${total} 🐣 get yours at strollerstats.com`;
 };
 
 /**
@@ -67,7 +67,7 @@ export const buildSlides = (data) => {
 
     const slides = [{
         key: "intro",
-        emoji: "🍼",
+        emoji: "🐣",
         eyebrow: `STROLLER_WRAPPED_${year}`,
         headline: `hey ${data.first_name} 👋`,
         sub: `let's look back at your ${year} in the stroller.`,

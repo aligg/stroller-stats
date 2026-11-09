@@ -54,11 +54,11 @@ describe("copy helpers", () => {
         expect(cleanTitle(null)).toBe("");
     });
     test("share text includes the total and the site", () => {
-        expect(shareText(baseData)).toBe("my 2026 stroller wrapped: 100 stroller miles 🍼 get yours at strollerstats.com");
+        expect(shareText(baseData)).toBe("my 2026 stroller wrapped: 100 stroller miles 🐣 get yours at strollerstats.com");
     });
     test("share text falls back to carrier miles for pack-only users", () => {
         const data = { ...baseData, stroller: { ...baseData.stroller, total_distance: 0 }, pack: { total_distance: 8046.72, activity_count: 2 } };
-        expect(shareText(data)).toBe("my 2026 stroller wrapped: 5 carrier miles 🍼 get yours at strollerstats.com");
+        expect(shareText(data)).toBe("my 2026 stroller wrapped: 5 carrier miles 🐣 get yours at strollerstats.com");
     });
 });
 

@@ -24,7 +24,7 @@ const WrappedShareCard = forwardRef(({ data }, ref) => {
             <p className="wrapped-card-big">
                 {formatDistance(hasStroller ? stroller.total_distance : pack.total_distance, isKm)}
             </p>
-            <p className="wrapped-card-unit">{hasStroller ? "stroller" : "carrier"} {unit}s 🍼</p>
+            <p className="wrapped-card-unit">{hasStroller ? "stroller" : "carrier"} {unit}s 🐣</p>
             {hasStroller && <p className="wrapped-card-comparison">{distanceComparison(stroller.total_distance)}</p>}
 
             <div className="wrapped-card-stats">
