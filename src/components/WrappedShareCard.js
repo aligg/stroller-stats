@@ -1,5 +1,5 @@
 import { forwardRef } from "react";
-import { cleanTitle, distanceComparison, formatDistance, monthName } from "../utils/wrapped";
+import { cleanTitle, formatDistance, marathonsRunLine, monthName } from "../utils/wrapped";
 
 const Stat = ({ label, value }) => (
     <div className="wrapped-card-stat">
@@ -15,6 +15,7 @@ const WrappedShareCard = forwardRef(({ data }, ref) => {
     const isKm = unit === "kilometer";
     const unitShort = isKm ? "km" : "mi";
     const hasStroller = stroller.total_distance > 0;
+    const marathonLine = marathonsRunLine(stroller.run_distance);
 
     return (
         <div className="wrapped-card" ref={ref}>
@@ -25,13 +26,13 @@ const WrappedShareCard = forwardRef(({ data }, ref) => {
                 {formatDistance(hasStroller ? stroller.total_distance : pack.total_distance, isKm)}
             </p>
             <p className="wrapped-card-unit">{hasStroller ? "stroller" : "carrier"} {unit}s 🐣</p>
-            {hasStroller && <p className="wrapped-card-comparison">{distanceComparison(stroller.total_distance)}</p>}
+            {marathonLine && <p className="wrapped-card-comparison">{marathonLine}</p>}
 
             <div className="wrapped-card-stats">
                 {hasStroller && (
                     <>
-                        <Stat label="RUNS" value={`${stroller.run_count} · ${formatDistance(stroller.run_distance, isKm, 0)} ${unitShort}`} />
-                        <Stat label="WALKS" value={`${stroller.walk_count} · ${formatDistance(stroller.walk_distance, isKm, 0)} ${unitShort}`} />
+                        <Stat label="STROLLER RUNS" value={`${formatDistance(stroller.run_distance, isKm, 0)} ${unitShort}`} />
+                        <Stat label="STROLLER WALKS" value={`${formatDistance(stroller.walk_distance, isKm, 0)} ${unitShort}`} />
                         <Stat
                             label="LONGEST PUSH"
                             value={`${formatDistance(stroller.longest.distance, isKm)} ${unitShort}`}

@@ -30,6 +30,15 @@ export const distanceComparison = (meters) => {
     return `that's ${laps.toLocaleString("en-US")} laps around a track 🏟️`;
 };
 
+// Uses run distance only, since the copy says "run". Null until there's a full marathon.
+export const marathonsRunLine = (runMeters) => {
+    const marathons = Math.floor(runMeters / MARATHON_METERS);
+    if (marathons < 1) {
+        return null;
+    }
+    return `that's more than ${marathons} marathon${marathons === 1 ? "" : "s"} run with the stroller.`;
+};
+
 export const rankLine = (rank, participants) => {
     if (rank === 1) return "👑 main character behavior";
     if (rank <= 3) return "🏆 podium energy";
