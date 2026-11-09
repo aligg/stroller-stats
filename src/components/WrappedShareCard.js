@@ -1,5 +1,5 @@
 import { forwardRef } from "react";
-import { cleanTitle, formatDistance, marathonsLine, monthName } from "../utils/wrapped";
+import { cleanTitle, distanceComparison, formatDistance, monthName } from "../utils/wrapped";
 
 const Stat = ({ label, value }) => (
     <div className="wrapped-card-stat">
@@ -15,7 +15,6 @@ const WrappedShareCard = forwardRef(({ data }, ref) => {
     const isKm = unit === "kilometer";
     const unitShort = isKm ? "km" : "mi";
     const hasStroller = stroller.total_distance > 0;
-    const marathonLine = marathonsLine(stroller.total_distance);
 
     return (
         <div className="wrapped-card" ref={ref}>
@@ -26,7 +25,7 @@ const WrappedShareCard = forwardRef(({ data }, ref) => {
                 {formatDistance(hasStroller ? stroller.total_distance : pack.total_distance, isKm)}
             </p>
             <p className="wrapped-card-unit">{hasStroller ? "stroller" : "carrier"} {unit}s 🐣</p>
-            {marathonLine && <p className="wrapped-card-comparison">{marathonLine}</p>}
+            {hasStroller && <p className="wrapped-card-comparison">{distanceComparison(stroller.total_distance)}</p>}
 
             <div className="wrapped-card-stats">
                 {hasStroller && (

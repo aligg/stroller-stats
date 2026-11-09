@@ -24,19 +24,10 @@ const seasonForMonth = (month) => {
 export const distanceComparison = (meters) => {
     const marathons = meters / MARATHON_METERS;
     if (marathons >= 2) {
-        return `that's ${marathons.toFixed(1)} marathons, stroller edition.`;
+        return `that's ${marathons.toFixed(1)} marathons with the stroller.`;
     }
     const laps = Math.round(meters / TRACK_LAP_METERS);
     return `that's ${laps.toLocaleString("en-US")} laps around a track 🏟️`;
-};
-
-// Combined run + walk distance, in whole marathons. Null until there's a full marathon.
-export const marathonsLine = (meters) => {
-    const marathons = Math.floor(meters / MARATHON_METERS);
-    if (marathons < 1) {
-        return null;
-    }
-    return `that's more than ${marathons} marathon${marathons === 1 ? "" : "s"} with the stroller.`;
 };
 
 export const rankLine = (rank, participants) => {

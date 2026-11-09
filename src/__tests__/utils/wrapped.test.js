@@ -3,7 +3,6 @@ import {
     cleanTitle,
     defaultWrappedYear,
     distanceComparison,
-    marathonsLine,
     rankLine,
     shareText,
 } from "../../utils/wrapped";
@@ -39,16 +38,12 @@ describe("defaultWrappedYear", () => {
 
 describe("copy helpers", () => {
     test("compares big totals to marathons", () => {
-        expect(distanceComparison(160934.4)).toBe("that's 3.8 marathons, stroller edition.");
+        // 150 miles
+        expect(distanceComparison(241401.6)).toBe("that's 5.7 marathons with the stroller.");
+        expect(distanceComparison(160934.4)).toBe("that's 3.8 marathons with the stroller.");
     });
     test("compares small totals to track laps", () => {
         expect(distanceComparison(10000)).toBe("that's 25 laps around a track 🏟️");
-    });
-    test("marathons line counts whole marathons of combined distance", () => {
-        // 150 miles is 5.7 marathons
-        expect(marathonsLine(241401.6)).toBe("that's more than 5 marathons with the stroller.");
-        expect(marathonsLine(50000)).toBe("that's more than 1 marathon with the stroller.");
-        expect(marathonsLine(30000)).toBeNull();
     });
     test("rank lines by placement", () => {
         expect(rankLine(1, 87)).toMatch("main character");
