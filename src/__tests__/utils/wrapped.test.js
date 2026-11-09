@@ -78,6 +78,10 @@ describe("buildSlides", () => {
         expect(slides.find((s) => s.key === "total").headline).toBe("stroller kilometers this year.");
     });
 
+    test("rank slide says which year it covers", () => {
+        expect(buildSlides(baseData).find((s) => s.key === "rank").headline).toBe("of 87 stroller pushers in 2026.");
+    });
+
     test("adds a pack slide when there are pack miles", () => {
         const slides = buildSlides({ ...baseData, pack: { total_distance: 8046.72, activity_count: 2 } });
         expect(keys(slides)).toContain("pack");

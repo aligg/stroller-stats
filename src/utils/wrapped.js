@@ -130,7 +130,7 @@ export const buildSlides = (data) => {
             key: "rank",
             eyebrow: "LEADERBOARD",
             big: `#${leaderboard.rank}`,
-            headline: `of ${leaderboard.participants} stroller pushers.`,
+            headline: `of ${leaderboard.participants} stroller pushers in ${year}.`,
             sub: rankLine(leaderboard.rank, leaderboard.participants),
         });
     } else if (!leaderboard.opted_in) {

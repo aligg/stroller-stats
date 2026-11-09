@@ -43,7 +43,7 @@ const WrappedShareCard = forwardRef(({ data }, ref) => {
                     <Stat label="CARRIER" value={`${formatDistance(pack.total_distance, isKm)} ${unitShort}`} />
                 )}
                 {leaderboard.opted_in && leaderboard.rank && (
-                    <Stat label="LEADERBOARD" value={`#${leaderboard.rank} of ${leaderboard.participants}${leaderboard.rank === 1 ? " 👑" : ""}`} />
+                    <Stat label={`${year} RANK`} value={`#${leaderboard.rank} of ${leaderboard.participants}${leaderboard.rank === 1 ? " 👑" : ""}`} />
                 )}
             </div>
 
