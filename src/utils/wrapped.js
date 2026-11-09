@@ -70,7 +70,7 @@ export const buildSlides = (data) => {
         emoji: "🐣",
         eyebrow: `STROLLER_WRAPPED_${year}`,
         headline: `hey ${data.first_name} 👋`,
-        sub: `let's look back at your ${year} in the stroller.`,
+        sub: `let's look back at your ${year} ${hasStroller ? "stroller" : "carrier"} ${unit}s.`,
     }];
 
     if (hasStroller) {

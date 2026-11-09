@@ -67,6 +67,11 @@ describe("buildSlides", () => {
         expect(keys(buildSlides(baseData))).toEqual(["intro", "total", "split", "longest", "busiest", "rank", "share"]);
     });
 
+    test("intro mentions the user's units", () => {
+        expect(buildSlides(baseData)[0].sub).toBe("let's look back at your 2026 stroller miles.");
+        expect(buildSlides({ ...baseData, distance_unit: "kilometer" })[0].sub).toBe("let's look back at your 2026 stroller kilometers.");
+    });
+
     test("uses kilometers when the user prefers them", () => {
         const slides = buildSlides({ ...baseData, distance_unit: "kilometer" });
         expect(slides.find((s) => s.key === "total").big).toBe("160.9");
