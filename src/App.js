@@ -11,6 +11,7 @@ import { AuthProvider, useAuth } from "./utils/auth";
 
 const Settings = lazy(() => import("./components/Settings"));
 const HallOfFame = lazy(() => import("./components/HallOfFame"));
+const Wrapped = lazy(() => import("./components/Wrapped"));
 
 export default function App() {
   return (
@@ -58,6 +59,7 @@ function AppRoutes() {
                 <HallOfFame />
             }
           />
+          <Route path="/wrapped" element={<Wrapped />} />
           <Route path="*" element={<Navigate to="/"/>}/>
         </Routes>
         )}
