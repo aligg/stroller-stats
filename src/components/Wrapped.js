@@ -87,13 +87,6 @@ const ShareView = ({ data }) => {
         downloadFile(file);
     };
 
-    // Bluesky's compose link only takes text, so save the image for the user to attach.
-    const bluesky = () => {
-        trackShare("bluesky");
-        downloadFile(file);
-        window.open(`https://bsky.app/intent/compose?text=${encodeURIComponent(text)}`, "_blank", "noopener");
-    };
-
     return (
         <section className="wrapped-share">
             <div className="wrapped-card-offscreen" aria-hidden="true">
@@ -108,14 +101,7 @@ const ShareView = ({ data }) => {
                     <div className="wrapped-share-buttons">
                         {canShareFile && <button className="wrapped-button primary" onClick={share}>Share</button>}
                         <button className={`wrapped-button${canShareFile ? "" : " primary"}`} onClick={download}>Download image</button>
-                        <button className="wrapped-button" onClick={bluesky}>Post on Bluesky</button>
                     </div>
-                    <p className="wrapped-hint">
-                        {canShareFile
-                            ? "Posting to Instagram? Tap Share and pick Instagram to add it to your story."
-                            : "Posting to Instagram? Download the image, then share it from your phone."}
-                        {" "}For Bluesky, attach the image we just saved.
-                    </p>
                 </>
             )}
         </section>

@@ -505,12 +505,6 @@ td > a {
   margin-top: 20px;
 }
 
-.wrapped-hint {
-  font-size: 0.85rem;
-  color: var(--wrapped-light);
-  text-align: center;
-  margin: 16px 0 0;
-}
 
 /* Share card: fixed 360x640 so the exported PNG is always 1080x1920 */
 .wrapped-card-offscreen {
