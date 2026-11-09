@@ -9,7 +9,8 @@
     "start": "npm run shell",
     "deploy": "firebase deploy --only functions",
     "logs": "firebase functions:log",
-    "test": "FIRESTORE_EMULATOR_HOST=localhost:8080 node --test test/index.test.js"
+    "test": "FIRESTORE_EMULATOR_HOST=localhost:8080 node --test test/index.test.js",
+    "test:unit": "node --test test/wrapped.test.js"
   },
   "engines": {
     "node": "22"

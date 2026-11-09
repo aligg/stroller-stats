@@ -6,6 +6,7 @@ const {applicationDefault} = require("firebase-admin/app");
 
 const {getAuth} = require("firebase-admin/auth");
 const {writeMonthlyData} = require("./monthlyData");
+const {computeWrapped} = require("./wrapped");
 
 
 const firebaseConfig = {
@@ -589,6 +590,81 @@ app.get("/me/monthly-activities", requireAuth, async (request, res) => {
   } catch (error) {
     logger.error("Error fetching monthly activity data:", error);
     res.status(500).send({error: "Could not load monthly data"});
+  }
+});
+
+const WRAPPED_START_YEAR = 2023;
+// Rank needs every user's activities for the year; cache per warm instance so
+// each Wrapped view doesn't re-read the whole year.
+const YEAR_ACTIVITIES_TTL_MS = 60 * 60 * 1000;
+const yearActivitiesCache = new Map();
+
+const getYearActivities = async (year) => {
+  const cached = yearActivitiesCache.get(year);
+  if (cached && Date.now() - cached.fetchedAt < YEAR_ACTIVITIES_TTL_MS) {
+    return cached.activities;
+  }
+  const snapshot = await db.collection("activities")
+      .where("start_date", ">=", `${year}`)
+      .where("start_date", "<", `${year + 1}`)
+      .get();
+  const activities = snapshot.docs.map((doc) => {
+    const data = doc.data();
+    return {user_id: data.user_id, distance: data.distance, is_stroller: data.is_stroller};
+  });
+  yearActivitiesCache.set(year, {activities, fetchedAt: Date.now()});
+  return activities;
+};
+
+const getUserActivitiesForYear = async (userId, year, flag) => {
+  const snapshot = await db.collection("activities")
+      .where("user_id", "==", userId)
+      .where(flag, "==", true)
+      .where("start_date", ">=", `${year}`)
+      .where("start_date", "<", `${year + 1}`)
+      .get();
+  return snapshot.docs.map((doc) => doc.data());
+};
+
+app.get("/me/wrapped/:year", requireAuth, async (request, res) => {
+  const year = Number(request.params.year);
+  if (!Number.isInteger(year) || year < WRAPPED_START_YEAR || year > new Date().getFullYear()) {
+    return res.status(400).send({error: "Invalid year"});
+  }
+  try {
+    const userId = Number(request.userId);
+    const [userDoc, strollerActivities, packActivities] = await Promise.all([
+      getUser(userId),
+      getUserActivitiesForYear(userId, year, "is_stroller"),
+      getUserActivitiesForYear(userId, year, "is_pack"),
+    ]);
+    const user = userDoc.data();
+
+    let leaderboardUserIds = null;
+    let yearActivities = [];
+    if (user.opted_in_leaderboard) {
+      const [optedInSnap, activities] = await Promise.all([
+        db.collection("users").where("opted_in_leaderboard", "==", true).get(),
+        getYearActivities(year),
+      ]);
+      leaderboardUserIds = new Set(optedInSnap.docs.map((doc) => doc.data().user_id));
+      yearActivities = activities;
+    }
+
+    res.status(200).send({
+      year,
+      first_name: user.first_name,
+      distance_unit: user.opted_in_kilometers ? "kilometer" : "mile",
+      ...computeWrapped({
+        activities: [...strollerActivities, ...packActivities],
+        yearActivities,
+        leaderboardUserIds,
+        userId,
+      }),
+    });
+  } catch (error) {
+    logger.error("Error building wrapped:", error);
+    res.status(500).send({error: "Could not load wrapped"});
   }
 });
 
