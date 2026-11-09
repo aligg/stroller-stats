@@ -1,3 +1,4 @@
+import { closestRoute } from "./distanceRoutes";
 import { getDistance } from "./getDistance";
 
 const MARATHON_METERS = 42195;
@@ -35,6 +36,15 @@ export const rankLine = (rank, participants) => {
     const percentile = Math.ceil((rank / participants) * 100);
     if (percentile <= 50) return `top ${percentile}% of stroller pushers. we love to see it.`;
     return "every mile counts and yours did 💙";
+};
+
+export const routeLine = (meters, unit) => {
+    const route = closestRoute(meters);
+    if (!route) {
+        return `every ${unit} counts 💙`;
+    }
+    const comparison = route.farther ? "farther than" : "about";
+    return `combined, that's ${comparison} the distance from ${route.from} to ${route.to} as the crow flies 🗺️`;
 };
 
 // Strip #strollerstats-style tags so the title reads like the user wrote it.
@@ -85,7 +95,7 @@ export const buildSlides = (data) => {
             key: "split",
             eyebrow: "RUN VS WALK",
             headline: `${stroller.run_count} stroller runs + ${stroller.walk_count} stroller walks`,
-            sub: `${formatDistance(stroller.run_distance, isKm)} ${unit}s running, ${formatDistance(stroller.walk_distance, isKm)} ${unit}s walking. that's giving cardio.`,
+            sub: `${formatDistance(stroller.run_distance, isKm)} ${unit}s running, ${formatDistance(stroller.walk_distance, isKm)} ${unit}s walking. ${routeLine(stroller.total_distance, unit)}`,
         });
         const { longest } = stroller;
         const title = cleanTitle(longest.title);
