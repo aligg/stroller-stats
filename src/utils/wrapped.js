@@ -31,8 +31,8 @@ export const distanceComparison = (meters) => {
 };
 
 export const rankLine = (rank, participants) => {
-    if (rank === 1) return "👑 main character behavior.";
-    if (rank <= 3) return "🏆 podium energy.";
+    if (rank === 1) return "👑 main character behavior";
+    if (rank <= 3) return "🏆 podium energy";
     const percentile = Math.ceil((rank / participants) * 100);
     if (percentile <= 50) return `top ${percentile}% of stroller pushers. we love to see it.`;
     return "every mile counts and yours did 💙";
@@ -88,7 +88,7 @@ export const buildSlides = (data) => {
             key: "total",
             eyebrow: "TOTAL DISTANCE",
             big: formatDistance(stroller.total_distance, isKm),
-            headline: `stroller ${unit}s this year.`,
+            headline: `stroller ${unit}s this year`,
             sub: distanceComparison(stroller.total_distance),
         });
         slides.push({
@@ -103,7 +103,7 @@ export const buildSlides = (data) => {
             key: "longest",
             eyebrow: "LONGEST PUSH",
             big: formatDistance(longest.distance, isKm),
-            headline: `${unit}s on ${new Date(longest.start_date).toLocaleDateString("en-US", { month: "long", day: "numeric" })}.`,
+            headline: `${unit}s on ${new Date(longest.start_date).toLocaleDateString("en-US", { month: "long", day: "numeric" })}`,
             sub: `${title ? `"${title}" — ` : ""}one whole ${sportLabel(longest.sport_type)} with the stroller. the baby slept through it (probably).`,
         });
         const { busiest_month: busiest } = stroller;
@@ -120,7 +120,7 @@ export const buildSlides = (data) => {
             key: "pack",
             eyebrow: `CARRIER ${unit.toUpperCase()}S`,
             big: formatDistance(pack.total_distance, isKm),
-            headline: `${unit}s with baby in the carrier.`,
+            headline: `${unit}s with baby in the carrier`,
             sub: "core strength unlocked 💪",
         });
     }
@@ -130,7 +130,7 @@ export const buildSlides = (data) => {
             key: "rank",
             eyebrow: `${year} RANK`,
             big: `#${leaderboard.rank}`,
-            headline: `of ${leaderboard.participants} stroller pushers in ${year}.`,
+            headline: `of ${leaderboard.participants} stroller pushers in ${year}`,
             sub: rankLine(leaderboard.rank, leaderboard.participants),
         });
     } else if (!leaderboard.opted_in) {

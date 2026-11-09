@@ -75,13 +75,13 @@ describe("buildSlides", () => {
     test("uses kilometers when the user prefers them", () => {
         const slides = buildSlides({ ...baseData, distance_unit: "kilometer" });
         expect(slides.find((s) => s.key === "total").big).toBe("160.9");
-        expect(slides.find((s) => s.key === "total").headline).toBe("stroller kilometers this year.");
+        expect(slides.find((s) => s.key === "total").headline).toBe("stroller kilometers this year");
     });
 
     test("rank slide says which year it covers", () => {
         const rank = buildSlides(baseData).find((s) => s.key === "rank");
         expect(rank.eyebrow).toBe("2026 RANK");
-        expect(rank.headline).toBe("of 87 stroller pushers in 2026.");
+        expect(rank.headline).toBe("of 87 stroller pushers in 2026");
     });
 
     test("adds a pack slide when there are pack miles", () => {

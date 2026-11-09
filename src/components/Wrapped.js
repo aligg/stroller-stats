@@ -176,7 +176,7 @@ const Wrapped = () => {
                 <section className="wrapped-slide">
                     <p className="wrapped-eyebrow">STROLLER WRAPPED {data.year}</p>
                     <p className="wrapped-emoji">👀</p>
-                    <h1 className="wrapped-headline">no stroller {data.distance_unit}s in {data.year} yet.</h1>
+                    <h1 className="wrapped-headline">no stroller {data.distance_unit}s in {data.year} yet</h1>
                     <p className="wrapped-sub">add #strollerstats to your next Strava run or walk and we'll start counting.</p>
                     <a className="wrapped-link" href="/about">how it works →</a>
                 </section>
