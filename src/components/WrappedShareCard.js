@@ -1,5 +1,5 @@
 import { forwardRef } from "react";
-import { cleanTitle, formatDistance, marathonsRunLine, monthName } from "../utils/wrapped";
+import { cleanTitle, formatDistance, marathonsLine, monthName } from "../utils/wrapped";
 
 const Stat = ({ label, value }) => (
     <div className="wrapped-card-stat">
@@ -15,7 +15,7 @@ const WrappedShareCard = forwardRef(({ data }, ref) => {
     const isKm = unit === "kilometer";
     const unitShort = isKm ? "km" : "mi";
     const hasStroller = stroller.total_distance > 0;
-    const marathonLine = marathonsRunLine(stroller.run_distance);
+    const marathonLine = marathonsLine(stroller.total_distance);
 
     return (
         <div className="wrapped-card" ref={ref}>
