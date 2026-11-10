@@ -1,5 +1,5 @@
 import { forwardRef } from "react";
-import { cleanTitle, distanceComparison, formatDistance, formatPace, monthName } from "../utils/wrapped";
+import { distanceComparison, formatDistance, formatPace, monthName } from "../utils/wrapped";
 
 const Stat = ({ label, value }) => (
     <div className="wrapped-card-stat">
@@ -29,7 +29,6 @@ const WrappedShareCard = forwardRef(({ data }, ref) => {
     }
     candidates.push(<Stat key="busiest" label="BUSIEST MONTH" value={busiestMonth} />);
     const extras = hasStroller && candidates.length >= 2 ? candidates.slice(0, 2) : [];
-    const busiestInGrid = extras.some((stat) => stat.key === "busiest");
 
     return (
         <div className="wrapped-card" ref={ref}>
@@ -56,16 +55,6 @@ const WrappedShareCard = forwardRef(({ data }, ref) => {
                 )}
                 {extras}
             </div>
-
-            {hasStroller && cleanTitle(stroller.longest.title) && (
-                <p className="wrapped-card-quote">longest push: "{cleanTitle(stroller.longest.title)}"</p>
-            )}
-            {hasStroller && !busiestInGrid && (
-                <p className="wrapped-card-note">busiest month: {busiestMonth}</p>
-            )}
-            {hasStroller && pack && (
-                <p className="wrapped-card-note">plus {formatDistance(pack.total_distance, isKm)} {unit}s in the carrier 💪</p>
-            )}
 
             <div className="wrapped-card-footer">
                 <span className="wrapped-card-url">strollerstats.com</span>

@@ -595,20 +595,7 @@ td > a {
   font-weight: 700;
 }
 
-.wrapped-card-quote {
-  margin-top: 16px !important;
-  font-size: 13px;
-  color: #90e0ef;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
 
-.wrapped-card-note {
-  margin-top: 6px !important;
-  font-size: 13px;
-  color: #90e0ef;
-}
 
 .wrapped-card-footer {
   margin-top: auto;
