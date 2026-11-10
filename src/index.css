@@ -605,6 +605,12 @@ td > a {
   -webkit-box-orient: vertical;
 }
 
+.wrapped-card-note {
+  margin-top: 6px !important;
+  font-size: 13px;
+  color: #90e0ef;
+}
+
 .wrapped-card-footer {
   margin-top: auto;
   display: flex;

@@ -16,20 +16,18 @@ const WrappedShareCard = forwardRef(({ data }, ref) => {
     const unitShort = isKm ? "km" : "mi";
     const hasStroller = stroller.total_distance > 0;
 
-    // Carrier and rank are optional. If only one shows, fill the other slot so the grid stays even.
-    const extras = [];
-    if (hasStroller && pack) {
-        extras.push(<Stat key="carrier" label="CARRIER" value={`${formatDistance(pack.total_distance, isKm)} ${unitShort}`} />);
+    // Last grid row: pace and rank when available, outing count as the fallback.
+    // A lone extra would leave a gap in the 2-column grid, so show two or none.
+    const pace = formatPace(stroller.average_run_speed, isKm);
+    const candidates = [];
+    if (pace) {
+        candidates.push(<Stat key="pace" label="AVG RUN PACE" value={pace} />);
     }
     if (leaderboard.opted_in && leaderboard.rank) {
-        extras.push(<Stat key="rank" label={`${year} RANK`} value={`#${leaderboard.rank} of ${leaderboard.participants}${leaderboard.rank === 1 ? " 👑" : ""}`} />);
+        candidates.push(<Stat key="rank" label={`${year} RANK`} value={`#${leaderboard.rank} of ${leaderboard.participants}${leaderboard.rank === 1 ? " 👑" : ""}`} />);
     }
-    if (hasStroller && extras.length === 1) {
-        const pace = formatPace(stroller.average_run_speed, isKm);
-        extras.unshift(pace
-            ? <Stat key="pace" label="AVG RUN PACE" value={pace} />
-            : <Stat key="outings" label="STROLLER OUTINGS" value={stroller.activity_count} />);
-    }
+    candidates.push(<Stat key="outings" label="STROLLER OUTINGS" value={stroller.activity_count} />);
+    const extras = hasStroller && candidates.length >= 2 ? candidates.slice(0, 2) : [];
 
     return (
         <div className="wrapped-card" ref={ref}>
@@ -59,6 +57,9 @@ const WrappedShareCard = forwardRef(({ data }, ref) => {
 
             {hasStroller && cleanTitle(stroller.longest.title) && (
                 <p className="wrapped-card-quote">longest push: "{cleanTitle(stroller.longest.title)}"</p>
+            )}
+            {hasStroller && pack && (
+                <p className="wrapped-card-note">plus {formatDistance(pack.total_distance, isKm)} {unit}s in the carrier 💪</p>
             )}
 
             <div className="wrapped-card-footer">
