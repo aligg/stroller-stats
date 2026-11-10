@@ -361,3 +361,256 @@ td > a {
   }
 }
 
+
+/* Stroller Wrapped */
+.wrapped {
+  --wrapped-navy: #03045e;
+  --wrapped-mint: #00f5d4;
+  --wrapped-sky: #00bbf9;
+  --wrapped-light: #90e0ef;
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.wrapped-progress {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.wrapped-progress span {
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: #d6d6e7;
+}
+
+.wrapped-progress span.done {
+  background: var(--wrapped-navy);
+}
+
+.wrapped-slide,
+.wrapped-share {
+  background: var(--wrapped-navy);
+  color: #fff;
+  border-radius: 24px;
+  padding: 32px 24px;
+  min-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.wrapped-slide {
+  cursor: pointer;
+  user-select: none;
+}
+
+.wrapped-share {
+  align-items: center;
+}
+
+.wrapped-eyebrow {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  color: var(--wrapped-light);
+  margin: 0 0 16px;
+}
+
+.wrapped-emoji {
+  font-size: 3rem;
+  margin: 0;
+}
+
+.wrapped-big {
+  font-size: clamp(3.5rem, 18vw, 6rem);
+  font-weight: 900;
+  line-height: 1;
+  color: var(--wrapped-mint);
+  margin: 0;
+}
+
+.wrapped-headline {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 12px 0;
+}
+
+.wrapped-sub {
+  font-size: 1.1rem;
+  color: var(--wrapped-light);
+  margin: 0;
+}
+
+.wrapped-link {
+  display: inline-block;
+  margin-top: 20px;
+  color: var(--wrapped-mint);
+  font-weight: 700;
+}
+
+.wrapped-tap {
+  margin: 32px 0 0;
+  font-size: 0.8rem;
+  opacity: 0.6;
+}
+
+.wrapped-controls {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 12px;
+}
+
+.wrapped-button {
+  font-family: "Inter";
+  font-size: 1rem;
+  font-weight: 700;
+  padding: 10px 18px;
+  border-radius: 999px;
+  border: 2px solid var(--wrapped-navy);
+  background: #fff;
+  color: var(--wrapped-navy);
+  cursor: pointer;
+}
+
+.wrapped-button:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.wrapped-share .wrapped-button {
+  border-color: var(--wrapped-mint);
+}
+
+.wrapped-button.primary {
+  background: var(--wrapped-mint);
+}
+
+.wrapped-preview {
+  width: 100%;
+  max-width: 300px;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.wrapped-share-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+
+/* Share card: fixed 360x640 so the exported PNG is always 1080x1920 */
+.wrapped-card-offscreen {
+  position: fixed;
+  left: -10000px;
+  top: 0;
+}
+
+.wrapped-card {
+  width: 360px;
+  height: 640px;
+  box-sizing: border-box;
+  padding: 28px 24px 20px;
+  display: flex;
+  flex-direction: column;
+  background: #03045e;
+  color: #fff;
+  font-family: "Inter", sans-serif;
+}
+
+.wrapped-card p {
+  margin: 0;
+}
+
+.wrapped-card-logo {
+  width: 120px;
+  margin-bottom: 20px;
+}
+
+.wrapped-card-eyebrow {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: #90e0ef;
+}
+
+.wrapped-card-name {
+  font-size: 20px;
+  font-weight: 700;
+  margin-top: 6px !important;
+}
+
+.wrapped-card-big {
+  font-size: 84px;
+  font-weight: 900;
+  line-height: 1;
+  color: #00f5d4;
+  margin-top: 18px !important;
+}
+
+.wrapped-card-unit {
+  font-size: 18px;
+  font-weight: 700;
+  margin-top: 4px !important;
+}
+
+.wrapped-card-comparison {
+  font-size: 14px;
+  color: #90e0ef;
+  margin-top: 6px !important;
+}
+
+.wrapped-card-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.wrapped-card-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(0, 187, 249, 0.18);
+}
+
+.wrapped-card-stat-label {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  color: #90e0ef;
+}
+
+.wrapped-card-stat-value {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+
+
+.wrapped-card-footer {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.wrapped-card-url {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 15px;
+  font-weight: 700;
+  color: #00f5d4;
+}
+
+.wrapped-card-strava {
+  width: 110px;
+}

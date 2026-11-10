@@ -44,6 +44,29 @@ describe("computeWrapped", () => {
     assert.strictEqual(result.stroller.activity_count, 3);
   });
 
+  it("averages run speed across runs, weighted by distance", () => {
+    const result = computeWrapped({
+      activities: [
+        activity({distance: 5000, average_speed: 2.5}), // 2000 s
+        activity({distance: 10000, average_speed: 2}), // 5000 s
+        activity({distance: 3000, sport_type: "Walk", average_speed: 1.5}),
+        activity({distance: 4000, average_speed: 0}), // no speed recorded, skipped
+      ],
+      leaderboardUserIds: null,
+      userId: ME,
+    });
+    assert.strictEqual(result.stroller.average_run_speed, 15000 / 7000);
+  });
+
+  it("has no run speed without runs", () => {
+    const result = computeWrapped({
+      activities: [activity({sport_type: "Walk", average_speed: 1.5})],
+      leaderboardUserIds: null,
+      userId: ME,
+    });
+    assert.strictEqual(result.stroller.average_run_speed, null);
+  });
+
   it("finds the longest stroller activity", () => {
     const result = computeWrapped({
       activities: [

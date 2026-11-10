@@ -46,7 +46,11 @@ const computeWrapped = ({activities, yearActivities = [], leaderboardUserIds, us
     walk_count: 0,
     longest: null,
     busiest_month: null,
+    average_run_speed: null,
   };
+  // Pace only counts runs that have a recorded speed.
+  let timedRunDistance = 0;
+  let runSeconds = 0;
   const pack = {total_distance: 0, activity_count: 0};
 
   for (const activity of activities) {
@@ -54,6 +58,10 @@ const computeWrapped = ({activities, yearActivities = [], leaderboardUserIds, us
       if (RUN_TYPES.includes(activity.sport_type)) {
         stroller.run_distance += activity.distance;
         stroller.run_count += 1;
+        if (activity.average_speed > 0) {
+          timedRunDistance += activity.distance;
+          runSeconds += activity.distance / activity.average_speed;
+        }
       } else if (activity.sport_type === "Walk") {
         stroller.walk_distance += activity.distance;
         stroller.walk_count += 1;
@@ -76,6 +84,11 @@ const computeWrapped = ({activities, yearActivities = [], leaderboardUserIds, us
       pack.total_distance += activity.distance;
       pack.activity_count += 1;
     }
+  }
+
+  if (runSeconds > 0) {
+    // meters per second; the client turns it into min/mile or min/km.
+    stroller.average_run_speed = timedRunDistance / runSeconds;
   }
 
   if (stroller.total_distance > 0) {

@@ -28,6 +28,7 @@ const Nav = ({loggedIn}) => {
                     <li><a href="/">Home</a></li>
                     <li><a href="/about">About+FAQ </a></li>
                     <li><a href="/hall-of-fame">Hall of Fame </a></li>
+                    <li><a href="/wrapped">Wrapped 🎁</a></li>
                     <li><a href="/settings">Settings </a></li>
                     <li><a href="/" onClick={logout}>Logout</a></li>
                 </div>)}
