@@ -16,9 +16,10 @@ const WrappedShareCard = forwardRef(({ data }, ref) => {
     const unitShort = isKm ? "km" : "mi";
     const hasStroller = stroller.total_distance > 0;
 
-    // Last grid row: pace and rank when available, outing count as the fallback.
+    // Last grid row: pace and rank when available, busiest month as the fallback.
     // A lone extra would leave a gap in the 2-column grid, so show two or none.
     const pace = formatPace(stroller.average_run_speed, isKm);
+    const busiestMonth = hasStroller ? monthName(stroller.busiest_month.month) : null;
     const candidates = [];
     if (pace) {
         candidates.push(<Stat key="pace" label="AVG RUN PACE" value={pace} />);
@@ -26,8 +27,9 @@ const WrappedShareCard = forwardRef(({ data }, ref) => {
     if (leaderboard.opted_in && leaderboard.rank) {
         candidates.push(<Stat key="rank" label={`${year} RANK`} value={`#${leaderboard.rank} of ${leaderboard.participants}${leaderboard.rank === 1 ? " 👑" : ""}`} />);
     }
-    candidates.push(<Stat key="outings" label="STROLLER OUTINGS" value={stroller.activity_count} />);
+    candidates.push(<Stat key="busiest" label="BUSIEST MONTH" value={busiestMonth} />);
     const extras = hasStroller && candidates.length >= 2 ? candidates.slice(0, 2) : [];
+    const busiestInGrid = extras.some((stat) => stat.key === "busiest");
 
     return (
         <div className="wrapped-card" ref={ref}>
@@ -49,7 +51,7 @@ const WrappedShareCard = forwardRef(({ data }, ref) => {
                             label="LONGEST PUSH"
                             value={`${formatDistance(stroller.longest.distance, isKm)} ${unitShort}`}
                         />
-                        <Stat label="BUSIEST MONTH" value={monthName(stroller.busiest_month.month)} />
+                        <Stat label="STROLLER OUTINGS" value={stroller.activity_count} />
                     </>
                 )}
                 {extras}
@@ -57,6 +59,9 @@ const WrappedShareCard = forwardRef(({ data }, ref) => {
 
             {hasStroller && cleanTitle(stroller.longest.title) && (
                 <p className="wrapped-card-quote">longest push: "{cleanTitle(stroller.longest.title)}"</p>
+            )}
+            {hasStroller && !busiestInGrid && (
+                <p className="wrapped-card-note">busiest month: {busiestMonth}</p>
             )}
             {hasStroller && pack && (
                 <p className="wrapped-card-note">plus {formatDistance(pack.total_distance, isKm)} {unit}s in the carrier 💪</p>

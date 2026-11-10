@@ -600,9 +600,8 @@ td > a {
   font-size: 13px;
   color: #90e0ef;
   overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .wrapped-card-note {
